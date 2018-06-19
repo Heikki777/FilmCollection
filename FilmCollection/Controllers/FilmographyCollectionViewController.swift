@@ -265,27 +265,24 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                     var loaded: Float = 0
                     let thingsToLoad: Float = 1
                     
-                    self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-                    
-                    let progressChanged: (String) -> () = { (infoMessage) in
-                        print(infoMessage)
-                        loaded += 1
-                        progress = loaded / thingsToLoad
-                        loadingIndicator.setProgress(progress)
-                        if loaded == thingsToLoad{
-                            loadingIndicator.finish()
+                    self.tabBarController?.present(loadingIndicator, animated: true, completion: {
+                        
+                        let progressChanged: (String) -> () = { (infoMessage) in
+                            print(infoMessage)
+                            loaded += 1
+                            progress = loaded / thingsToLoad
+                            loadingIndicator.setProgress(progress)
+                            if loaded == thingsToLoad{
+                                loadingIndicator.finish()
+                            }
                         }
-                    }
-                    
-                    loadingIndicator.setProgress(progress)
-                    attempt{
-                        self.api.loadMovie(id, append: ["credits"]).ensure { progressChanged("Movie loaded") }
-                    }
-                    .done{ (movie) in
-                        if let filmCollectionVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
-                            return vc is FilmCollectionTableViewController
-                        }).first as? FilmCollectionTableViewController){
-                            
+                        
+                        loadingIndicator.setProgress(progress)
+                        
+                        attempt{
+                            self.api.loadMovie(id, append: ["credits"]).ensure { progressChanged("Movie loaded") }
+                        }
+                        .done{ (movie) in
                             if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
                                 return vc is FilmDetailViewController
                             }).first as? FilmDetailViewController){
@@ -293,14 +290,12 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                                 filmDetailVC.movie = movie
                                 filmDetailVC.setup()
                                 self.navigationController?.popToViewController(filmDetailVC, animated: true)
-                                
                             }
                         }
-                        
-                    }
-                    .catch{ (error) in
-                        print(error.localizedDescription)
-                    }
+                        .catch{ (error) in
+                            print(error.localizedDescription)
+                        }
+                    })
                 })
             
                 alert.addAction(showMovieDetailAction)

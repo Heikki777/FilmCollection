@@ -160,12 +160,10 @@ class FilmDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        setContentHeight()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        //setup()
         setContentHeight()
         
         var movieIsInCollection = false
@@ -395,6 +393,9 @@ class FilmDetailViewController: UIViewController {
                 self.crewCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
             }
         })
+        
+        setContentHeight()
+        scrollView.scrollToTop()
     }
     
     func showAlert(title: String, message: String){
@@ -851,5 +852,12 @@ extension FilmDetailViewController: UICollectionViewDelegate{
 
 enum FilmDetailViewControllerError: Error{
     case movieIsNil
+}
+
+extension UIScrollView{
+    func scrollToTop(){
+        let desiredOffset = CGPoint(x: 0, y: -contentInset.top)
+        setContentOffset(desiredOffset, animated: true)
+    }
 }
 

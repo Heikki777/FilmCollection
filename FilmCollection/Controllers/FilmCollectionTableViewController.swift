@@ -60,12 +60,14 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     func reset(){
-        self.movies.removeAll()
-        self.movieDict.removeAll()
-        self.filteredMovieDict.removeAll()
-        self.sections.removeAll()
-        self.filteredSections.removeAll()
+        print("reset()")
+        self.movies = []
+        self.movieDict = [:]
+        self.filteredMovieDict = [:]
+        self.sections = []
+        self.filteredSections = []
         tableView.reloadData()
+        print("movies.count: \(movies.count)")
     }
     
     override func viewDidLoad() {
@@ -81,10 +83,13 @@ class FilmCollectionTableViewController: UIViewController {
         let loadingIndicator = LoadingIndicatorViewController(title: "Loading movies", message: "", complete: nil)
         self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
         
-        databaseRef.child("user-movies").child(user.uid).observe(.value) { (snapshot) in
-            self.reset()
+        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { (snapshot) in
             
             if let dbMovies = snapshot.value as? [String:AnyObject]{
+                
+                print("Movie list value changed: \(dbMovies.count)")
+                self.reset()
+
                 for (_,dbMovie) in dbMovies{
                     if let id = dbMovie["id"] as? Int, let rating = dbMovie["rating"] as? Int{
                         attempt{
@@ -119,9 +124,10 @@ class FilmCollectionTableViewController: UIViewController {
                 }
             }
         }
-        /*
+        
         // Listen for new movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
+            print("childAdded")
             // Use this handler only if the movies have been loaded
             guard !self.movies.isEmpty else{
                 return
@@ -157,7 +163,6 @@ class FilmCollectionTableViewController: UIViewController {
                     print(error.localizedDescription)
                 }
                 .finally {
-                    loadingIndicator.message = movie.title
                     self.movies.append(movie)
                     _ = self.addMovieToDictionary(movie)
                     self.setNavigationBarTitle("\(self.movies.count) movies")
@@ -167,7 +172,6 @@ class FilmCollectionTableViewController: UIViewController {
                 print(error.localizedDescription)
             }
         })
-        */
         
         // Listen for changed movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childChanged, with: { (dataSnapshot) in
