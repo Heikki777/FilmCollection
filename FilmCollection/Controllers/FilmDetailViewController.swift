@@ -562,7 +562,6 @@ class FilmDetailViewController: UIViewController {
             self.show(vc, sender: self)
         }
     }
-
 }
 
 // MARK: - UIViewControllerPreviewingDelegate
@@ -575,6 +574,8 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
                 if let image = self.bigPosterImage {
                     previewingContext.sourceRect = self.view.convert(imageView.frame, from: contentView)
+                
+                    vc.identifier = "Poster"
                     vc.image = image
                     vc.preferredContentSize = image.size
                     return vc
@@ -587,6 +588,7 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
         if let castIndexPath = castCollectionView.indexPathForItem(at: castCollectionViewPoint){
             if let cell = castCollectionView.cellForItem(at: castIndexPath) as? CastCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
+        
                     if let image = cell.imageView.image {
                         vc.image = image
                         vc.preferredContentSize = image.size
@@ -595,7 +597,7 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
                         let y = cell.frame.minY
                         let viewPoint = view.convert(CGPoint(x: x, y: y), from: castCollectionView)
                         previewingContext.sourceRect = CGRect(origin: viewPoint, size: resizedImageRect.size)
-
+                        
                         return vc
                     }
                 }
@@ -607,13 +609,16 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
         if let crewIndexPath = crewCollectionView.indexPathForItem(at: crewCollectionViewPoint){
             if let cell = crewCollectionView.cellForItem(at: crewIndexPath) as? CrewCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
+                    
                     if let image = cell.imageView.image {
                         vc.image = image
+    
                         let resizedImageRect = cell.imageView.contentClippingRect
                         let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
                         let y = cell.frame.minY
                         let viewPoint = view.convert(CGPoint(x: x, y: y), from: crewCollectionView)
                         previewingContext.sourceRect = CGRect(origin: viewPoint, size: resizedImageRect.size)
+                        
                         return vc
                     }
                 }
@@ -624,28 +629,55 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
     }
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
-        if previewingContext.sourceView == imageView{
-            guard movie != nil else{
-                return
-            }
+        
+        guard let imagePreviewVC = viewControllerToCommit as? ImagePreviewController else{
+            return
+        }
+        
+        if imagePreviewVC.identifier == "Poster"{
             
-            guard let images = images else{
-                return
-            }
-            
-            guard !images.isEmpty else{
-                return
-            }
-
-            if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
-
-                vc.images = images
-
-                if vc.images.count > 0{
-                    vc.preferredContentSize = CGSize(width: 0, height: 0)
+            let showMovieImagesPageVC = {
+                guard let images = self.images else{
+                    return
                 }
-
-                show(vc, sender: self)
+                
+                if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
+                    
+                    vc.images = images
+                    
+                    if vc.images.count > 0{
+                        vc.preferredContentSize = CGSize(width: 0, height: 0)
+                    }
+                    
+                    self.show(vc, sender: self)
+                }
+            }
+            
+            guard movie != nil else{
+                print("Movie is nil")
+                return
+            }
+            
+            if images == nil{
+                attempt{
+                    self.loadMovieImages()
+                }
+                .done { (movieImages) in
+                    self.images = movieImages
+                    if movieImages.isEmpty{
+                        return
+                    }
+                    else{
+                        showMovieImagesPageVC()
+                    }
+                }
+                .catch({ (error) in
+                    print(error.localizedDescription)
+                    return
+                })
+            }
+            else{
+                showMovieImagesPageVC()
             }
         }
     }

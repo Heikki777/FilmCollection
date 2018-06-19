@@ -744,7 +744,7 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.66422420739999999" green="0.66424006219999998" blue="0.66423153879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.91669274038611115" green="0.39725872539444446" blue="0.054883665536111098" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="sQ4-rh-9eZ" firstAttribute="centerX" secondItem="LMo-2C-S2t" secondAttribute="centerX" id="3Fr-Iu-Pkt"/>
                             <constraint firstItem="LMo-2C-S2t" firstAttribute="trailing" secondItem="sQ4-rh-9eZ" secondAttribute="trailing" constant="60" id="DGR-uI-3C1"/>
@@ -826,7 +826,7 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.66422420739999999" green="0.66424006219999998" blue="0.66423153879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.062689887152777776" green="0.12508888474277777" blue="0.43666643147222217" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="O1Z-nO-ZgT" firstAttribute="top" secondItem="DIj-3s-f3p" secondAttribute="bottom" constant="8" id="3QP-6t-PZI"/>
                             <constraint firstItem="hds-c3-8Fk" firstAttribute="top" secondItem="O1Z-nO-ZgT" secondAttribute="bottom" constant="25" id="E9j-QS-sl7"/>
@@ -1543,6 +1543,7 @@
         <image name="visible" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="TiP-cO-AZq"/>
+        <segue reference="mMb-JN-Bid"/>
+        <segue reference="OZX-FN-kvo"/>
     </inferredMetricsTieBreakers>
 </document>

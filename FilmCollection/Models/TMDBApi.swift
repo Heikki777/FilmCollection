@@ -30,7 +30,7 @@ class TMDBApi{
     static let posterImageBaseURL: String = "https://image.tmdb.org/t/p/"
     static let version: Int = 3
     
-    private let apiKey: String = API_KEY
+    private let apiKey: String = "a62c4199a4ee1f2fcec39ddffc60199f"
     
     private init(){
         return
@@ -62,10 +62,11 @@ class TMDBApi{
             var urlString = "\(TMDBApi.baseURL)\(TMDBApi.version)/search/movie?api_key=\(self.apiKey)&query=\(query)&language=en-US&include_adult=false"
             urlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             let url = URL.init(string: urlString)!
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -108,10 +109,11 @@ class TMDBApi{
     func loadVideos(_ movieId: Int, retryCount: Int = 0) -> Promise<[Video]> {
         return Promise { result in
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/videos?api_key=\(self.apiKey)&language=en-US")!
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -133,10 +135,11 @@ class TMDBApi{
             }
         
             let url = TMDBApi.getPosterURL(size: size, imagePath: path) 
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -153,10 +156,11 @@ class TMDBApi{
     func loadCredits(forPersonWithID id: Int) -> Promise<(crew: [CrewMember], cast: [CastMember])>{
         return Promise { result in
             let url = URL(string: "https://api.themoviedb.org/3/person/\(id)/movie_credits?api_key=\(self.apiKey)&language=en-US")!
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -198,9 +202,11 @@ class TMDBApi{
             var numberOfPosterImagesLoaded = 0
             var numberOfBackdropImagesLoaded = 0
             
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+            
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -272,10 +278,11 @@ class TMDBApi{
     func loadCredits(_ movieId: Int, retryCount: Int = 0) -> Promise<Credits> {
         return Promise { result in
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/credits?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }
@@ -292,10 +299,11 @@ class TMDBApi{
     func loadPersonDetails(_ personId: Int) -> Promise<PersonDetailInformation> {
         return Promise { result in
             let url = URL(string: "https://api.themoviedb.org/3/person/\(personId)?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
-            
+            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+
             Alamofire.request(url)
             .validate()
-            .responseData(completionHandler: { (response) in
+            .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
                     result.reject(error)
                 }

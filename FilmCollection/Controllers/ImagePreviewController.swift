@@ -12,6 +12,7 @@ class ImagePreviewController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
     
+    var identifier: String = ""
     var image: UIImage?
     
     override func viewDidLoad() {
