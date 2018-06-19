@@ -257,12 +257,15 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                     movieAdditionAlert.addAction(okAction)
                     self.present(movieAdditionAlert, animated: true, completion: nil)
                 })
+                
                 // Show movie detail action
                 let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
                     let loadingIndicator = LoadingIndicatorViewController(title: "Loading movie", message: movieTitle, complete: nil)
                     var progress: Float = 0
                     var loaded: Float = 0
                     let thingsToLoad: Float = 1
+                    
+                    self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
                     
                     let progressChanged: (String) -> () = { (infoMessage) in
                         print(infoMessage)
@@ -279,9 +282,6 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                         self.api.loadMovie(id, append: ["credits"]).ensure { progressChanged("Movie loaded") }
                     }
                     .done{ (movie) in
-                        print("DONE")
-                        print(movie.title)
-
                         if let filmCollectionVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
                             return vc is FilmCollectionTableViewController
                         }).first as? FilmCollectionTableViewController){

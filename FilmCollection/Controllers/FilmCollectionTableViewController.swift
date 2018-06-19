@@ -81,11 +81,6 @@ class FilmCollectionTableViewController: UIViewController {
         let loadingIndicator = LoadingIndicatorViewController(title: "Loading movies", message: "", complete: nil)
         self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
         
-        var moviesCount: UInt = 0{
-            didSet{
-                self.setNavigationBarTitle("\(self.movies.count) movies")
-            }
-        }
         databaseRef.child("user-movies").child(user.uid).observe(.value) { (snapshot) in
             self.reset()
             
@@ -96,7 +91,6 @@ class FilmCollectionTableViewController: UIViewController {
                             self.api.loadMovie(id, append: ["credits"])
                         }
                         .done{ movie in
-                            moviesCount += 1
                             movie.review = dbMovie["review"] as? String ?? ""
                             movie.rating = Rating.all[rating]
                             // Load the small poster images for the tableView
@@ -111,9 +105,9 @@ class FilmCollectionTableViewController: UIViewController {
                                 print(error.localizedDescription)
                             }
                             .finally {
-                                loadingIndicator.setProgress(Float(moviesCount) / Float(dbMovies.count))
                                 loadingIndicator.message = movie.title
                                 self.movies.append(movie)
+                                loadingIndicator.setProgress(Float(self.movies.count) / Float(dbMovies.count))
                                 _ = self.addMovieToDictionary(movie)
                                 self.setNavigationBarTitle("\(self.movies.count) movies")
                             }
@@ -125,7 +119,6 @@ class FilmCollectionTableViewController: UIViewController {
                 }
             }
         }
-
         /*
         // Listen for new movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
@@ -178,15 +171,13 @@ class FilmCollectionTableViewController: UIViewController {
         
         // Listen for changed movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childChanged, with: { (dataSnapshot) in
-            print("Movie changed")
-            print(dataSnapshot)
+
             guard let snapshotValue = dataSnapshot.value as? [String:AnyObject] else {
                 return
             }
             
             if let id = snapshotValue["id"] as? Int, let movie = (self.movies.filter { $0.id == id }).first{
                 // Rating changed
-                print("\(movie.title) changed")
                 if let rating = snapshotValue["rating"] as? Int{
                     movie.rating = Rating.all[rating]
                     if let indexPath = self.getIndexPath(for: movie){
@@ -198,8 +189,6 @@ class FilmCollectionTableViewController: UIViewController {
         
         // Listen for deleted movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childRemoved, with: { (dataSnapshot) in
-            print("Movie removed")
-            print(dataSnapshot)
             if let value = dataSnapshot.value as? [String:Any]{
                 if let id = value["id"] as? Int {
                     if let movie = self.getMovie(withId: id), let indexPath = self.getIndexPath(for: movie){
