@@ -569,6 +569,7 @@ class FilmDetailViewController: UIViewController {
 extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         
+        // Movie poster
         let posterPoint = self.imageView.convert(location, from: view)
         if imageView.bounds.contains(posterPoint){
             if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
@@ -581,29 +582,38 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             }
         }
         
+        // Cast member
         let castCollectionViewPoint = castCollectionView.convert(location, from: view)
         if let castIndexPath = castCollectionView.indexPathForItem(at: castCollectionViewPoint){
             if let cell = castCollectionView.cellForItem(at: castIndexPath) as? CastCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
                     if let image = cell.imageView.image {
-                        let viewPoint = view.convert(cell.frame.origin, from: castCollectionView)
                         vc.image = image
                         vc.preferredContentSize = image.size
-                        previewingContext.sourceRect = CGRect(origin: viewPoint, size: cell.frame.size)
+                        let resizedImageRect = cell.imageView.contentClippingRect
+                        let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
+                        let y = cell.frame.minY
+                        let viewPoint = view.convert(CGPoint(x: x, y: y), from: castCollectionView)
+                        previewingContext.sourceRect = CGRect(origin: viewPoint, size: resizedImageRect.size)
+
                         return vc
                     }
                 }
             }
         }
+        
+        // Crew member
         let crewCollectionViewPoint = crewCollectionView.convert(location, from: view)
         if let crewIndexPath = crewCollectionView.indexPathForItem(at: crewCollectionViewPoint){
             if let cell = crewCollectionView.cellForItem(at: crewIndexPath) as? CrewCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
                     if let image = cell.imageView.image {
-                        let viewPoint = view.convert(cell.frame.origin, from: crewCollectionView)
                         vc.image = image
-                        vc.preferredContentSize = image.size
-                        previewingContext.sourceRect = CGRect(origin: viewPoint, size: cell.frame.size)
+                        let resizedImageRect = cell.imageView.contentClippingRect
+                        let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
+                        let y = cell.frame.minY
+                        let viewPoint = view.convert(CGPoint(x: x, y: y), from: crewCollectionView)
+                        previewingContext.sourceRect = CGRect(origin: viewPoint, size: resizedImageRect.size)
                         return vc
                     }
                 }

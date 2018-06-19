@@ -906,7 +906,7 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.66422420739999999" green="0.66424006219999998" blue="0.66423153879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.1561439037322998" green="0.19246660338507759" blue="0.27276174227396649" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="jUg-OP-qpS" firstAttribute="top" secondItem="Xsu-XO-jXO" secondAttribute="bottom" constant="33" id="48X-9F-H2i"/>
                             <constraint firstItem="jUg-OP-qpS" firstAttribute="leading" secondItem="AxA-re-tSv" secondAttribute="leading" constant="60" id="8Kt-ql-1tf"/>
@@ -1543,6 +1543,6 @@
         <image name="visible" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="OZX-FN-kvo"/>
+        <segue reference="TiP-cO-AZq"/>
     </inferredMetricsTieBreakers>
 </document>

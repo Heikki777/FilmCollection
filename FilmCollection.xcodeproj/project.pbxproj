@@ -40,6 +40,7 @@
 		C313D02620221BD600BB658C /* Segue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C313D02520221BD600BB658C /* Segue.swift */; };
 		C31BC9D12040337100BC2FBD /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31BC9D02040337100BC2FBD /* PopoverTableViewController.swift */; };
 		C31BC9D32040348000BC2FBD /* SortingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31BC9D22040348000BC2FBD /* SortingRule.swift */; };
+		C335C17120D8EC9700F52856 /* UIImageViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */; };
 		C34B3FDC2034437100503CB3 /* FilmSearchResultTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */; };
 		C34BA0222021C4500041EFD4 /* FilmDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */; };
 		C354001E206E3EB100BC6706 /* ReviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C354001D206E3EB100BC6706 /* ReviewViewController.swift */; };
@@ -115,6 +116,7 @@
 		C313D02520221BD600BB658C /* Segue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segue.swift; sourceTree = "<group>"; };
 		C31BC9D02040337100BC2FBD /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PopoverTableViewController.swift; path = FilmCollection/Controllers/Popover/PopoverTableViewController.swift; sourceTree = SOURCE_ROOT; };
 		C31BC9D22040348000BC2FBD /* SortingRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortingRule.swift; sourceTree = "<group>"; };
+		C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageViewExtensions.swift; sourceTree = "<group>"; };
 		C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmSearchResultTableViewCell.swift; sourceTree = "<group>"; };
 		C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmDetailViewController.swift; sourceTree = "<group>"; };
 		C354001D206E3EB100BC6706 /* ReviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewController.swift; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 		73FB10EA20224EA800B89532 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */,
 				C357438A2020743400DC5F7B /* AppDelegate.swift */,
 				73FB10EB202251DF00B89532 /* Helpers.swift */,
 				730C54C7206AD17C00367B0A /* Retry.swift */,
@@ -546,6 +549,7 @@
 				C354001E206E3EB100BC6706 /* ReviewViewController.swift in Sources */,
 				C35CD3A4204425C100967E1F /* PopoverTableViewCell.swift in Sources */,
 				C3D5DAF3206B6D0B00551ABD /* Credits.swift in Sources */,
+				C335C17120D8EC9700F52856 /* UIImageViewExtensions.swift in Sources */,
 				73E7192A2071584B009A4FFB /* ViewingHistoryTableViewController.swift in Sources */,
 				73E3509D2023A18900FFDB6E /* RatingControl.swift in Sources */,
 				73DF1ABF203E007B009955FA /* VideoPlayerViewController.swift in Sources */,
