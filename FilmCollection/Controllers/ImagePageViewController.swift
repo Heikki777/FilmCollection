@@ -10,22 +10,22 @@ import UIKit
 
 class ImagePageViewController: UIPageViewController {
 
-    var images: MovieImages = MovieImages()
+    var images: [UIImage] = []
     var orderedViewControllers: [UIViewController] = []
     var startPageIdx: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        guard startPageIdx < images.all.count else{
+        guard startPageIdx < images.count else{
             print("ImagePageViewController. startPageIdx is too big")
             return
         }
         
-        for imageTuple in images.all{
+        self.orderedViewControllers = images.map{
             let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as! ImagePreviewController
-            vc.image = imageTuple.image
-            self.orderedViewControllers.append(vc)
+            vc.image = $0
+            return vc
         }
         
         let firstViewController = orderedViewControllers[startPageIdx]

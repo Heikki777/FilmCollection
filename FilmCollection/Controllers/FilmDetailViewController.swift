@@ -117,7 +117,7 @@ class FilmDetailViewController: UIViewController {
         }
     }
     
-    var images: MovieImages?
+    var movieImages: MovieImages?
     var videos: [Video] = []{
         didSet{
             setFeaturedVideo()
@@ -140,6 +140,7 @@ class FilmDetailViewController: UIViewController {
     var crewImages: [UIImage] = []
     
     var selectedCastMember: CastMember?
+    var selectedCrewMember: CrewMember?
 
     lazy var api: TMDBApi = {
         return TMDBApi.shared
@@ -430,10 +431,10 @@ class FilmDetailViewController: UIViewController {
     
     @objc func imageTapped(_ sender: UITapGestureRecognizer){
 
-        guard let images = images, !images.isEmpty else{
+        guard let movieImages = movieImages, !movieImages.isEmpty else{
             loadMovieImages()
             .done { (movieImages) in
-                self.images = movieImages
+                self.movieImages = movieImages
                 self.showImageCollectionViewController()
             }
             .catch { (error) in
@@ -465,7 +466,7 @@ class FilmDetailViewController: UIViewController {
                 }
             }
             .done { images in
-                self.images = images
+                self.movieImages = images
                 result.fulfill(images)
             }
             .catch { error in
@@ -547,18 +548,17 @@ class FilmDetailViewController: UIViewController {
     }
     
     func showImageCollectionViewController(){
-        guard let images = self.images else{
+        guard let movieImages = self.movieImages else{
             print("No images")
             return
         }
         
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
-            guard images.count > 0 else{
+            guard movieImages.count > 0 else{
                 print("MovieImages is empty")
                 return
             }
-            vc.sectionTitles = images.groupTitles
-            vc.images = images
+            vc.images = movieImages.toDictionary
             vc.movieId = movie?.id
             vc.navigationItem.title = movie?.title
         
@@ -619,7 +619,10 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
                     
                     if let image = cell.imageView.image {
                         vc.image = image
-    
+                        vc.identifier = "CrewMember"
+                        let crewMember = crewMembersWithImage[crewIndexPath.row]
+                        self.selectedCrewMember = crewMember
+
                         let resizedImageRect = cell.imageView.contentClippingRect
                         let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
                         let y = cell.frame.minY
@@ -641,59 +644,90 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             return
         }
         
+        let showImageCollectionVC: (_ images: [String: [UIImage]]) -> () = { images in
+            if let imageCollectionVC = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
+                imageCollectionVC.images = images
+                self.show(imageCollectionVC, sender: self)
+            }
+        }
+        
         switch imagePreviewVC.identifier {
         case "Poster":
-            let showImageCollectionVC = {
-                guard let images = self.images else{
-                    return
-                }
-                
-                if let imageCollectionVC = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
-                    imageCollectionVC.images = images
-                    self.show(imageCollectionVC, sender: self)
-                }
-            }
             
             guard movie != nil else{
                 print("Movie is nil")
                 return
             }
             
-            if images == nil{
-                attempt{
-                    self.loadMovieImages()
-                    }
-                    .done { (movieImages) in
-                        self.images = movieImages
-                        if movieImages.isEmpty{
-                            return
-                        }
-                        else{
-                            showImageCollectionVC()
-                        }
-                    }
-                    .catch({ (error) in
-                        print(error.localizedDescription)
-                        return
-                    })
+            if let movieImages = self.movieImages{
+                showImageCollectionVC(movieImages.toDictionary)
             }
             else{
-                showImageCollectionVC()
+                attempt{
+                    self.loadMovieImages()
+                }
+                .done { (images) in
+                    self.movieImages = images
+                    if images.isEmpty{
+                        return
+                    }
+                    else{
+                        showImageCollectionVC(images.toDictionary)
+                    }
+                }
+                .catch({ (error) in
+                    print(error.localizedDescription)
+                    return
+                })
             }
         
         case "CastMember":
-            print("3d castmember")
-            guard let castMember = selectedCastMember, let personId = castMember.id else{
+            guard let castMember = selectedCastMember, let personId = castMember.id, let name = castMember.name else{
                 return
             }
-            print(castMember.name)
             
-            api.loadImages(personId: personId)
+            let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(name) images", message: "", complete: nil)
+            loadingIndicator.progressView.isHidden = true
+            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
+            
+            attempt{
+                self.api.loadImages(personId: personId)
+            }
             .done { (images) in
-                print("Cast member images loaded")
+                showImageCollectionVC([name: images])
             }
             .catch { (error) in
                 print(error.localizedDescription)
+            }
+            .finally {
+                loadingIndicator.finish()
+                self.selectedCastMember = nil
+            }
+            
+        case "CrewMember":
+            guard
+                let crewMember = selectedCrewMember,
+                let personId = crewMember.id,
+                let name = crewMember.name else{
+                return
+            }
+            
+            let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(name) images", message: "", complete: nil)
+            loadingIndicator.progressView.isHidden = true
+            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
+            
+            attempt{
+                self.api.loadImages(personId: personId)
+            }
+            .done { (images) in
+                showImageCollectionVC([name: images])
+            }
+            .catch { (error) in
+                print(error.localizedDescription)
+            }
+            .finally {
+                loadingIndicator.finish()
+                self.selectedCrewMember = nil
             }
         
         default:

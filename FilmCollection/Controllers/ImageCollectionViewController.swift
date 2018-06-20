@@ -12,10 +12,14 @@ import PromiseKit
 class ImageCollectionViewController: UICollectionViewController {
     
     private let reuseIdentifier = "imageCollectionViewCell"
-    var sectionTitles: [String] = []
-    var images: MovieImages = MovieImages()
+    
     var movieId: Int?
-    //var largeImages: MovieImages?
+    var images: [String: [UIImage]] = [:]
+    var largeImages: [String: [UIImage]] = [:]
+
+    var sectionTitles: [String]{
+        return images.keys.map{ $0 }
+    }
     
     lazy var api: TMDBApi = {
         return TMDBApi.shared
@@ -23,13 +27,6 @@ class ImageCollectionViewController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if !images.posters.isEmpty{
-            sectionTitles.append("Posters")
-        }
-        if !images.backdrops.isEmpty{
-            sectionTitles.append("Backdrops")
-        }
         
         collectionView?.dataSource = self
         collectionView?.delegate = self
@@ -55,11 +52,14 @@ class ImageCollectionViewController: UICollectionViewController {
     
     func showImagePageController(startPageIdx: Int = 0){
         print("showImagePageController")
-        instantiateImagePageViewController(images: images, startPageIdx: startPageIdx)
-
+        var imageArray: [UIImage] = []
+        for arr in images.values{
+            imageArray += arr
+        }
+        instantiateImagePageViewController(images: imageArray, startPageIdx: startPageIdx)
     }
     
-    func instantiateImagePageViewController(images: MovieImages, startPageIdx: Int = 0){
+    func instantiateImagePageViewController(images: [UIImage], startPageIdx: Int = 0){
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
             if !images.isEmpty{
                 vc.images = images
@@ -72,7 +72,7 @@ class ImageCollectionViewController: UICollectionViewController {
     // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return images.groupTitles.count
+        return images.keys.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -97,13 +97,13 @@ class ImageCollectionViewController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionTitle = sectionTitles[section]
-        return images[sectionTitle].count
+        return images[sectionTitle]?.count ?? 0
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionViewCell
         let sectionTitle = sectionTitles[indexPath.section]
-        cell.configure(image: images[sectionTitle][indexPath.row].image)
+        cell.configure(image: images[sectionTitle]?[indexPath.row])
         return cell
     }
     
@@ -112,11 +112,11 @@ class ImageCollectionViewController: UICollectionViewController {
     // MARK: UICollectionViewDelegate
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedImage = images[images.groupTitles[indexPath.section]][indexPath.row].image
-        if let index = (images.all.index { (data: ImageData, image: UIImage) -> Bool in
-            return selectedImage == image
-        }){
-            showImagePageController(startPageIdx: index)
+        let sectionTitle = sectionTitles[indexPath.section]
+        if let selectedImage = images[sectionTitle]?[indexPath.row]{
+            if let index = images.values.reduce([], +).index(of: selectedImage){
+                showImagePageController(startPageIdx: index)
+            }
         }
     }
     
@@ -195,17 +195,17 @@ extension ImageCollectionViewController: UIViewControllerPreviewingDelegate{
         
         if let imagePreviewController = viewControllerToCommit as? ImagePreviewController{
             if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
-                
-                vc.images = images
-                vc.startPageIdx = images.all.index(where: { (imageData, image) -> Bool in
-                    image == imagePreviewController.image
-                }) ?? 0
-                
-                if vc.images.count > 0{
-                    vc.preferredContentSize = CGSize(width: 0, height: 0)
+                if let firstImage = imagePreviewController.image{
+                    vc.images = images.values.reduce([], +)
+                    vc.startPageIdx = vc.images.index(of: firstImage) ?? 0
+                    
+                    if vc.images.count > 0{
+                        vc.preferredContentSize = CGSize(width: 0, height: 0)
+                    }
+                    
+                    show(vc, sender: self)
                 }
-                
-                show(vc, sender: self)
+
             }
         }
     }

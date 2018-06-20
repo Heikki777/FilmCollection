@@ -29,6 +29,13 @@ class MovieImages{
         })
     }
     
+    var toDictionary: [String: [UIImage]]{
+        return [
+            "Posters": posters.map{ $0.image },
+            "Backdrops": backdrops.map{ $0.image},
+        ]
+    }
+    
     subscript(key: String) -> [(data: ImageData, image: UIImage)] {
         get {
             switch key.capitalized{

@@ -106,7 +106,7 @@ class TMDBApi{
         }
     }
     
-    func loadVideos(_ movieId: Int, retryCount: Int = 0) -> Promise<[Video]> {
+    func loadVideos(_ movieId: Int) -> Promise<[Video]> {
         return Promise { result in
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/videos?api_key=\(self.apiKey)&language=en-US")!
             let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
@@ -182,7 +182,7 @@ class TMDBApi{
         }
     }
     
-    func loadImages(personId: Int) -> Promise<[UIImage]>{
+    func loadImages(personId: Int, progressHandler: ((Float) -> Void)? = nil) -> Promise<[UIImage]>{
         
         return Promise { result in
             let urlString = "https://api.themoviedb.org/3/person/\(personId)/images?api_key=\(self.apiKey)"
@@ -197,9 +197,18 @@ class TMDBApi{
                         return
                     }
                     if let personImagesResponse = try? self.jsonDecoder.decode(PersonImagesResponse.self, from: data){
-                        print(personImagesResponse)
-                        print("\(personImagesResponse.profiles.count) images")
-                        // TODO: Load person images
+                        let imagePromises = personImagesResponse.profiles.map{
+                            self.loadImage(withPath: $0.file_path)
+                        }
+                    
+                        when(fulfilled: imagePromises)
+                        .done({ (images) in
+                            result.fulfill(images)
+                            progressHandler?(1)
+                        })
+                        .catch({ (error) in
+                            result.reject(error)
+                        })
                     }
                     else{
                         result.reject(TMDBApiError.DecodeImagesError)
