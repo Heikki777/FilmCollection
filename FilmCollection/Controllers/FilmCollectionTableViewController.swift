@@ -128,7 +128,7 @@ class FilmCollectionTableViewController: UIViewController {
         
         // Listen for new movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
-            print("childAdded")
+            
             // Use this handler only if the movies have been loaded
             guard !self.movies.isEmpty else{
                 return
