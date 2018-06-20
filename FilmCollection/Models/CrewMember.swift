@@ -2,7 +2,7 @@
 //  CrewMember.swift
 //  FilmCollection
 //
-//  Created by Sofia Digital on 04/05/2018.
+//  Created by Heikki Hämälistö on 04/05/2018.
 //  Copyright © 2018 Heikki Hämälistö. All rights reserved.
 //
 

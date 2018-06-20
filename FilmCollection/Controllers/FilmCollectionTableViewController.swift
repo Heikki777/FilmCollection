@@ -110,9 +110,10 @@ class FilmCollectionTableViewController: UIViewController {
                                 print(error.localizedDescription)
                             }
                             .finally {
-                                loadingIndicator.message = movie.title
                                 self.movies.append(movie)
-                                loadingIndicator.setProgress(Float(self.movies.count) / Float(dbMovies.count))
+                                let progress = Float(self.movies.count) / Float(dbMovies.count)
+                                loadingIndicator.message = "\(Int(progress*100)) %"
+                                loadingIndicator.setProgress(progress)
                                 _ = self.addMovieToDictionary(movie)
                                 self.setNavigationBarTitle("\(self.movies.count) movies")
                             }
@@ -185,7 +186,7 @@ class FilmCollectionTableViewController: UIViewController {
                 if let rating = snapshotValue["rating"] as? Int{
                     movie.rating = Rating.all[rating]
                     if let indexPath = self.getIndexPath(for: movie){
-                        self.tableView.reloadRows(at: [indexPath], with: .fade)
+                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
                     }
                 }
             }
@@ -402,7 +403,7 @@ class FilmCollectionTableViewController: UIViewController {
             sections.sort(by: { (a, b) -> Bool in
                 if sortingRule == .rating{
                     if let ratingA = Rating.init(string: a), let ratingB = Rating.init(string: b){
-                        return (order == .ascending) ? ratingA < ratingB : ratingA > ratingB
+                        return (order == .ascending) ? ratingA.rawValue < ratingB.rawValue : ratingA.rawValue > ratingB.rawValue
                     }
                 }
                 return (order == .ascending) ? a < b : a > b
@@ -413,7 +414,7 @@ class FilmCollectionTableViewController: UIViewController {
                 }
                 else{
                     self.tableView.performBatchUpdates({
-                        self.tableView.insertSections([sectionIndex], with: .fade)
+                        self.tableView.insertSections([sectionIndex], with: .automatic)
                     }, completion: nil)
                 }
             }
@@ -439,7 +440,7 @@ class FilmCollectionTableViewController: UIViewController {
                         }
                         else{
                             self.tableView.performBatchUpdates({
-                                self.tableView.insertRows(at: [indexPath], with: .fade)
+                                self.tableView.insertRows(at: [indexPath], with: .automatic)
                             }, completion: nil)
                         }
 
@@ -502,7 +503,7 @@ class FilmCollectionTableViewController: UIViewController {
                         if let sectionMovies = filteredMovieDict[section], sectionMovies.isEmpty{
                             filteredMovieDict[section] = nil
                             if let indexOfFilteredSection = filteredSections.index(of: section){
-                                tableView.deleteSections([indexOfFilteredSection], with: .fade)
+                                tableView.deleteSections([indexOfFilteredSection], with: .automatic)
                             }
                         }
                     }
@@ -510,10 +511,10 @@ class FilmCollectionTableViewController: UIViewController {
                 
                 movieDict[section]!.remove(at: indexInDict)
                 movies.remove(at: movies.index(of:movie)!)
-                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.deleteRows(at: [indexPath], with: .automatic)
                 if movieDict[section]!.isEmpty{
                     movieDict[section] = nil
-                    tableView.deleteSections([indexPath.section], with: .fade)
+                    tableView.deleteSections([indexPath.section], with: .automatic)
                 }
                 tableView.endUpdates()
             }

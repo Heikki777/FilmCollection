@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Firebase
 @testable import FilmCollection
 
 class FilmCollectionTests: XCTestCase {

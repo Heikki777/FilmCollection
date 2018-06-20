@@ -1450,7 +1450,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="KBg-Qg-t5Q">
-                                <rect key="frame" x="0.0" y="227.5" width="375" height="211"/>
+                                <rect key="frame" x="0.0" y="235.5" width="375" height="211"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="KBg-Qg-t5Q" secondAttribute="height" multiplier="375:211" id="yBt-In-kO8"/>
@@ -1463,9 +1463,9 @@
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="KBg-Qg-t5Q" firstAttribute="centerY" secondItem="jyw-sV-eJI" secondAttribute="centerY" constant="-8" id="ALL-Pd-B9l"/>
                             <constraint firstItem="KBg-Qg-t5Q" firstAttribute="leading" secondItem="jyw-sV-eJI" secondAttribute="leading" id="DHc-D4-J1r"/>
                             <constraint firstItem="jyw-sV-eJI" firstAttribute="trailing" secondItem="KBg-Qg-t5Q" secondAttribute="trailing" id="JRu-27-AZH"/>
+                            <constraint firstItem="KBg-Qg-t5Q" firstAttribute="centerY" secondItem="jyw-sV-eJI" secondAttribute="centerY" id="eSP-2h-Izc"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="jyw-sV-eJI"/>
                     </view>
@@ -1543,7 +1543,6 @@
         <image name="visible" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="mMb-JN-Bid"/>
         <segue reference="OZX-FN-kvo"/>
     </inferredMetricsTieBreakers>
 </document>
