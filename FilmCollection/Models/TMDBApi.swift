@@ -182,6 +182,34 @@ class TMDBApi{
         }
     }
     
+    func loadImages(personId: Int) -> Promise<[UIImage]>{
+        
+        return Promise { result in
+            let urlString = "https://api.themoviedb.org/3/person/\(personId)/images?api_key=\(self.apiKey)"
+            let url = URL.init(string: urlString)!
+            
+            DispatchQueue.global().async {
+                Alamofire.request(url)
+                .validate()
+                .responseData(completionHandler: { (response) in
+                    guard let data = response.data else{
+                        result.reject(TMDBApiError.DataError("No data in response"))
+                        return
+                    }
+                    if let personImagesResponse = try? self.jsonDecoder.decode(PersonImagesResponse.self, from: data){
+                        print(personImagesResponse)
+                        print("\(personImagesResponse.profiles.count) images")
+                        // TODO: Load person images
+                    }
+                    else{
+                        result.reject(TMDBApiError.DecodeImagesError)
+                    }
+                })
+            }
+        }
+
+    }
+    
     func loadImages(_ movieId: Int, size: PosterSize = .original, progressHandler: @escaping (Float) -> Void) -> Promise<MovieImages> {
 
         return Promise { result in
@@ -329,6 +357,13 @@ class TMDBApi{
         case w780
         case original
     }
+}
+struct PersonImagesResponse: Decodable{
+    var profiles: [ProfileImage]
+    var id: Int?
+}
+struct ProfileImage: Decodable{
+    var file_path: String
 }
 
 typealias Video = VideoResponse.Video

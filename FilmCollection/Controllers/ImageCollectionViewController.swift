@@ -24,6 +24,13 @@ class ImageCollectionViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if !images.posters.isEmpty{
+            sectionTitles.append("Posters")
+        }
+        if !images.backdrops.isEmpty{
+            sectionTitles.append("Backdrops")
+        }
+        
         collectionView?.dataSource = self
         collectionView?.delegate = self
         

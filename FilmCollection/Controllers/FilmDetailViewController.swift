@@ -138,6 +138,8 @@ class FilmDetailViewController: UIViewController {
     
     var castImages: [UIImage] = []
     var crewImages: [UIImage] = []
+    
+    var selectedCastMember: CastMember?
 
     lazy var api: TMDBApi = {
         return TMDBApi.shared
@@ -591,7 +593,11 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
         
                     if let image = cell.imageView.image {
+                        let castMember = castMembersWithImage[castIndexPath.row]
+                        self.selectedCastMember = castMember
+                        
                         vc.image = image
+                        vc.identifier = "CastMember"
                         vc.preferredContentSize = image.size
                         let resizedImageRect = cell.imageView.contentClippingRect
                         let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
@@ -635,22 +641,16 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             return
         }
         
-        if imagePreviewVC.identifier == "Poster"{
-            
-            let showMovieImagesPageVC = {
+        switch imagePreviewVC.identifier {
+        case "Poster":
+            let showImageCollectionVC = {
                 guard let images = self.images else{
                     return
                 }
                 
-                if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
-                    
-                    vc.images = images
-                    
-                    if vc.images.count > 0{
-                        vc.preferredContentSize = CGSize(width: 0, height: 0)
-                    }
-                    
-                    self.show(vc, sender: self)
+                if let imageCollectionVC = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
+                    imageCollectionVC.images = images
+                    self.show(imageCollectionVC, sender: self)
                 }
             }
             
@@ -662,24 +662,42 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             if images == nil{
                 attempt{
                     self.loadMovieImages()
-                }
-                .done { (movieImages) in
-                    self.images = movieImages
-                    if movieImages.isEmpty{
+                    }
+                    .done { (movieImages) in
+                        self.images = movieImages
+                        if movieImages.isEmpty{
+                            return
+                        }
+                        else{
+                            showImageCollectionVC()
+                        }
+                    }
+                    .catch({ (error) in
+                        print(error.localizedDescription)
                         return
-                    }
-                    else{
-                        showMovieImagesPageVC()
-                    }
-                }
-                .catch({ (error) in
-                    print(error.localizedDescription)
-                    return
-                })
+                    })
             }
             else{
-                showMovieImagesPageVC()
+                showImageCollectionVC()
             }
+        
+        case "CastMember":
+            print("3d castmember")
+            guard let castMember = selectedCastMember, let personId = castMember.id else{
+                return
+            }
+            print(castMember.name)
+            
+            api.loadImages(personId: personId)
+            .done { (images) in
+                print("Cast member images loaded")
+            }
+            .catch { (error) in
+                print(error.localizedDescription)
+            }
+        
+        default:
+            break
         }
     }
 }
@@ -769,6 +787,7 @@ extension FilmDetailViewController: UICollectionViewDelegate{
             name = castMember.name
             profilePath = castMember.profilePath
         }
+        // Crew Collection View
         else if collectionView == crewCollectionView{
             let crewMember = crewMembersWithImage[indexPath.row]
             id = crewMember.id
