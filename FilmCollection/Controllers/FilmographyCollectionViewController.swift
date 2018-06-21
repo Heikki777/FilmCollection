@@ -288,7 +288,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                             }).first as? FilmDetailViewController){
                                 filmDetailVC.reset()
                                 filmDetailVC.movie = movie
-                                filmDetailVC.setup()
+                                filmDetailVC.populate()
                                 self.navigationController?.popToViewController(filmDetailVC, animated: true)
                             }
                         }
@@ -315,7 +315,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                         }).first as? FilmDetailViewController){
                             filmDetailVC.reset()
                             filmDetailVC.movie = filmCollectionVC.getMovie(withId: id)
-                            filmDetailVC.setup()
+                            filmDetailVC.populate()
                             self.navigationController?.popToViewController(filmDetailVC, animated: true)
                             
                         }

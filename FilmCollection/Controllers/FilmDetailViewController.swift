@@ -34,6 +34,8 @@ class FilmDetailViewController: UIViewController {
     @IBOutlet weak var reviewBarButton: UIBarButtonItem!
     @IBOutlet weak var castHeaderLabel: UILabel!
     @IBOutlet weak var crewHeaderLabel: UILabel!
+    @IBOutlet weak var reviewHeaderLabel: UILabel!
+    @IBOutlet weak var reviewTextView: UITextView!
     
     @IBAction func removeMovie(_ sender: Any) {
         guard let movie = movie else{
@@ -162,7 +164,7 @@ class FilmDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setup()
+        populate()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -228,7 +230,7 @@ class FilmDetailViewController: UIViewController {
         crewCollectionView.reloadData()
     }
     
-    func setup(){
+    func populate(){
                 
         playVideoButton.isHidden = true
         
@@ -396,6 +398,11 @@ class FilmDetailViewController: UIViewController {
                 self.crewCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
             }
         })
+        
+        // Review
+        reviewTextView.text = movie.review
+        reviewTextView.isHidden = movie.review.isEmpty
+        reviewHeaderLabel.isHidden = movie.review.isEmpty
         
         setContentHeight()
         scrollView.scrollToTop()
