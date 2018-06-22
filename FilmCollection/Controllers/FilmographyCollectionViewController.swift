@@ -10,7 +10,6 @@ import UIKit
 import PromiseKit
 import Firebase
 
-
 private let reuseIdentifier = "filmographyMovieCell"
 
 enum FilmographyCollectionViewControllerError: Error{

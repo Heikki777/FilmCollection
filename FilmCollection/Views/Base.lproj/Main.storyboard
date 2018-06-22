@@ -1460,7 +1460,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yb0-kO-Y9h" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3184.8000000000002" y="-322.48875562218893"/>
+            <point key="canvasLocation" x="3185" y="-322"/>
         </scene>
         <!--Video Player View Controller-->
         <scene sceneID="bzn-mx-71o">
@@ -1498,11 +1498,11 @@
             </objects>
             <point key="canvasLocation" x="3185" y="449"/>
         </scene>
-        <!--Add Film-->
+        <!--Add Movie-->
         <scene sceneID="n29-mI-ymV">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="WOo-lf-7WO" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Add Film" image="plus" id="RIQ-yq-yq9"/>
+                    <tabBarItem key="tabBarItem" title="Add Movie" image="plus" id="RIQ-yq-yq9"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jFq-Lp-gmU">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
