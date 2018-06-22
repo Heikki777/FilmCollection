@@ -29,6 +29,7 @@ class FilmCollectionTableViewController: UIViewController {
     let reuseIdentifier = "filmCell"
     let scopeButtonTitles: [String] = ["All"] + Genre.all.map {$0.rawValue}
     let searchController = UISearchController(searchResultsController: nil)
+    
     var sortingRule: SortingRule = .title
     var sections: [String] = []
     var filteredSections: [String] = []
@@ -69,7 +70,7 @@ class FilmCollectionTableViewController: UIViewController {
         tableView.reloadData()
         print("movies.count: \(movies.count)")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -277,6 +278,7 @@ class FilmCollectionTableViewController: UIViewController {
         else if identifier == Segue.showSortOptionsSegue.rawValue{
             if let popoverTableViewController = segue.destination as? PopoverTableViewController{
                 popoverTableViewController.items = SortingRule.all.map{$0.rawValue}
+                popoverTableViewController.navigationItem.title = "Order by"
                 popoverTableViewController.delegate = self
                 if let sortingRuleIndex = SortingRule.all.index(of: sortingRule){
                     popoverTableViewController.selectionIndexPath = IndexPath(row: sortingRuleIndex, section: 0)
@@ -621,6 +623,8 @@ extension FilmCollectionTableViewController: UISearchBarDelegate{
         print("Selected scope: \(scope)")
         filterContent(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
     }
+    
+    
 }
 
 extension FilmCollectionTableViewController: UIPopoverPresentationControllerDelegate{

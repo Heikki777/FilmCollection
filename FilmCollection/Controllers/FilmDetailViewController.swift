@@ -86,6 +86,8 @@ class FilmDetailViewController: UIViewController {
         self.showAlert(title: "Viewing saved", message: "\(movie.title)\n\(self.dateFormatter.string(from: date))")
     }
     
+    var fadeableViews: [UIView] = []
+    
     lazy var databaseRef: DatabaseReference = {
        return Database.database().reference()
     }()
@@ -164,7 +166,15 @@ class FilmDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        populate()
+        setup()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        fadeableViews.forEach { (view) in
+            view.alpha = 0.0
+        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -191,9 +201,10 @@ class FilmDetailViewController: UIViewController {
                         }
                     })
                 }
-
             })
         }
+        
+        fadeIn()
     
     }
     
@@ -230,7 +241,40 @@ class FilmDetailViewController: UIViewController {
         crewCollectionView.reloadData()
     }
     
-    func populate(){
+    
+    func fadeIn(){
+        let slowest = 3.0
+        let fastest = 2.0
+        let slowestFastestDiff = slowest - fastest
+        var duration = 2.0
+        
+        fadeableViews.forEach { (view) in
+            UIView.animate(withDuration: duration, animations: {
+                view.alpha = 1.0
+            })
+            duration -= (slowestFastestDiff / Double(fadeableViews.count))
+        }
+
+    }
+    
+    func setup(){
+        
+        fadeableViews = [
+            imageView,
+            titleLabel,
+            directorLabel,
+            ratingLabel,
+            descriptionTextView,
+            genreLabel,
+            durationLabel,
+            playVideoButton,
+            castCollectionView,
+            crewCollectionView,
+            castHeaderLabel,
+            crewHeaderLabel,
+            reviewHeaderLabel,
+            reviewTextView
+        ]
                 
         playVideoButton.isHidden = true
         

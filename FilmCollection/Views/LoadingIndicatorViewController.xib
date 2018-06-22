@@ -32,7 +32,7 @@
                             <rect key="frame" x="20" y="258.5" width="335" height="150"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3UG-hG-pkS">
-                                    <rect key="frame" x="0.0" y="8" width="335" height="21"/>
+                                    <rect key="frame" x="8" y="8" width="319" height="21"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="21" id="mPf-NW-cmu"/>
                                     </constraints>
@@ -65,10 +65,10 @@
                                 <constraint firstItem="nXT-30-s0Q" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" constant="8" id="I1H-DN-UTb"/>
                                 <constraint firstAttribute="trailing" secondItem="Qnm-hr-N4y" secondAttribute="trailing" constant="20" id="Izz-XI-Y4U"/>
                                 <constraint firstItem="Qnm-hr-N4y" firstAttribute="top" secondItem="nXT-30-s0Q" secondAttribute="bottom" constant="32" id="P9Q-zL-Urz"/>
-                                <constraint firstItem="3UG-hG-pkS" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" id="RFR-tV-3GG"/>
+                                <constraint firstItem="3UG-hG-pkS" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" constant="8" id="RFR-tV-3GG"/>
                                 <constraint firstAttribute="trailing" secondItem="nXT-30-s0Q" secondAttribute="trailing" constant="8" id="Xe7-C4-lfC"/>
                                 <constraint firstAttribute="height" constant="150" id="aaA-DD-KjL"/>
-                                <constraint firstAttribute="trailing" secondItem="3UG-hG-pkS" secondAttribute="trailing" id="dww-S9-2du"/>
+                                <constraint firstAttribute="trailing" secondItem="3UG-hG-pkS" secondAttribute="trailing" constant="8" id="dww-S9-2du"/>
                                 <constraint firstAttribute="width" constant="335" id="i6d-fF-oOu"/>
                                 <constraint firstItem="41N-nP-2iP" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" constant="149" id="uco-ul-0bE"/>
                             </constraints>
