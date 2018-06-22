@@ -186,4 +186,23 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
             }
         }
     }
+    
+    func loadBigPosterImage() -> Promise<UIImage>{
+        return Promise { result in
+            if let posterPath = self.posterPath{
+                let bigPosterURL = TMDBApi.getPosterURL(size: .w780, imagePath: posterPath)
+                Downloader.shared.loadImage(url: bigPosterURL)
+                .done({ (image) in
+                    result.fulfill(image)
+                })
+                .catch({ (error) in
+                    print("Loading poster images for the movie: \(self.title) failed")
+                    print(error.localizedDescription)
+                })
+            }
+            else{
+                result.reject(MovieError.missingData("posterPath"))
+            }
+        }
+    }
 }

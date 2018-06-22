@@ -694,11 +694,13 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             }
             
             let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(name) images", message: "", complete: nil)
-            loadingIndicator.progressView.isHidden = true
             self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
             
             attempt{
-                self.api.loadImages(personId: personId)
+                self.api.loadImages(personId: personId, progressHandler: { (progress) in
+                    loadingIndicator.setProgress(progress)
+                    loadingIndicator.message = "\(Int(100 * progress)) %"
+                })
             }
             .done { (images) in
                 showImageCollectionVC([name: images])

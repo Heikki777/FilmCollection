@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -45,7 +45,7 @@
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </activityIndicatorView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXT-30-s0Q">
-                                    <rect key="frame" x="8" y="37" width="327" height="18"/>
+                                    <rect key="frame" x="8" y="37" width="319" height="18"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -66,8 +66,10 @@
                                 <constraint firstAttribute="trailing" secondItem="Qnm-hr-N4y" secondAttribute="trailing" constant="20" id="Izz-XI-Y4U"/>
                                 <constraint firstItem="Qnm-hr-N4y" firstAttribute="top" secondItem="nXT-30-s0Q" secondAttribute="bottom" constant="32" id="P9Q-zL-Urz"/>
                                 <constraint firstItem="3UG-hG-pkS" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" id="RFR-tV-3GG"/>
+                                <constraint firstAttribute="trailing" secondItem="nXT-30-s0Q" secondAttribute="trailing" constant="8" id="Xe7-C4-lfC"/>
                                 <constraint firstAttribute="height" constant="150" id="aaA-DD-KjL"/>
                                 <constraint firstAttribute="trailing" secondItem="3UG-hG-pkS" secondAttribute="trailing" id="dww-S9-2du"/>
+                                <constraint firstAttribute="width" constant="335" id="i6d-fF-oOu"/>
                                 <constraint firstItem="41N-nP-2iP" firstAttribute="leading" secondItem="iiv-wk-j1Q" secondAttribute="leading" constant="149" id="uco-ul-0bE"/>
                             </constraints>
                         </view>
@@ -75,10 +77,7 @@
                     <color key="backgroundColor" white="0.0" alpha="0.30024614726027399" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="iiv-wk-j1Q" firstAttribute="centerX" secondItem="p6d-Tl-Jjf" secondAttribute="centerX" id="Eee-xy-5gc"/>
-                        <constraint firstAttribute="trailing" secondItem="iiv-wk-j1Q" secondAttribute="trailing" constant="20" id="SRt-ei-Krd"/>
-                        <constraint firstAttribute="trailing" secondItem="nXT-30-s0Q" secondAttribute="trailing" constant="20" id="d42-1o-Jzg"/>
                         <constraint firstItem="iiv-wk-j1Q" firstAttribute="centerY" secondItem="p6d-Tl-Jjf" secondAttribute="centerY" constant="-5" id="mM3-Da-kUf"/>
-                        <constraint firstItem="iiv-wk-j1Q" firstAttribute="leading" secondItem="p6d-Tl-Jjf" secondAttribute="leading" constant="20" id="xCo-Y9-cFg"/>
                     </constraints>
                 </view>
             </subviews>

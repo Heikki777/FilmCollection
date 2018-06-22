@@ -40,6 +40,7 @@
 		C313D02620221BD600BB658C /* Segue.swift in Sources */ = {isa = PBXBuildFile; fileRef = C313D02520221BD600BB658C /* Segue.swift */; };
 		C31BC9D12040337100BC2FBD /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31BC9D02040337100BC2FBD /* PopoverTableViewController.swift */; };
 		C31BC9D32040348000BC2FBD /* SortingRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C31BC9D22040348000BC2FBD /* SortingRule.swift */; };
+		C329C8CF20DCFF4700B2A5A2 /* FilmPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C329C8CE20DCFF4700B2A5A2 /* FilmPreviewViewController.swift */; };
 		C335C17120D8EC9700F52856 /* UIImageViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */; };
 		C34B3FDC2034437100503CB3 /* FilmSearchResultTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */; };
 		C34BA0222021C4500041EFD4 /* FilmDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */; };
@@ -116,6 +117,7 @@
 		C313D02520221BD600BB658C /* Segue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segue.swift; sourceTree = "<group>"; };
 		C31BC9D02040337100BC2FBD /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PopoverTableViewController.swift; path = FilmCollection/Controllers/Popover/PopoverTableViewController.swift; sourceTree = SOURCE_ROOT; };
 		C31BC9D22040348000BC2FBD /* SortingRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortingRule.swift; sourceTree = "<group>"; };
+		C329C8CE20DCFF4700B2A5A2 /* FilmPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPreviewViewController.swift; sourceTree = "<group>"; };
 		C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageViewExtensions.swift; sourceTree = "<group>"; };
 		C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmSearchResultTableViewCell.swift; sourceTree = "<group>"; };
 		C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmDetailViewController.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				737219B12090EF62002A712D /* BiographyViewController.swift */,
 				C357438C2020743400DC5F7B /* FilmCollectionTableViewController.swift */,
 				C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */,
+				C329C8CE20DCFF4700B2A5A2 /* FilmPreviewViewController.swift */,
 				737219A920890698002A712D /* FilmographyCollectionViewController.swift */,
 				73EEB09D207A8C2000726933 /* HomeTabBarController.swift */,
 				C3E4B8BC2064E3DA00F0BE90 /* ImageCollectionViewController.swift */,
@@ -550,6 +553,7 @@
 				C39C63582032D2FB0028B7CB /* TMDBApi.swift in Sources */,
 				C3942D9420738F89002FD5DC /* UIViewControllerExtensions.swift in Sources */,
 				C354001E206E3EB100BC6706 /* ReviewViewController.swift in Sources */,
+				C329C8CF20DCFF4700B2A5A2 /* FilmPreviewViewController.swift in Sources */,
 				C35CD3A4204425C100967E1F /* PopoverTableViewCell.swift in Sources */,
 				C3D5DAF3206B6D0B00551ABD /* Credits.swift in Sources */,
 				C335C17120D8EC9700F52856 /* UIImageViewExtensions.swift in Sources */,

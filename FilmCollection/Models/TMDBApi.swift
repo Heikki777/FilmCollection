@@ -200,6 +200,14 @@ class TMDBApi{
                         let imagePromises = personImagesResponse.profiles.map{
                             self.loadImage(withPath: $0.file_path)
                         }
+                        
+                        var imagesLoaded: Float = 0
+                        imagePromises.forEach({ (imagePromise) in
+                            imagePromise.done({ (image) in
+                                imagesLoaded += 1
+                                progressHandler?(imagesLoaded / Float(imagePromises.count))
+                            })
+                        })
                     
                         when(fulfilled: imagePromises)
                         .done({ (images) in

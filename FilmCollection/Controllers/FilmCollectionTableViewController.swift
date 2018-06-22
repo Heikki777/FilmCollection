@@ -78,6 +78,16 @@ class FilmCollectionTableViewController: UIViewController {
             // TODO: Show alert
             return
         }
+        
+        // Check if 3D Touch is available
+        if traitCollection.forceTouchCapability == .available{
+            print("3D touch is available")
+            registerForPreviewing(with: self, sourceView: view)
+        }
+        else{
+            print("3D Touch not available")
+        }
+        
         self.user = user
         
         let loadingIndicator = LoadingIndicatorViewController(title: "Loading movies", message: "", complete: nil)
@@ -630,5 +640,43 @@ extension FilmCollectionTableViewController: PopoverTableItemSelectionDelegate{
         createMovieDictionary()
         self.tableView.reloadData()
         self.navigationItem.title = "\(movies.count) movies"
+    }
+}
+
+extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
+
+        let point = tableView.convert(location, from: self.view)
+        
+        guard let indexPath = tableView.indexPathForRow(at: point) else{
+            print("No indexpath for point: \(point)")
+            return nil
+        }
+        
+        guard let cell = tableView.cellForRow(at: indexPath) else{
+            print("no cell")
+            return nil
+        }
+        
+        let sectionTitle = getSectionTitle(atIndex: indexPath.section)
+        guard let film = movieDict[sectionTitle]?[indexPath.row] else{
+            print("There is no film at indexPath: \(indexPath)")
+            return nil
+        }
+        
+        guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else{
+            print("A FilmPreviewViewController could not be instantiated")
+            return nil
+        }
+        
+        previewingContext.sourceRect = self.view.convert(cell.frame, from: self.tableView)
+        filmPreviewVC.film = film
+        
+        return filmPreviewVC
+    }
+    
+    func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+        
+        // TODO:
     }
 }

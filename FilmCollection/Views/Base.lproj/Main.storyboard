@@ -481,7 +481,7 @@
             </objects>
             <point key="canvasLocation" x="1604" y="448"/>
         </scene>
-        <!--View history-->
+        <!--Viewing history-->
         <scene sceneID="Lnn-vZ-8tI">
             <objects>
                 <tableViewController id="aU3-Zm-GLH" customClass="ViewingHistoryTableViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
@@ -520,7 +520,7 @@
                             <outlet property="delegate" destination="aU3-Zm-GLH" id="g49-4v-wwF"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="View history" id="yjU-Rk-nLI"/>
+                    <navigationItem key="navigationItem" title="Viewing history" id="yjU-Rk-nLI"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EWm-Ta-lOj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -688,6 +688,48 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i5Y-4t-gb7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2398" y="1217"/>
+        </scene>
+        <!--Film Preview View Controller-->
+        <scene sceneID="jGP-dJ-eMf">
+            <objects>
+                <viewController storyboardIdentifier="FilmPreviewViewController" id="rxX-xp-JU6" customClass="FilmPreviewViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="4q8-wF-rpL">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lch-rK-KDa">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.24772581335616439" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="bottom" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aRH-ry-hGU">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="VTN-wQ-oRM" firstAttribute="trailing" secondItem="aRH-ry-hGU" secondAttribute="trailing" id="ApI-1g-oZO"/>
+                            <constraint firstItem="VTN-wQ-oRM" firstAttribute="bottom" secondItem="lch-rK-KDa" secondAttribute="bottom" id="HT5-fJ-ofc"/>
+                            <constraint firstItem="aRH-ry-hGU" firstAttribute="leading" secondItem="VTN-wQ-oRM" secondAttribute="leading" id="KOx-XQ-7j8"/>
+                            <constraint firstItem="aRH-ry-hGU" firstAttribute="top" secondItem="VTN-wQ-oRM" secondAttribute="top" id="P3n-jR-q9r"/>
+                            <constraint firstItem="VTN-wQ-oRM" firstAttribute="trailing" secondItem="lch-rK-KDa" secondAttribute="trailing" id="PXa-hw-qEt"/>
+                            <constraint firstItem="VTN-wQ-oRM" firstAttribute="bottom" secondItem="aRH-ry-hGU" secondAttribute="bottom" id="Vay-OV-mJG"/>
+                            <constraint firstItem="lch-rK-KDa" firstAttribute="top" secondItem="VTN-wQ-oRM" secondAttribute="top" id="hvZ-BC-IpC"/>
+                            <constraint firstItem="lch-rK-KDa" firstAttribute="leading" secondItem="VTN-wQ-oRM" secondAttribute="leading" id="pkm-Ri-vyy"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="VTN-wQ-oRM"/>
+                    </view>
+                    <connections>
+                        <outlet property="descriptionTextView" destination="aRH-ry-hGU" id="Zyy-pV-Izd"/>
+                        <outlet property="imageView" destination="lch-rK-KDa" id="xVo-qE-GMk"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CUY-TR-ene" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3185" y="1217"/>
         </scene>
         <!--Sign In View Controller-->
         <scene sceneID="ZNQ-Q5-Mz1">
@@ -1498,11 +1540,11 @@
             </objects>
             <point key="canvasLocation" x="3185" y="449"/>
         </scene>
-        <!--Add Movie-->
+        <!--Add Film-->
         <scene sceneID="n29-mI-ymV">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="WOo-lf-7WO" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Add Movie" image="plus" id="RIQ-yq-yq9"/>
+                    <tabBarItem key="tabBarItem" title="Add Film" image="plus" id="RIQ-yq-yq9"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jFq-Lp-gmU">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
