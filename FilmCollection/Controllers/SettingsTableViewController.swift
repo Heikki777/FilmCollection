@@ -17,7 +17,7 @@ class SettingsTableViewController: UITableViewController {
         appDelegate.persistentContainer.viewContext
     }()
     
-    var settings = Settings()
+    var settings: Settings!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,22 +29,16 @@ class SettingsTableViewController: UITableViewController {
                 print("No settings")
                 return
             }
-            print("Settings: \(settings)")
+            self.settings = settings
         }
         catch let error {
             print(error.localizedDescription)
         }
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        appDelegate.saveContext()
     }
 
     // MARK: - Table view data source
@@ -71,13 +65,41 @@ class SettingsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let dict = settings.dictionary
         let cell = UITableViewCell()
-        let sectionTitle = dict.keys[dict.index(dict.startIndex, offsetBy: indexPath.section)]
-        cell.textLabel?.text = dict[sectionTitle]?[indexPath.row]
-        print(dict[sectionTitle]?[indexPath.row])
         
+        let sectionTitle = dict.keys[dict.index(dict.startIndex, offsetBy: indexPath.section)]
+        
+        switch(indexPath.section){
+        case 0:
+            cell.accessoryType = .none
+            if let labelText = dict[sectionTitle]?[indexPath.row]{
+                cell.textLabel?.text = labelText
+                if settings.filmCollectionLayout.rawValue == labelText{
+                    cell.accessoryType = .checkmark
+                }
+            }
+        default:
+            break
+        }
+
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let dict = settings.dictionary
+        return dict.keys[dict.index(dict.startIndex, offsetBy: section)]
+    }
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch(indexPath.section){
+        case 0:
+            settings.filmCollectionLayout = FilmCollectionLayoutOption.all[indexPath.row]
+            appDelegate.saveContext()
+            tableView.reloadSections([indexPath.section], with: .automatic)
+        default:
+            break
+        }
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
