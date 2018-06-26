@@ -13,27 +13,32 @@ class SettingsTableViewController: UITableViewController {
 
     private let reuseIdentifier = "settingsTableViewCell"
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
     lazy var context = {
-        appDelegate.persistentContainer.viewContext
+        return appDelegate.persistentContainer.viewContext
     }()
     
-    var settings: Settings!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+    lazy var settings: Settings = {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Settings")
         
         do{
-            guard let settings = try context.fetch(request).first as? Settings else{
-                print("No settings")
-                return
+            if let settingsArray = try context.fetch(request) as? [Settings], let settings = settingsArray.first{
+                print("settings array")
+                print(settingsArray)
+                return settings
             }
-            self.settings = settings
         }
         catch let error {
             print(error.localizedDescription)
         }
+        
+        let settings = Settings(context: context)
+        appDelegate.saveContext()
+        return settings
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -73,7 +78,7 @@ class SettingsTableViewController: UITableViewController {
             cell.accessoryType = .none
             if let labelText = dict[sectionTitle]?[indexPath.row]{
                 cell.textLabel?.text = labelText
-                if settings.filmCollectionLayout.rawValue == labelText{
+                if settings.filmCollectionLayout == labelText{
                     cell.accessoryType = .checkmark
                 }
             }
@@ -92,7 +97,7 @@ class SettingsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch(indexPath.section){
         case 0:
-            settings.filmCollectionLayout = FilmCollectionLayoutOption.all[indexPath.row]
+            settings.filmCollectionLayout = FilmCollectionLayoutOption.all[indexPath.row].rawValue
             appDelegate.saveContext()
             tableView.reloadSections([indexPath.section], with: .automatic)
         default:

@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 class Settings: NSManagedObject{
-    var filmCollectionLayout: FilmCollectionLayoutOption = .posterTitleOverview
+    @NSManaged var filmCollectionLayout: String
 
     var dictionary: [String: [String]]{
         return [

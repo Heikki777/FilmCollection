@@ -90,7 +90,7 @@ class TMDBApi{
             .validate()
             .responseData(queue: queue, completionHandler: { (response) in
                 if let error = response.error{
-                    print(error)
+                    //print(error.localizedDescription)
                     result.reject(error)
                 }
                 else if let data = response.data{
@@ -281,7 +281,7 @@ class TMDBApi{
                                 }
                             }
                             .catch { error in
-                                print(error.localizedDescription)
+                                //print(error.localizedDescription)
                             }
                         })
                         
@@ -305,7 +305,7 @@ class TMDBApi{
                                 }
                             }
                             .catch { error in
-                                print(error.localizedDescription)
+                                //print(error.localizedDescription)
                             }
                         })
                     }
