@@ -106,5 +106,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    // MARK: - Settings
+    
+    lazy var settings: Settings = {
+        let context = persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Settings")
+        
+        do{
+            if let settingsArray = try context.fetch(request) as? [Settings], let settings = settingsArray.first{
+                print("settings array")
+                print(settingsArray)
+                return settings
+            }
+        }
+        catch let error {
+            print(error.localizedDescription)
+        }
+        
+        let settings = Settings(context: context)
+        saveContext()
+        return settings
+    }()
+    
 }
 

@@ -10,8 +10,15 @@ import UIKit
 import PromiseKit
 import Firebase
 
+
+
 class FilmCollectionTableViewController: UIViewController {
 
+    private enum ReuseIdentifier: String{
+        case filmCellSimple
+        case filmCellExpanded
+    }
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var orderBarButton: UIBarButtonItem!
     
@@ -26,7 +33,7 @@ class FilmCollectionTableViewController: UIViewController {
         return Database.database().reference()
     }()
     
-    let reuseIdentifier = "filmCell"
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let scopeButtonTitles: [String] = ["All"] + Genre.all.map {$0.rawValue}
     let searchController = UISearchController(searchResultsController: nil)
     
@@ -39,6 +46,7 @@ class FilmCollectionTableViewController: UIViewController {
     
     var movies: [Movie] = []
     var user: User?
+    var selectedLayoutOption: FilmCollectionLayoutOption = .posterTitleOverview
     
     var selectedFilteringScope: String{
         let index = searchController.searchBar.selectedScopeButtonIndex
@@ -51,6 +59,14 @@ class FilmCollectionTableViewController: UIViewController {
     
     lazy var jsonDecoder: JSONDecoder = {
         return JSONDecoder()
+    }()
+    
+    lazy var context = {
+        return appDelegate.persistentContainer.viewContext
+    }()
+    
+    lazy var settings = {
+        return appDelegate.settings
     }()
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -241,6 +257,13 @@ class FilmCollectionTableViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        if let settingsLayoutOption = FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout){
+            if selectedLayoutOption != settingsLayoutOption{
+                selectedLayoutOption = settingsLayoutOption
+                tableView.reloadData()
+            }
+        }
+
     }
     
     override func didReceiveMemoryWarning() {
@@ -547,14 +570,30 @@ extension FilmCollectionTableViewController: UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) as! FilmTableViewCell
         let sectionTitle = getSectionTitle(atIndex: indexPath.section)
-        if let movie = isFiltering() ? filteredMovieDict[sectionTitle]?[indexPath.row] : movieDict[sectionTitle]?[indexPath.row]{
-            cell.configure(withMovie: movie)
-        }
-        cell.selectionStyle = .none
         
-        return cell
+        if let movie = isFiltering() ? filteredMovieDict[sectionTitle]?[indexPath.row] : movieDict[sectionTitle]?[indexPath.row]{
+            
+            switch settings.filmCollectionLayout {
+                
+            case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ReuseIdentifier.filmCellExpanded.rawValue) as! FilmTableViewCellExpanded
+                cell.configure(withMovie: movie)
+                cell.selectionStyle = .none
+                return cell
+
+            case FilmCollectionLayoutOption.title.rawValue:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ReuseIdentifier.filmCellSimple.rawValue) as! FilmTableViewCellSimple
+                cell.configure(withMovie: movie)
+                cell.selectionStyle = .none
+                return cell
+                
+            default:
+                break
+            }
+        }
+        
+        return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -588,7 +627,14 @@ extension FilmCollectionTableViewController: UITableViewDelegate{
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 138
+        switch settings.filmCollectionLayout{
+        case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
+            return 138
+        case FilmCollectionLayoutOption.title.rawValue:
+            return 45
+        default:
+            return 0
+        }
     }
    
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {

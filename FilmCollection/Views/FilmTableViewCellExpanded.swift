@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 import PromiseKit
 
-class FilmTableViewCell: UITableViewCell {
+class FilmTableViewCellExpanded: UITableViewCell {
 
     @IBOutlet weak var posterImageView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!

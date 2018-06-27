@@ -54,9 +54,10 @@
 		C35743942020743400DC5F7B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C35743932020743400DC5F7B /* Assets.xcassets */; };
 		C35743972020743400DC5F7B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C35743952020743400DC5F7B /* LaunchScreen.storyboard */; };
 		C35743A22020743400DC5F7B /* FilmCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35743A12020743400DC5F7B /* FilmCollectionTests.swift */; };
-		C35743AD2020798900DC5F7B /* FilmTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35743AC2020798900DC5F7B /* FilmTableViewCell.swift */; };
+		C35743AD2020798900DC5F7B /* FilmTableViewCellExpanded.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35743AC2020798900DC5F7B /* FilmTableViewCellExpanded.swift */; };
 		C35CD3A220441BA200967E1F /* PopoverTableItemSelectionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35CD3A120441BA200967E1F /* PopoverTableItemSelectionDelegate.swift */; };
 		C35CD3A4204425C100967E1F /* PopoverTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C35CD3A3204425C100967E1F /* PopoverTableViewCell.swift */; };
+		C366AB4F20E3543500BEC556 /* FilmTableViewCellSimple.swift in Sources */ = {isa = PBXBuildFile; fileRef = C366AB4E20E3543500BEC556 /* FilmTableViewCellSimple.swift */; };
 		C36CB4B72023079F00346E80 /* ImagePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36CB4B62023079F00346E80 /* ImagePageViewController.swift */; };
 		C38487B72065344100988A7B /* ImageCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38487B62065344100988A7B /* ImageCollectionReusableView.swift */; };
 		C38F682D206E06A000601F7B /* CastCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C38F682C206E06A000601F7B /* CastCollectionViewCell.swift */; };
@@ -138,9 +139,10 @@
 		C357439D2020743400DC5F7B /* FilmCollectionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FilmCollectionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C35743A12020743400DC5F7B /* FilmCollectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmCollectionTests.swift; sourceTree = "<group>"; };
 		C35743A32020743400DC5F7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C35743AC2020798900DC5F7B /* FilmTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmTableViewCell.swift; sourceTree = "<group>"; };
+		C35743AC2020798900DC5F7B /* FilmTableViewCellExpanded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmTableViewCellExpanded.swift; sourceTree = "<group>"; };
 		C35CD3A120441BA200967E1F /* PopoverTableItemSelectionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableItemSelectionDelegate.swift; sourceTree = "<group>"; };
 		C35CD3A3204425C100967E1F /* PopoverTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewCell.swift; sourceTree = "<group>"; };
+		C366AB4E20E3543500BEC556 /* FilmTableViewCellSimple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmTableViewCellSimple.swift; sourceTree = "<group>"; };
 		C36CB4B62023079F00346E80 /* ImagePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePageViewController.swift; sourceTree = "<group>"; };
 		C38487B62065344100988A7B /* ImageCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionReusableView.swift; sourceTree = "<group>"; };
 		C38F682C206E06A000601F7B /* CastCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -254,9 +256,10 @@
 			children = (
 				C38487B62065344100988A7B /* ImageCollectionReusableView.swift */,
 				C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */,
-				C35743AC2020798900DC5F7B /* FilmTableViewCell.swift */,
+				C35743AC2020798900DC5F7B /* FilmTableViewCellExpanded.swift */,
 				C35743952020743400DC5F7B /* LaunchScreen.storyboard */,
 				C35743902020743400DC5F7B /* Main.storyboard */,
+				C366AB4E20E3543500BEC556 /* FilmTableViewCellSimple.swift */,
 				737219AF208BCCCF002A712D /* FilmographyCollectionReusableView.swift */,
 				737219AB20892416002A712D /* FilmographyCollectionViewCell.swift */,
 				C38F682C206E06A000601F7B /* CastCollectionViewCell.swift */,
@@ -524,6 +527,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C366AB4F20E3543500BEC556 /* FilmTableViewCellSimple.swift in Sources */,
 				C3B03634209C397F0089D0AE /* CrewMember.swift in Sources */,
 				C3E4B8BD2064E3DA00F0BE90 /* ImageCollectionViewController.swift in Sources */,
 				C35CD3A220441BA200967E1F /* PopoverTableItemSelectionDelegate.swift in Sources */,
@@ -537,7 +541,7 @@
 				73CBE4A42038F0B900935F54 /* HasVideo.swift in Sources */,
 				C313D02620221BD600BB658C /* Segue.swift in Sources */,
 				C3E4B8C52064E61300F0BE90 /* ImageCollectionViewCell.swift in Sources */,
-				C35743AD2020798900DC5F7B /* FilmTableViewCell.swift in Sources */,
+				C35743AD2020798900DC5F7B /* FilmTableViewCellExpanded.swift in Sources */,
 				C39C635A2032DF9E0028B7CB /* Downloader.swift in Sources */,
 				737219AE208B206A002A712D /* PersonCredits.swift in Sources */,
 				73EEB0992079EF5D00726933 /* SignInViewController.swift in Sources */,

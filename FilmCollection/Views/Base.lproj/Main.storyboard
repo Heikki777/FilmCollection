@@ -26,7 +26,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCell" rowHeight="138" id="O0i-KZ-6v6" customClass="FilmTableViewCell" customModule="FilmCollection" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellExpanded" rowHeight="138" id="O0i-KZ-6v6" customClass="FilmTableViewCellExpanded" customModule="FilmCollection" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="375" height="138"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O0i-KZ-6v6" id="UgC-Q9-R3J">
@@ -87,6 +87,31 @@
                                             <outlet property="ratingLabel" destination="Vww-T3-wmp" id="nPJ-4I-8Oa"/>
                                             <outlet property="titleLabel" destination="Ba2-q4-Vmk" id="MAc-Gv-bT5"/>
                                             <segue destination="0Te-Bz-sJv" kind="show" identifier="showFilmDetailSegue" id="Buq-Yl-9mD"/>
+                                        </connections>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellSimple" rowHeight="45" id="hum-nS-2X6" customClass="FilmTableViewCellSimple" customModule="FilmCollection" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="166" width="375" height="45"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hum-nS-2X6" id="Hm8-b1-DoU">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eT4-Fc-uCb">
+                                                    <rect key="frame" x="15" y="11" width="345" height="23"/>
+                                                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="eT4-Fc-uCb" firstAttribute="bottom" secondItem="Hm8-b1-DoU" secondAttribute="bottomMargin" id="FYV-YY-uoU"/>
+                                                <constraint firstItem="eT4-Fc-uCb" firstAttribute="trailing" secondItem="Hm8-b1-DoU" secondAttribute="trailingMargin" id="RBi-x6-1ES"/>
+                                                <constraint firstItem="eT4-Fc-uCb" firstAttribute="top" secondItem="Hm8-b1-DoU" secondAttribute="topMargin" id="fyp-co-nMd"/>
+                                                <constraint firstItem="eT4-Fc-uCb" firstAttribute="leading" secondItem="Hm8-b1-DoU" secondAttribute="leadingMargin" id="vKz-1S-3rK"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.97230924809999997" green="0.98193607230000002" blue="0.98193607230000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <connections>
+                                            <outlet property="titleLabel" destination="eT4-Fc-uCb" id="azO-Xy-qs4"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
