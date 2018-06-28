@@ -612,10 +612,11 @@ extension FilmCollectionTableViewController: UITableViewDataSource{
         }
         return sections[section]
     }
+    
 }
 
 extension FilmCollectionTableViewController: UITableViewDelegate{
-    // MARK: - UITableViewDelegate Delegate
+    // MARK: - UITableViewDelegate
     func numberOfSections(in tableView: UITableView) -> Int {
         return isFiltering() ? filteredMovieDict.count : movieDict.count
     }
@@ -633,6 +634,13 @@ extension FilmCollectionTableViewController: UITableViewDelegate{
    
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
         return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        view.tintColor = UIColor.gray
+        if let header = view as? UITableViewHeaderFooterView{
+            header.textLabel?.textColor = UIColor.white
+        }
     }
 
 }
