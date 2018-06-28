@@ -112,6 +112,7 @@
                                         <color key="backgroundColor" red="0.97230924809999997" green="0.98193607230000002" blue="0.98193607230000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
                                             <outlet property="titleLabel" destination="eT4-Fc-uCb" id="azO-Xy-qs4"/>
+                                            <segue destination="0Te-Bz-sJv" kind="show" identifier="showFilmDetailSegue" id="vMr-6b-K8d"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1693,6 +1694,7 @@
         <image name="visible" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
+        <segue reference="vMr-6b-K8d"/>
         <segue reference="OZX-FN-kvo"/>
     </inferredMetricsTieBreakers>
 </document>

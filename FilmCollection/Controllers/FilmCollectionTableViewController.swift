@@ -10,8 +10,6 @@ import UIKit
 import PromiseKit
 import Firebase
 
-
-
 class FilmCollectionTableViewController: UIViewController {
 
     private enum ReuseIdentifier: String{
@@ -77,14 +75,12 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     func reset(){
-        print("reset()")
         self.movies = []
         self.movieDict = [:]
         self.filteredMovieDict = [:]
         self.sections = []
         self.filteredSections = []
         tableView.reloadData()
-        print("movies.count: \(movies.count)")
     }
 
     override func viewDidLoad() {
@@ -570,9 +566,7 @@ extension FilmCollectionTableViewController: UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let sectionTitle = getSectionTitle(atIndex: indexPath.section)
-        
-        if let movie = isFiltering() ? filteredMovieDict[sectionTitle]?[indexPath.row] : movieDict[sectionTitle]?[indexPath.row]{
+        if let movie = getMovie(at: indexPath){
             
             switch settings.filmCollectionLayout {
                 
