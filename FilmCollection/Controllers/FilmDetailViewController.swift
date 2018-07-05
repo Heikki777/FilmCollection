@@ -37,6 +37,9 @@ class FilmDetailViewController: UIViewController {
     @IBOutlet weak var reviewHeaderLabel: UILabel!
     @IBOutlet weak var reviewTextView: UITextView!
     
+    let castLabel = UILabel()
+    let crewLabel = UILabel()
+    
     @IBAction func removeMovie(_ sender: Any) {
         guard let movie = movie else{
             print("Error! There is no movie to remove!")
@@ -268,7 +271,11 @@ class FilmDetailViewController: UIViewController {
             genreLabel,
             durationLabel,
             playVideoButton,
+            castHeaderLabel,
+            castLabel,
             castCollectionView,
+            crewHeaderLabel,
+            crewLabel,
             crewCollectionView,
             castHeaderLabel,
             crewHeaderLabel,
@@ -370,31 +377,53 @@ class FilmDetailViewController: UIViewController {
         castImages = []
         castCollectionView.delegate = self
         castCollectionView.dataSource = self
-        let numberOfCastItems = collectionView(castCollectionView, numberOfItemsInSection: 0)
-        castCollectionView.isHidden = numberOfCastItems == 0
+        castCollectionView.isHidden = castMembersWithImage.isEmpty
+ 
+        // If there are no cast members with images. Show the cast members as a list in a UILabel
+        if castMembersWithImage.isEmpty {
+            castLabel.font = UIFont.init(name: "HelveticaNeue", size: 14.0)
+            castLabel.numberOfLines = 5
+            castLabel.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(castLabel)
+            castLabel.topAnchor.constraint(equalTo: castHeaderLabel.bottomAnchor, constant: 8).isActive = true
+            castLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
+            castLabel.bottomAnchor.constraint(equalTo: crewHeaderLabel.topAnchor, constant: -8).isActive = true
+            castLabel.textColor = .white
+
+            var text = ""
+            for castMember in movie.credits.cast{
+                if let character = castMember.character, let name = castMember.name{
+                    text += "\(character): \(name)"
+                }
+            }
+            castLabel.text = text
+            castCollectionView.removeFromSuperview()
+        }
         
         // Crew
         crewImages = []
         crewCollectionView.delegate = self
         crewCollectionView.dataSource = self
-        let numberOfCrewItems = collectionView(crewCollectionView, numberOfItemsInSection: 0)
-        crewCollectionView.isHidden = numberOfCrewItems == 0
+        crewCollectionView.isHidden = crewMembersWithImage.isEmpty
         
         // If there are no crew members with images. Show the crew members as a list in a UILabel
-        if numberOfCrewItems == 0{
-            let crewLabel = UILabel()
+        if crewMembersWithImage.isEmpty {
             crewLabel.font = UIFont.init(name: "HelveticaNeue", size: 14.0)
             crewLabel.numberOfLines = 5
             crewLabel.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(crewLabel)
             crewLabel.topAnchor.constraint(equalTo: crewHeaderLabel.bottomAnchor, constant: 8).isActive = true
-            crewLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8).isActive = true
+            crewLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
+            crewLabel.bottomAnchor.constraint(equalTo: reviewHeaderLabel.topAnchor, constant: -8).isActive = true
             crewLabel.textColor = .white
             var text = ""
             for crewMember in movie.credits.crew{
-                text += "\(crewMember.job): \(crewMember.name)\n"
+                if let job = crewMember.job, let name = crewMember.name{
+                    text += "\(job): \(name)\n"
+                }
             }
             crewLabel.text = text
+            crewCollectionView.removeFromSuperview()
         }
         
         let castMemberImagePromises = castMembersWithImage.map { (castMember) -> Promise<UIImage> in

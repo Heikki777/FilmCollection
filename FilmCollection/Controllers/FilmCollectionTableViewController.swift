@@ -138,7 +138,7 @@ class FilmCollectionTableViewController: UIViewController {
                                 loadingIndicator.message = "\(Int(progress*100)) %"
                                 loadingIndicator.setProgress(progress)
                                 _ = self.addMovieToDictionary(movie)
-                                self.setNavigationBarTitle("\(self.movies.count) movies")
+                                self.setNavigationBarTitle("\(self.movies.count) films")
                             }
                         }
                         .catch{ error in
