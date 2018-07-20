@@ -30,7 +30,7 @@ class TMDBApi{
     static let posterImageBaseURL: String = "https://image.tmdb.org/t/p/"
     static let version: Int = 3
     
-    private let apiKey: String = "a62c4199a4ee1f2fcec39ddffc60199f" //TMDB_API_KEY
+    private let apiKey: String = TMDB_API_KEY
     
     private init(){
         return
@@ -66,11 +66,21 @@ class TMDBApi{
 
             Alamofire.request(url)
             .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
+            .responseData(queue: queue, completionHandler: { (dataResponse) in
+                if let error = dataResponse.error{
+                    //print(error.localizedDescription)
+                    if let response = dataResponse.response,
+                        let headers = response.allHeaderFields as? [String: Any],
+                        let retryAfter = headers["Retry-After"] as? String,
+                        let seconds = Int(retryAfter){
+                        if response.statusCode == 429{
+                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                            return
+                        }
+                    }
                     result.reject(error)
                 }
-                else if let data = response.data{
+                else if let data = dataResponse.data{
                     if let filmSearchResponse = try? self.jsonDecoder.decode(FilmSearchResponse.self, from: data){
                         result.fulfill(filmSearchResponse.results)
                     }
@@ -84,16 +94,26 @@ class TMDBApi{
             let appendToResponse = "&append_to_response=" + append.joined(separator: ",")
 
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)?api_key=\(self.apiKey)&language=en-US\(appendToResponse)")!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+            let queue = DispatchQueue.init(label: "bgThread1", qos: .background, attributes: .concurrent)
 
             Alamofire.request(url)
             .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
+            .responseData(queue: queue, completionHandler: { (dataResponse) in
+
+                if let error = dataResponse.error{
                     //print(error.localizedDescription)
+                    if let response = dataResponse.response,
+                    let headers = response.allHeaderFields as? [String: Any],
+                    let retryAfter = headers["Retry-After"] as? String,
+                    let seconds = Int(retryAfter){
+                        if response.statusCode == 429{
+                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                            return
+                        }
+                    }
                     result.reject(error)
                 }
-                else if let data = response.data{
+                else if let data = dataResponse.data{
                     if let movie = try? self.jsonDecoder.decode(Movie.self, from: data){
                         result.fulfill(movie)
                     }
@@ -113,11 +133,21 @@ class TMDBApi{
 
             Alamofire.request(url)
             .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
+            .responseData(queue: queue, completionHandler: { (dataResponse) in
+                if let error = dataResponse.error{
+                    //print(error.localizedDescription)
+                    if let response = dataResponse.response,
+                        let headers = response.allHeaderFields as? [String: Any],
+                        let retryAfter = headers["Retry-After"] as? String,
+                        let seconds = Int(retryAfter){
+                        if response.statusCode == 429{
+                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                            return
+                        }
+                    }
                     result.reject(error)
                 }
-                else if let data = response.data{
+                else if let data = dataResponse.data{
                     if let videoResponse = try? self.jsonDecoder.decode(VideoResponse.self, from: data){
                         let videos = videoResponse.results
                         result.fulfill(videos)
@@ -139,11 +169,21 @@ class TMDBApi{
 
             Alamofire.request(url)
             .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
+            .responseData(queue: queue, completionHandler: { (dataResponse) in
+                if let error = dataResponse.error{
+                    //print(error.localizedDescription)
+                    if let response = dataResponse.response,
+                        let headers = response.allHeaderFields as? [String: Any],
+                        let retryAfter = headers["Retry-After"] as? String,
+                        let seconds = Int(retryAfter){
+                        if response.statusCode == 429{
+                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                            return
+                        }
+                    }
                     result.reject(error)
                 }
-                else if let data = response.data{
+                else if let data = dataResponse.data{
                     if let image = UIImage.init(data: data){
                         result.fulfill(image)
                     }
@@ -160,11 +200,21 @@ class TMDBApi{
 
             Alamofire.request(url)
             .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
+            .responseData(queue: queue, completionHandler: { (dataResponse) in
+                if let error = dataResponse.error{
+                    //print(error.localizedDescription)
+                    if let response = dataResponse.response,
+                        let headers = response.allHeaderFields as? [String: Any],
+                        let retryAfter = headers["Retry-After"] as? String,
+                        let seconds = Int(retryAfter){
+                        if response.statusCode == 429{
+                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                            return
+                        }
+                    }
                     result.reject(error)
                 }
-                else if let data = response.data{
+                else if let data = dataResponse.data{
                     print("data")
                     if let creditsResponse = try? self.jsonDecoder.decode(Credits.self, from: data){
                         let cast = creditsResponse.cast
@@ -521,6 +571,7 @@ enum TMDBApiError: Error{
     case DecodePersonMovieCreditsError
     case ImageError(String)
     case DecodeVideosError
+    case RequestLimitExceeded(Int)
 }
 
 enum MovieError: Error{

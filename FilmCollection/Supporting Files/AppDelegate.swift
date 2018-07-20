@@ -11,15 +11,22 @@ import PromiseKit
 import Firebase
 import UserNotifications
 import CoreData
+import AFNetworking
+
+let NetworkReachabilityChanged = NSNotification.Name("NetworkReachabilityChanged")
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
-        registerForPushNotifications()
+        
+        setupNetworkReachabilityManager()
+        createObservers()
+        
         return true
     }
 
@@ -44,22 +51,110 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func setupNetworkReachabilityManager(){
+        
+        AFNetworkReachabilityManager.shared().startMonitoring()
+        AFNetworkReachabilityManager.shared().setReachabilityStatusChange { (status) in
+            let reachabilityStatus = AFStringFromNetworkReachabilityStatus(status)
+            var reachableOrNot = ""
+            var networkSummary = ""
+            var reachableStatusBool = false
+            
+            switch (status){
+            case .reachableViaWWAN, .reachableViaWiFi:
+                // Reachable
+                reachableOrNot = "Reachable"
+                networkSummary = "Connected to Network"
+                reachableStatusBool = true
+            default:
+                // Not reachable
+                reachableOrNot = "Not Reachable"
+                networkSummary = "Disconnected from Network"
+                reachableStatusBool = false
+            }
+            
+            if (self.previousNetworkReachabilityStatus != .unknown && status != self.previousNetworkReachabilityStatus){
+                NotificationCenter.default.post(name: NetworkReachabilityChanged, object: nil, userInfo: [
+                    "reachabilityStatus": "Connection Status : \(reachabilityStatus)",
+                    "reachableOrNot": "Network Connection \(reachableOrNot)",
+                    "summary" : networkSummary,
+                    "reachableStatus" : reachableStatusBool
+                ])
+            }
+            self.previousNetworkReachabilityStatus = status
+        }
+    }
+    
+    
+    func createObservers(){
+        let collectionChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmCollectionValueChanged.rawValue)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionChanged, object: nil)
+    }
+    
+    @objc func handleCollectionLoaded(notification: NSNotification){
+        registerForLocalNotifications()
+    }
 
     // MARK: - Notifications
+    func registerForLocalNotifications() {
+        configureUserNotificationsCenter()
+        
+        registerForFilmRecommendationNotifications()
+    }
     
-    func registerForPushNotifications() {
-        UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+    private func configureUserNotificationsCenter() {
+        // Configure User Notification Center
+        UNUserNotificationCenter.current().delegate = self
+        
+        // Define Actions
+        let actionShowDetails = UNNotificationAction(identifier: FilmNotification.Action.showDetails, title: "Show Details", options: [.foreground])
+        let actionUnsubscribe = UNNotificationAction(identifier: FilmNotification.Action.unsubscribe, title: "Unsubscribe", options: [.destructive, .authenticationRequired])
+
+        // Define Category
+        let recommendationCategory = UNNotificationCategory(identifier: FilmNotification.Category.randomRecommendation, actions: [actionShowDetails, actionUnsubscribe], intentIdentifiers: [], options: [])
+        
+        // Register Category
+        UNUserNotificationCenter.current().setNotificationCategories([recommendationCategory])
+    }
+    
+    func registerForFilmRecommendationNotifications(){
+        print("AppDelegate.registerForLocalNotifications")
+        let filmCollection = FilmCollection.shared
+        
+        UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
             (granted, error) in
-            print("Permission granted: \(granted)")
-            // 1. Check if permission granted
-            guard granted else { return }
-            // 2. Attempt registration for remote notifications on the main thread
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
+            print("Notifications permission granted: \(granted)")
+            
+            if granted{
+                
+                if let randomFilm = filmCollection.randomFilm(){
+                    print("Random film: \(randomFilm.title)")
+                    
+                    let notificationContent = UNMutableNotificationContent()
+                    notificationContent.title = "Film recommendation"
+                    notificationContent.subtitle = "Watch today"
+                    notificationContent.body = randomFilm.title
+                    notificationContent.userInfo["filmID"] = randomFilm.id
+                    notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
+                    
+                    let calendar = Locale.current.calendar
+                    
+                    let dateComponents = DateComponents(calendar: calendar, timeZone: nil, era: nil, year: nil, month: nil, day: nil, hour: 15, minute: 35, second: 0, nanosecond: nil, weekday: nil, weekdayOrdinal: nil, quarter: nil, weekOfMonth: nil, weekOfYear: nil, yearForWeekOfYear: nil)
+                    
+                    // FOR testing: 10 second interval trigger
+                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
+                    //let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+                    
+                    let request = UNNotificationRequest(identifier: FilmNotification.Category.randomRecommendation, content: notificationContent, trigger: trigger)
+                    
+                    UNUserNotificationCenter.current().add(request)
+                }
             }
         }
     }
+    
     
     // MARK: - Core Data stack
     
@@ -93,8 +188,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Core Data Saving support
     
     func saveContext () {
+        print("saveContext")
         let context = persistentContainer.viewContext
         if context.hasChanges {
+            print("Context has changes")
             do {
                 try context.save()
             } catch {
@@ -127,6 +224,76 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         saveContext()
         return settings
     }()
+    
+}
+
+enum NotificationRequest: String{
+    case randomFilmRecommendation
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    //for displaying notification when app is in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
+        //If you don't want to show notification when app is open, do something here else and make a return here.
+        //Even you don't implement this delegate method, you will not see the notification on the specified controller. So, you have to implement this delegate and make sure the below line execute. i.e. completionHandler.
+        
+        completionHandler([.alert, .badge, .sound])
+    }
+    
+    // For handling tap and user actions
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        print("userNotificationCenter: didReceive: \(response)")
+        
+        switch response.notification.request.identifier {
+        case FilmNotification.Category.randomRecommendation:
+            print("Show details of the recommended film")
+            if let filmID = response.notification.request.content.userInfo["filmID"] as? Int{
+                print("Film in notification: \(filmID)")
+                if let film = FilmCollection.shared.getMovie(withId: filmID){
+                    print(film.titleYear)
+
+                    guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
+                        print("No homeTabBarController")
+                        return
+                    }
+                    
+                    guard let navigationController = homeTabBarController.childViewControllers.filter({
+                        $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
+                            print("CollectionTabNavigationController could not be found")
+                            return
+                    }
+                    
+                    guard let indexPath = FilmCollection.shared.getIndexPath(for: film) else{
+                        print("The film has no indexPath")
+                        return
+                    }
+                    
+                    if let filmCollectionTableViewController = navigationController.childViewControllers.first as? FilmCollectionTableViewController{
+                        print("FilmCollectionTableViewController")
+                        filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
+                        filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+                    }
+                    else if let filmPosterCollectionViewController = navigationController.childViewControllers.first as? FilmPosterCollectionViewController{
+                        print("FilmPosterCollectionViewController")
+                        filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+                        filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+                    }
+                    else{
+                        print("ERROR!")
+                    }
+                    
+                    homeTabBarController.selectedIndex = 0
+
+                }
+            }
+        default:
+            break
+        }
+        completionHandler()
+    }
     
 }
 

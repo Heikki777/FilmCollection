@@ -7,8 +7,6 @@
 //
 
 import UIKit
-import PromiseKit
-import Firebase
 
 class FilmCollectionTableViewController: UIViewController {
 
@@ -21,29 +19,15 @@ class FilmCollectionTableViewController: UIViewController {
     @IBOutlet weak var orderBarButton: UIBarButtonItem!
     
     @IBAction func changeSortOrder(_ sender: Any) {
-        order.toggle()
-        orderBarButton.title = String(order.symbol)
-        createMovieDictionary()
+        filmCollection.order.toggle()
+        orderBarButton.title = String(filmCollection.order.symbol)
     }
-    
-    // Firebase
-    lazy var databaseRef: DatabaseReference = {
-        return Database.database().reference()
-    }()
-    
+
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let filmCollection = FilmCollection.shared
     let scopeButtonTitles: [String] = ["All"] + Genre.all.map {$0.rawValue}
     let searchController = UISearchController(searchResultsController: nil)
     
-    var sortingRule: SortingRule = .title
-    var sections: [String] = []
-    var filteredSections: [String] = []
-    var movieDict: [String:[Movie]] = [:]
-    var filteredMovieDict: [String:[Movie]] = [:]
-    var order: SortOrder = .ascending
-    
-    var movies: [Movie] = []
-    var user: User?
     var selectedLayoutOption: FilmCollectionLayoutOption = .posterTitleOverview
     
     var selectedFilteringScope: String{
@@ -74,23 +58,15 @@ class FilmCollectionTableViewController: UIViewController {
         
     }
     
-    func reset(){
-        self.movies = []
-        self.movieDict = [:]
-        self.filteredMovieDict = [:]
-        self.sections = []
-        self.filteredSections = []
-        tableView.reloadData()
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     override func viewDidLoad() {
+        print("FilmCollectionTableViewController viewDidLoad")
         super.viewDidLoad()
         
-        guard let user = Auth.auth().currentUser else{
-            print("Error! No user")
-            // TODO: Show alert
-            return
-        }
+        createObservers()
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
@@ -101,138 +77,10 @@ class FilmCollectionTableViewController: UIViewController {
             print("3D Touch not available")
         }
         
-        self.user = user
-        
-        let loadingIndicator = LoadingIndicatorViewController(title: "Loading movies", message: "", complete: nil)
-        self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-        
-        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { (snapshot) in
-            
-            if let dbMovies = snapshot.value as? [String:AnyObject]{
-                
-                print("Movie list value changed: \(dbMovies.count)")
-                self.reset()
-
-                for (_,dbMovie) in dbMovies{
-                    if let id = dbMovie["id"] as? Int, let rating = dbMovie["rating"] as? Int{
-                        attempt{
-                            self.api.loadMovie(id, append: ["credits"])
-                        }
-                        .done{ movie in
-                            movie.review = dbMovie["review"] as? String ?? ""
-                            movie.rating = Rating.all[rating]
-                            // Load the small poster images for the tableView
-                            attempt{
-                                movie.loadSmallPosterImage()
-                            }
-                            .done{ (image) in
-                                movie.smallPosterImage = image
-                            }
-                            .catch{ error in
-                                print("Could not load small poster image for the movie \(movie.title)")
-                                print(error.localizedDescription)
-                            }
-                            .finally {
-                                self.movies.append(movie)
-                                let progress = Float(self.movies.count) / Float(dbMovies.count)
-                                loadingIndicator.message = "\(Int(progress*100)) %"
-                                loadingIndicator.setProgress(progress)
-                                _ = self.addMovieToDictionary(movie)
-                                self.setNavigationBarTitle("\(self.movies.count) films")
-                            }
-                        }
-                        .catch{ error in
-                            print(error.localizedDescription)
-                        }
-                    }
-                }
-            }
-        }
-        
-        // Listen for new movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
-            
-            // Use this handler only if the movies have been loaded
-            guard !self.movies.isEmpty else{
-                return
-            }
-            
-            guard let snapshotValue = dataSnapshot.value as? [String:AnyObject],
-                let id = snapshotValue["id"] as? Int,
-                let rating = snapshotValue["rating"] as? Int else {
-                return
-            }
-            
-            // Make sure that the movie is not already in the movies array before loading it.
-            if !self.movies.filter({ (movie) -> Bool in
-                return movie.id == id
-            }).isEmpty{
-                return
-            }
-            
-            attempt{
-                self.api.loadMovie(id, append: ["credits"])
-            }
-            .done{ movie in
-                movie.rating = Rating.all[rating]
-                // Load the small poster images for the tableView
-                attempt{
-                    movie.loadSmallPosterImage()
-                }
-                .done{ (image) in
-                    movie.smallPosterImage = image
-                }
-                .catch{ error in
-                    print("Could not load small poster image for the movie \(movie.title)")
-                    print(error.localizedDescription)
-                }
-                .finally {
-                    self.movies.append(movie)
-                    _ = self.addMovieToDictionary(movie)
-                    self.setNavigationBarTitle("\(self.movies.count) movies")
-                }
-            }
-            .catch{ error in
-                print(error.localizedDescription)
-            }
-        })
-        
-        // Listen for changed movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childChanged, with: { (dataSnapshot) in
-
-            guard let snapshotValue = dataSnapshot.value as? [String:AnyObject] else {
-                return
-            }
-            
-            if let id = snapshotValue["id"] as? Int, let movie = (self.movies.filter { $0.id == id }).first{
-                // Rating changed
-                if let rating = snapshotValue["rating"] as? Int{
-                    movie.rating = Rating.all[rating]
-                    if let indexPath = self.getIndexPath(for: movie){
-                        self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                    }
-                }
-            }
-        })
-        
-        // Listen for deleted movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childRemoved, with: { (dataSnapshot) in
-            if let value = dataSnapshot.value as? [String:Any]{
-                if let id = value["id"] as? Int {
-                    if let movie = self.getMovie(withId: id), let indexPath = self.getIndexPath(for: movie){
-                        self.removeMovie(at: indexPath)
-                    }
-                }
-            }
-            
-            self.setNavigationBarTitle("\(self.movies.count) movies")
-            
-        })
-                
-        orderBarButton.title = String(order.symbol)
+        orderBarButton.title = String(filmCollection.order.symbol)
 
         tableView.delegate = self
-        tableView.dataSource = self
+        tableView.dataSource = filmCollection
         
         // Setup the search controller
         searchController.searchResultsUpdater = self
@@ -244,27 +92,122 @@ class FilmCollectionTableViewController: UIViewController {
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
         definesPresentationContext = true
+
+        if let layoutOption = FilmCollectionLayoutOption(rawValue: appDelegate.settings.filmCollectionLayout){
+            self.selectedLayoutOption = layoutOption
+        }
         
-    }
-    
-    @IBAction func unwindToFilmCollectionTableVC(segue: UIStoryboardSegue){
-        print("unwindToFilmCollectionTableVC")
+        //print("FILMS: \(filmCollection.size)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if let settingsLayoutOption = FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout){
-            if selectedLayoutOption != settingsLayoutOption{
-                selectedLayoutOption = settingsLayoutOption
-                tableView.reloadData()
-            }
-        }
+        print("FilmCollectionTableViewController viewDidAppear")
+    }
+    
+    func createObservers(){
+        let collectionLoaded = Notification.Name(rawValue: FilmCollection.NotificationKey.filmCollectionValueChanged.rawValue)
+        let filmAddedToCollection = Notification.Name(rawValue: FilmCollection.NotificationKey.filmAddedToCollection.rawValue)
+        let filmChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmChanged.rawValue)
+        let filmRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.filmRemoved.rawValue)
+        let progressChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.loadingProgressChanged.rawValue)
+        let filmDictionaryChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmDictionaryChanged.rawValue)
+        let newSectionAdded = Notification.Name(rawValue: FilmCollection.NotificationKey.newSectionAddedToDictionary.rawValue)
+        let sectionRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.sectionRemovedFromDictionary.rawValue)
+        let beginUpdates = Notification.Name(rawValue: FilmCollection.NotificationKey.beginUpdates.rawValue)
+        let endUpdates = Notification.Name(rawValue: FilmCollection.NotificationKey.endUpdates.rawValue)
+        let collectionFiltered = Notification.Name(rawValue: FilmCollection.NotificationKey.collectionFiltered.rawValue)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionLoaded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleChangeInFilmData(notification:)), name: filmChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmRemoval(notification:)), name: filmRemoved, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleLoadingProgressChange(notification:)), name: progressChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmDictionaryChange(notification:)), name: filmDictionaryChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSectionAddition(notification:)), name: newSectionAdded, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSectionRemoval(notification:)), name: sectionRemoved, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(beginUpdates(notification:)), name: beginUpdates, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(endUpdates(notification:)), name: endUpdates, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
 
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @objc func handleCollectionFiltered(notification: NSNotification){
+        self.tableView.reloadData()
+    }
+    
+    @objc func beginUpdates(notification: NSNotification){
+        self.tableView.beginUpdates()
+    }
+    
+    @objc func endUpdates(notification: NSNotification){
+        self.tableView.endUpdates()
+    }
+    
+    @objc func handleSectionAddition(notification: NSNotification){
+        if let sectionIndex = notification.object as? Int{
+            print("new section: \(sectionIndex)")
+            self.tableView.insertSections([sectionIndex], with: .automatic)
+        }
+    }
+    
+    @objc func handleSectionRemoval(notification: NSNotification){
+        if let sectionIndex = notification.object as? Int{
+            print("remove section at index: \(sectionIndex)")
+            self.tableView.deleteSections([sectionIndex], with: .automatic)
+        }
+    }
+    
+    @objc func handleFilmDictionaryChange(notification: NSNotification){
+        tableView.reloadData()
+    }
+    
+    @objc func handleFilmRemoval(notification: NSNotification){
+        guard let (film, indexPath) = notification.object as? (Movie, IndexPath) else {
+            return
+        }
+        print("Remove: \(film.title) at indexPath: \(indexPath)")
+    
+        // Remove the corresponding tableview cell
+        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        self.setNavigationBarTitle("\(self.filmCollection.size) films")
+
+    }
+    
+    @objc func handleCollectionLoaded(notification: NSNotification){
+        print(filmCollection.size)
+    }
+    
+    @objc func handleCollectionAddition(notification: NSNotification){
+        if let film = notification.object as? Movie{
+
+            if let indexPath = filmCollection.getIndexPath(for: film){
+                self.tableView.insertRows(at: [indexPath], with: .automatic)
+                self.setNavigationBarTitle("\(self.filmCollection.size) films")
+            }
+        }
+    }
+    
+    @objc func handleChangeInFilmData(notification: NSNotification){
+        if let film = notification.object as? Movie, let indexPath = filmCollection.getIndexPath(for: film){
+            // Reload the tableView cell that displays the changed film
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+    }
+    
+    @objc func handleLoadingProgressChange(notification: NSNotification){
+        //print("handleLoadingProgressChange: \(Int(notification.object as! Float * 100)) %")
+        guard let homeTabBarController = self.tabBarController as? HomeTabBarController else{
+            return
+        }
+        if let progress = notification.object as? Float{
+            let percentage: Int = Int(progress * 100)
+            homeTabBarController.showLoadingIndicator(withTitle: "Loading films", message: "\(percentage) %", progress: progress, complete: nil)
+        }
+    }
+    
+    @IBAction func unwindToFilmCollectionTableVC(segue: UIStoryboardSegue){
+        print("unwindToFilmCollectionTableVC")
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -281,12 +224,12 @@ class FilmCollectionTableViewController: UIViewController {
                 return
             }
             
-            if let movie = getMovie(at: indexPath){
+            if let film = filmCollection.getMovie(at: indexPath){
                 
                 if let identifier = segue.identifier{
                     if identifier == Segue.showFilmDetailSegue.rawValue{
                         if let destinationVC = segue.destination as? FilmDetailViewController{
-                            destinationVC.movie = movie
+                            destinationVC.film = film
                         }
                     }
                 }
@@ -299,7 +242,7 @@ class FilmCollectionTableViewController: UIViewController {
                 popoverTableViewController.items = SortingRule.all.map{$0.rawValue}
                 popoverTableViewController.navigationItem.title = "Order by"
                 popoverTableViewController.delegate = self
-                if let sortingRuleIndex = SortingRule.all.index(of: sortingRule){
+                if let sortingRuleIndex = SortingRule.all.index(of: filmCollection.sortingRule){
                     popoverTableViewController.selectionIndexPath = IndexPath(row: sortingRuleIndex, section: 0)
                 }
             }
@@ -314,9 +257,10 @@ class FilmCollectionTableViewController: UIViewController {
     
     func handleShakeGesture(){
         // Show a random movie
-        let random = Int(arc4random_uniform(UInt32(movies.count)))
-        let movie = movies[random]
-        if let indexPath = getIndexPath(for: movie){
+        guard let movie = filmCollection.randomFilm() else{
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: movie){
             tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
             performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
         }
@@ -326,300 +270,14 @@ class FilmCollectionTableViewController: UIViewController {
         self.navigationItem.title = title
     }
     
-    func sort(movies: inout [Movie], sortingRule: SortingRule, order: SortOrder = .ascending){
-        movies.sort { (movie_A, movie_B) -> Bool in
-            switch sortingRule{
-            case .title:
-                return (order == .ascending) ? movie_A.sortingTitle < movie_B.sortingTitle : movie_A.sortingTitle > movie_B.sortingTitle
-            case .year:
-                if let movie_A_year = movie_A.year{
-                    if let movie_B_year = movie_B.year{
-                        return (order == .ascending) ? movie_A_year < movie_B_year : movie_A_year > movie_B_year
-                    }
-                    return true
-                }
-                return false
-            case .rating:
-                return movie_A.rating.rawValue < movie_B.rating.rawValue
-            }
-        }
-    }
-    
-    func getIndexPath(for movie: Movie) -> IndexPath?{
-        let sectionTitle = getSectionTitle(for: movie)
-        if isFiltering(){
-            if let row = filteredMovieDict[sectionTitle]?.index(of: movie), let section = filteredSections.index(of: sectionTitle){
-                return IndexPath.init(row: row, section: section)
-            }
-        }
-        else if let row = movieDict[sectionTitle]?.index(of: movie), let section = sections.index(of: sectionTitle){
-            return IndexPath.init(row: row, section: section)
-        }
-        return nil
-    }
-    
     func searchBarIsEmpty() -> Bool{
         return searchController.searchBar.text?.isEmpty ?? true
-    }
-    
-    func filterContent(scope: String = "All", searchText: String){
-        filteredMovieDict = [:]
-        filteredSections = []
-        for section in sections{
-            if let sectionMovies = movieDict[section]{
-                let filteredSectionMovies = sectionMovies.filter({ (movie) -> Bool in
-                    switch scope{
-                        
-                    case "All":
-                        return movie.title.lowercased().contains(searchText.lowercased())
-                        
-                    default:
-                        
-                        let movieBelongsToGenre = movie.genres?.contains(where: { (genre) -> Bool in
-                            return genre.name == scope
-                        }) ?? false
-                        
-                        if searchText.isEmpty{
-                            return movieBelongsToGenre
-                        }
-                        else{
-                            return movieBelongsToGenre && movie.title.lowercased().contains(searchText.lowercased())
-                        }
-                        
-                    }
-                })
-                if filteredSectionMovies.count > 0{
-                    filteredSections.append(section)
-                    filteredMovieDict[section] = filteredSectionMovies
-                }
-            }
-        }
-        
-        tableView.reloadData()
-        if tableView.numberOfSections > 0{
-            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-        }
-    }
-    
-    func isFiltering() -> Bool{
-        let searchBarScopeIsFiltering = searchController.searchBar.selectedScopeButtonIndex != 0
-        return searchBarScopeIsFiltering || (searchController.isActive && !searchBarIsEmpty())
-    }
-    
-    // Re-creates the film dictionary by applying the selected sorting rule
-    func createMovieDictionary(){
-        var tempMovies = movies
-        let secondarySortingRule: SortingRule = (sortingRule == .title) ? .year : .title
-        sort(movies: &tempMovies, sortingRule: secondarySortingRule, order: order)
-        sections = []
-        filteredSections = []
-        movieDict = [:]
-        filteredMovieDict = [:]
-        tableView.reloadData()
-        
-        for movie in tempMovies{
-            _ = self.addMovieToDictionary(movie)
-        }
-    }
-    
-    /* Adds the movie to the dictionary and updated the tableview.
-     Returns false if the movie was already in the collection, otherwise return true.
-     */
-    func addMovieToDictionary(_ movie: Movie) -> Bool{
-        let sectionTitle = getSectionTitle(for: movie)
-        if movieDict[sectionTitle] == nil{
-            sections.append(sectionTitle)
-            movieDict[sectionTitle] = []
-
-            sections.sort(by: { (a, b) -> Bool in
-                if sortingRule == .rating{
-                    if let ratingA = Rating.init(string: a), let ratingB = Rating.init(string: b){
-                        return (order == .ascending) ? ratingA.rawValue < ratingB.rawValue : ratingA.rawValue > ratingB.rawValue
-                    }
-                }
-                return (order == .ascending) ? a < b : a > b
-            })
-            if let sectionIndex = sections.index(of: sectionTitle){
-                if isFiltering(){
-                    filterContent(scope: selectedFilteringScope, searchText: searchController.searchBar.text!)
-                }
-                else{
-                    self.tableView.performBatchUpdates({
-                        self.tableView.insertSections([sectionIndex], with: .automatic)
-                    }, completion: nil)
-                }
-            }
-        }
-
-        if var sectionMovies = movieDict[sectionTitle], !sectionMovies.contains(movie){
-            if let sectionIndex = sections.index(of: sectionTitle){
-                if movieDict[sectionTitle] != nil{
-
-                    // Add movie to temp array
-                    sectionMovies.append(movie)
-                    // Sort
-                    sort(movies: &sectionMovies, sortingRule: sortingRule)
-                    // Find the index of the added movie
-                    let index = sectionMovies.index(of: movie)!
-                    // Add movie to the dictionary
-                    movieDict[sectionTitle]?.insert(movie, at: index)
-
-                    if let rowIndex = movieDict[sectionTitle]?.index(of: movie){
-                        let indexPath = IndexPath.init(row: rowIndex, section: sectionIndex)
-                        if isFiltering(){
-                            filterContent(scope: selectedFilteringScope, searchText: self.searchController.searchBar.text!)
-                        }
-                        else{
-                            self.tableView.performBatchUpdates({
-                                self.tableView.insertRows(at: [indexPath], with: .automatic)
-                            }, completion: nil)
-                        }
-
-                        setNavigationBarTitle("\(movies.count) movies")
-                        return true
-                    }
-                }
-            }
-        }
-        return false
-    }
-    
-    func getSectionTitle(for movie: Movie) -> String{
-        switch sortingRule {
-        case .rating:
-            return movie.rating.description
-        case .title:
-            if let first = movie.sortingTitle.first{
-                return String.init(first)
-            }
-            return ""
-        case .year:
-            if let year = movie.year{
-                return "\(year)"
-            }
-            return "Unknown"
-        }
-    }
-    
-    func getSectionTitle(atIndex index: Int) -> String{
-        return isFiltering() ? filteredSections[index] : sections[index]
-    }
-    
-    func getMovie(at indexPath: IndexPath) -> Movie?{
-        let sectionTitle = getSectionTitle(atIndex: indexPath.section)
-        return isFiltering() ? filteredMovieDict[sectionTitle]?[indexPath.row] : movieDict[sectionTitle]?[indexPath.row]
-    }
-    
-    func getMovie(withId id: Int) -> Movie?{
-        return movies.filter { $0.id == id }.first
-    }
-    
-    func removeMovie(at indexPath: IndexPath){
-        let section = isFiltering() ? filteredSections[indexPath.section] : sections[indexPath.section]
-        if let movie = isFiltering() ? filteredMovieDict[section]?[indexPath.row] : movieDict[section]?[indexPath.row]{
-            print("Trying to delete the movie: \(movie.title)")
-            
-            if let user = Auth.auth().currentUser{
-                // Remove the movie to database
-                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").removeValue()
-            }
-            
-            if let indexInDict = movieDict[section]!.index(of: movie){
-                print(indexInDict)
-                tableView.beginUpdates()
-                
-                if isFiltering(){
-                    if let indexInFilteredMovieDict = filteredMovieDict[section]!.index(of: movie){
-                        filteredMovieDict[section]!.remove(at: indexInFilteredMovieDict)
-                        if let sectionMovies = filteredMovieDict[section], sectionMovies.isEmpty{
-                            filteredMovieDict[section] = nil
-                            if let indexOfFilteredSection = filteredSections.index(of: section){
-                                tableView.deleteSections([indexOfFilteredSection], with: .automatic)
-                            }
-                        }
-                    }
-                }
-                
-                movieDict[section]!.remove(at: indexInDict)
-                movies.remove(at: movies.index(of:movie)!)
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-                if movieDict[section]!.isEmpty{
-                    movieDict[section] = nil
-                    tableView.deleteSections([indexPath.section], with: .automatic)
-                }
-                tableView.endUpdates()
-            }
-        }
-    }
-}
-
-extension FilmCollectionTableViewController: UITableViewDataSource{
-    // MARK: - UITableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
-        let sectionTitle = getSectionTitle(atIndex: section)
-        if let sectionMovies = isFiltering() ? filteredMovieDict[sectionTitle] : movieDict[sectionTitle]{
-            return sectionMovies.count
-        }
-        return 0
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        if let movie = getMovie(at: indexPath){
-            
-            switch settings.filmCollectionLayout {
-                
-            case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
-                let cell = tableView.dequeueReusableCell(withIdentifier: ReuseIdentifier.filmCellExpanded.rawValue) as! FilmTableViewCellExpanded
-                cell.configure(withMovie: movie)
-                cell.selectionStyle = .none
-                return cell
-
-            case FilmCollectionLayoutOption.title.rawValue:
-                let cell = tableView.dequeueReusableCell(withIdentifier: ReuseIdentifier.filmCellSimple.rawValue) as! FilmTableViewCellSimple
-                cell.configure(withMovie: movie)
-                cell.selectionStyle = .none
-                return cell
-                
-            default:
-                break
-            }
-        }
-        
-        return UITableViewCell()
-    }
-    
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-
-        if editingStyle == .delete{
-            print("DELETE")
-            removeMovie(at: indexPath)
-        }
-    }
-    
-    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return isFiltering() ? filteredSections : sections
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if isFiltering(){
-            return filteredSections[section]
-        }
-        return sections[section]
     }
     
 }
 
 extension FilmCollectionTableViewController: UITableViewDelegate{
     // MARK: - UITableViewDelegate
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return isFiltering() ? filteredMovieDict.count : movieDict.count
-    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch settings.filmCollectionLayout{
@@ -648,11 +306,10 @@ extension FilmCollectionTableViewController: UITableViewDelegate{
 extension FilmCollectionTableViewController: UISearchResultsUpdating{
     // MARK: - UISearchResultsUpdating Delegate
     func updateSearchResults(for searchController: UISearchController) {
-        if let text = searchController.searchBar.text{
-            filterContent(scope: selectedFilteringScope, searchText: text)
-        }
-        else{
-            print("No search text")
+        filmCollection.filterCollection(scope: selectedFilteringScope, searchText: searchController.searchBar.text ?? "")
+        tableView.reloadData()
+        if tableView.numberOfSections > 0{
+            tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         }
     }
     
@@ -669,7 +326,7 @@ extension FilmCollectionTableViewController: UISearchBarDelegate{
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         let scope = scopeButtonTitles[selectedScope]
         print("Selected scope: \(scope)")
-        filterContent(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
+        filmCollection.filterCollection(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
     }
     
     
@@ -688,10 +345,7 @@ extension FilmCollectionTableViewController: UIPopoverPresentationControllerDele
 
 extension FilmCollectionTableViewController: PopoverTableItemSelectionDelegate{
     func itemSelected(indexPath: IndexPath){
-        sortingRule = SortingRule.all[indexPath.row]
-        createMovieDictionary()
-        self.tableView.reloadData()
-        self.navigationItem.title = "\(movies.count) movies"
+        filmCollection.sortingRule = SortingRule.all[indexPath.row]
     }
 }
 
@@ -710,8 +364,7 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
             return nil
         }
         
-        let sectionTitle = getSectionTitle(atIndex: indexPath.section)
-        guard let film = movieDict[sectionTitle]?[indexPath.row] else{
+        guard let film = filmCollection.getMovie(at: indexPath) else{
             print("There is no film at indexPath: \(indexPath)")
             return nil
         }

@@ -16,6 +16,13 @@ class LoadingIndicatorViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var backgroundView: UIView!
     
+    override var title: String?{
+        didSet{
+            if titleLabel != nil{
+                titleLabel.text = title
+            }
+        }
+    }
     var message: String?{
         didSet{
             if messageLabel != nil{

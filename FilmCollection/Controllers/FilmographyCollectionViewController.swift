@@ -21,6 +21,7 @@ class FilmographyCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var backgroundImageView: UIImageView!
     
+    let filmCollection = FilmCollection.shared
     var user: User?
     var personCredits: PersonCredits = PersonCredits()
     var backgroundImage: UIImage?{
@@ -281,12 +282,12 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                         attempt{
                             self.api.loadMovie(id, append: ["credits"]).ensure { progressChanged("Movie loaded") }
                         }
-                        .done{ (movie) in
+                        .done{ (film) in
                             if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
                                 return vc is FilmDetailViewController
                             }).first as? FilmDetailViewController){
                                 filmDetailVC.reset()
-                                filmDetailVC.movie = movie
+                                filmDetailVC.film = film
                                 filmDetailVC.setup()
                                 self.navigationController?.popToViewController(filmDetailVC, animated: true)
                             }
@@ -305,19 +306,13 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                 
                 // Show movie detail action
                 let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
-                    if let filmCollectionVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
-                        return vc is FilmCollectionTableViewController
-                    }).first as? FilmCollectionTableViewController){
-                        
-                        if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
-                            return vc is FilmDetailViewController
-                        }).first as? FilmDetailViewController){
-                            filmDetailVC.reset()
-                            filmDetailVC.movie = filmCollectionVC.getMovie(withId: id)
-                            filmDetailVC.setup()
-                            self.navigationController?.popToViewController(filmDetailVC, animated: true)
-                            
-                        }
+                    if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
+                        return vc is FilmDetailViewController
+                    }).first as? FilmDetailViewController){
+                        filmDetailVC.reset()
+                        filmDetailVC.film = self.filmCollection.getMovie(withId: id)
+                        filmDetailVC.setup()
+                        self.navigationController?.popToViewController(filmDetailVC, animated: true)
                     }
                 })
                 

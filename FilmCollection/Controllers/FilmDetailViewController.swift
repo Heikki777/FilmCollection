@@ -41,15 +41,15 @@ class FilmDetailViewController: UIViewController {
     let crewLabel = UILabel()
     
     @IBAction func removeMovie(_ sender: Any) {
-        guard let movie = movie else{
-            print("Error! There is no movie to remove!")
+        guard let film = film else{
+            print("Error! There is no film to remove!")
             return
         }
         
         if let user = Auth.auth().currentUser{
-            let alert = UIAlertController.init(title: "Remove movie", message: "Are you sure that you want to remove the movie \(movie.title) from the collection?", preferredStyle: .alert)
+            let alert = UIAlertController.init(title: "Remove film", message: "Are you sure that you want to remove the movie \(film.title) from the collection?", preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "Remove", style: .destructive, handler: { (action) in
-                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").removeValue()
+                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").removeValue()
                 self.performSegue(withIdentifier: Segue.unwindFromMovieDetailToMovieCollection.rawValue, sender: self)
             }))
             alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
@@ -58,13 +58,13 @@ class FilmDetailViewController: UIViewController {
     }
     
     @IBAction func addMovie(_ sender: UIBarButtonItem) {
-        guard let user = Auth.auth().currentUser, let movie = movie else{
+        guard let user = Auth.auth().currentUser, let film = film else{
             return
         }
         
-        self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").setValue(
+        self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").setValue(
             [
-                "id": movie.id,
+                "id": film.id,
                 "rating": Rating.NotRated.rawValue,
                 "review": ""
             ]
@@ -73,20 +73,20 @@ class FilmDetailViewController: UIViewController {
     
     @IBAction func watched(_ sender: UIBarButtonItem) {
         
-        guard let user = Auth.auth().currentUser, let movie = movie else{
+        guard let user = Auth.auth().currentUser, let film = film else{
             return
         }
-        print("Watched movie \(movie.title)")
+        print("Watched film \(film.title)")
         
         let date = Date()
         self.databaseRef.child("user-viewing-history").child("\(user.uid)").child("watched").childByAutoId().setValue(
             [
                 "date": dateFormatter.string(from: date),
-                "movieTitle": movie.title,
-                "movieId": movie.id
+                "movieTitle": film.title,
+                "movieId": film.id
             ]
         )
-        self.showAlert(title: "Viewing saved", message: "\(movie.title)\n\(self.dateFormatter.string(from: date))")
+        self.showAlert(title: "Viewing saved", message: "\(film.title)\n\(self.dateFormatter.string(from: date))")
     }
     
     var fadeableViews: [UIView] = []
@@ -99,7 +99,7 @@ class FilmDetailViewController: UIViewController {
         case creditCollectionViewCell
     }
     
-    var movie: Movie?
+    var film: Movie?
     
     var smallPosterImage: UIImage?{
         didSet{
@@ -132,13 +132,13 @@ class FilmDetailViewController: UIViewController {
     }
     
     var castMembersWithImage: [CastMember]{
-        return movie?.credits.cast.filter({ (castMember) -> Bool in
+        return film?.credits.cast.filter({ (castMember) -> Bool in
             return castMember.profilePath != nil
         }) ?? []
     }
     
     var crewMembersWithImage: [CrewMember]{
-        return movie?.credits.crew.filter({ (crewMember) -> Bool in
+        return film?.credits.crew.filter({ (crewMember) -> Bool in
             return crewMember.profilePath != nil
         }) ?? []
     }
@@ -185,20 +185,20 @@ class FilmDetailViewController: UIViewController {
         setContentHeight()
         
         var movieIsInCollection = false
-        if let movie = movie, let user = Auth.auth().currentUser{
+        if let film = film, let user = Auth.auth().currentUser{
             self.databaseRef.child("user-movies").child("\(user.uid)").observe(.value, with: { (snapshot) in
 
-                movieIsInCollection = snapshot.hasChild("\(movie.id)")
+                movieIsInCollection = snapshot.hasChild("\(film.id)")
                 self.removeBarButton.isEnabled = movieIsInCollection
                 self.watchedBarButton.isEnabled = movieIsInCollection
                 self.reviewBarButton.isEnabled = movieIsInCollection
                 self.additionBarButton.isEnabled = !movieIsInCollection
                 
                 if movieIsInCollection{
-                    self.databaseRef.child("user-movies").child(user.uid).child("\(movie.id)").observe(.value, with: { (snapshot) in
+                    self.databaseRef.child("user-movies").child(user.uid).child("\(film.id)").observe(.value, with: { (snapshot) in
                         if let snapshotValue = snapshot.value as? [String:Any]{
                             if let ratingValue = snapshotValue["rating"] as? Int, let rating = Rating(rawValue: ratingValue){
-                                self.movie?.rating = rating
+                                self.film?.rating = rating
                                 self.ratingLabel.text = "Rating: \(rating.description)"
                             }
                         }
@@ -228,7 +228,7 @@ class FilmDetailViewController: UIViewController {
     }
     
     func reset(){
-        movie = nil
+        film = nil
         backgroundImageView.image = nil
         imageView.image = nil
         titleLabel.text = ""
@@ -285,23 +285,23 @@ class FilmDetailViewController: UIViewController {
                 
         playVideoButton.isHidden = true
         
-        guard let movie = movie else{
+        guard let film = film else{
             print("No film")
             return
         }
         
         // Observer changes in the movie
         if let user = Auth.auth().currentUser{
-            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").observe(.childChanged) { (snapshot) in
+            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").observe(.childChanged) { (snapshot) in
                 if let snapshotDict = snapshot.value as? [String:AnyObject], let rating = snapshotDict["rating"] as? Int {
-                    movie.rating = Rating.all[rating]
-                    self.ratingLabel.text = "Rating: \(movie.rating.description)"
+                    film.rating = Rating.all[rating]
+                    self.ratingLabel.text = "Rating: \(film.rating.description)"
                 }
             }
         }
         
         // Load background poster and the small poster images
-        movie.loadPosterImages().done({ (bigPosterImage, smallPosterImage) in
+        film.loadPosterImages().done({ (smallPosterImage, bigPosterImage) in
             self.bigPosterImage = bigPosterImage
             self.smallPosterImage = smallPosterImage
         }).catch { (error) in
@@ -310,7 +310,7 @@ class FilmDetailViewController: UIViewController {
         
         // Videos
         attempt{
-            self.api.loadVideos(movie.id)
+            self.api.loadVideos(film.id)
         }
         .done { (videos) in
             self.videos = videos
@@ -337,22 +337,22 @@ class FilmDetailViewController: UIViewController {
         }
         
         // MARK: - Set the movie title
-        titleLabel.text = movie.titleYear
+        titleLabel.text = film.titleYear
         
         // Overview
-        if let overview = movie.overview{
+        if let overview = film.overview{
             descriptionTextView.text = overview
             descriptionTextView.isScrollEnabled = false
             descriptionTextView.sizeToFit()
         }
         
         // Genre
-        genreLabel.text = movie.genres?.map({ (genre) -> String in
+        genreLabel.text = film.genres?.map({ (genre) -> String in
             return genre.name
         }).joined(separator: ", ")
         
         // Duration
-        if let runtime = movie.runtime{
+        if let runtime = film.runtime{
             let hours = Int(runtime / 60)
             let minutes = runtime % 60
             var durationText = ""
@@ -362,7 +362,7 @@ class FilmDetailViewController: UIViewController {
         }
         
         // Director
-        let directors = movie.directors
+        let directors = film.directors
         directorLabel.isHidden = true
         if directors.count > 0{
             let directorsString = directors.compactMap{$0.name}.joined(separator: ", ")
@@ -371,7 +371,7 @@ class FilmDetailViewController: UIViewController {
         }
         
         // Rating
-        ratingLabel.text = "Rating: \(movie.rating.description)"
+        ratingLabel.text = "Rating: \(film.rating.description)"
         
         // Cast
         castImages = []
@@ -391,7 +391,7 @@ class FilmDetailViewController: UIViewController {
             castLabel.textColor = .white
 
             var text = ""
-            for castMember in movie.credits.cast{
+            for castMember in film.credits.cast{
                 if let character = castMember.character, let name = castMember.name{
                     text += "\(character): \(name)"
                 }
@@ -417,7 +417,7 @@ class FilmDetailViewController: UIViewController {
             crewLabel.bottomAnchor.constraint(equalTo: reviewHeaderLabel.topAnchor, constant: -8).isActive = true
             crewLabel.textColor = .white
             var text = ""
-            for crewMember in movie.credits.crew{
+            for crewMember in film.credits.crew{
                 if let job = crewMember.job, let name = crewMember.name{
                     text += "\(job): \(name)\n"
                 }
@@ -473,9 +473,9 @@ class FilmDetailViewController: UIViewController {
         })
         
         // Review
-        reviewTextView.text = movie.review
-        reviewTextView.isHidden = movie.review.isEmpty
-        reviewHeaderLabel.isHidden = movie.review.isEmpty
+        reviewTextView.text = film.review
+        reviewTextView.isHidden = film.review.isEmpty
+        reviewHeaderLabel.isHidden = film.review.isEmpty
         
         setContentHeight()
         scrollView.scrollToTop()
@@ -529,7 +529,7 @@ class FilmDetailViewController: UIViewController {
     
     func loadMovieImages() -> Promise<MovieImages>{
         return Promise { result in
-            guard let movieId = self.movie?.id else{
+            guard let movieId = self.film?.id else{
                 print("No movie")
                 result.reject(FilmDetailViewControllerError.movieIsNil)
                 return
@@ -573,12 +573,12 @@ class FilmDetailViewController: UIViewController {
                 }
                 
                 let vc = segue.destination as! VideoPlayerViewController
-                vc.navigationItem.title = movie?.title
+                vc.navigationItem.title = film?.title
                 vc.url = url
         
             case Segue.showReviewSegue.rawValue:
                 let vc = segue.destination as! ReviewViewController
-                vc.movie = movie
+                vc.film = film
                 vc.backgroundImage = bigPosterImage
                 
             case Segue.showFilmographySegue.rawValue:
@@ -639,8 +639,8 @@ class FilmDetailViewController: UIViewController {
                 return
             }
             vc.images = movieImages.toDictionary
-            vc.movieId = movie?.id
-            vc.navigationItem.title = movie?.title
+            vc.movieId = film?.id
+            vc.navigationItem.title = film?.title
         
             self.show(vc, sender: self)
         }
@@ -734,8 +734,8 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
         switch imagePreviewVC.identifier {
         case "Poster":
             
-            guard movie != nil else{
-                print("Movie is nil")
+            guard film != nil else{
+                print("film is nil")
                 return
             }
             

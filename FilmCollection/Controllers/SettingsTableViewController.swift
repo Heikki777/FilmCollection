@@ -10,20 +10,64 @@ import UIKit
 import CoreData
 
 class SettingsTableViewController: UITableViewController {
-
+    
     private let reuseIdentifier = "settingsTableViewCell"
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    var startDateCellExpanded: Bool = false
+
+    @IBOutlet weak var startDetailLabel: UILabel!
+    @IBOutlet weak var notificationsSwitch: UISwitch!
+    @IBOutlet weak var notificationStartDatePicker: UIDatePicker!
     
-    lazy var context = {
-        return appDelegate.persistentContainer.viewContext
-    }()
+    @IBAction func datePickerValueChanged(_ sender: UIDatePicker) {
+        switch sender {
+        case notificationStartDatePicker:
+            notificationStartDate = sender.date
+        default:
+            break
+        }
+    }
     
+    @IBAction func switchNotificationsOnOff(_ sender: UISwitch) {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+        settings.notificationsOn = sender.isOn
+        appDelegate.saveContext()
+    }
+    
+    enum NotificationKey: String{
+        case filmCollectionLayoutChanged = "heikkihamalisto.FilmCollection.collectionLayoutChanged"
+    }
+
     lazy var settings = {
         return appDelegate.settings
     }()
     
+    lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d.MM.y, hh:mm"
+        return formatter
+    }()
+    
+    var notificationStartDate: Date?{
+        didSet{
+            settings.notificationStartDate = notificationStartDate
+            startDetailLabel.text = ""
+            if let notificationStartDate = notificationStartDate {
+                startDetailLabel.text = dateFormatter.string(from: notificationStartDate)
+            }
+            appDelegate.saveContext()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.notificationStartDate = settings.notificationStartDate
+        notificationsSwitch.isOn = settings.notificationsOn
+        
+        let filmCollectionLayout = Settings.FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout) ?? .title
+        let filmCollectionLayoutIndex = Settings.FilmCollectionLayoutOption.all.index(of: filmCollectionLayout) ?? 0
+        checkCell(inRow: filmCollectionLayoutIndex, section: 0)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -34,105 +78,93 @@ class SettingsTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return settings.dictionary.keys.count
+        return settings.sections.count
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let dict = settings.dictionary
-        let raw = dict.keys[dict.index(dict.startIndex, offsetBy: section)]
-        guard let sectionTitle = Settings.SectionTitle(rawValue: raw) else {
-            print("Section title with raw value: \(raw) is not included in Settings.SectionTitle enum")
+        guard let sectionTitle = Settings.SectionTitle(rawValue: settings.sections[section]) else {
+            print("Section title with raw value: \(settings.sections[section]) is not included in Settings.SectionTitle enum")
             return 0
         }
 
         switch sectionTitle{
         case Settings.SectionTitle.FilmCollectionLayout:
             return FilmCollectionLayoutOption.all.count
+        case Settings.SectionTitle.Notifications:
+            return NotificationSettings.all.count
         }
-            
-    }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let dict = settings.dictionary
-        let cell = UITableViewCell()
-        
-        let sectionTitle = dict.keys[dict.index(dict.startIndex, offsetBy: indexPath.section)]
-        
-        switch(indexPath.section){
-        case 0:
-            cell.accessoryType = .none
-            if let labelText = dict[sectionTitle]?[indexPath.row]{
-                cell.textLabel?.text = labelText
-                if settings.filmCollectionLayout == labelText{
-                    cell.accessoryType = .checkmark
-                }
-            }
-        default:
-            break
-        }
-
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let dict = settings.dictionary
-        return dict.keys[dict.index(dict.startIndex, offsetBy: section)]
+        return settings.sections[section]
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch(indexPath.section){
-        case 0:
-            settings.filmCollectionLayout = FilmCollectionLayoutOption.all[indexPath.row].rawValue
+        switch indexPath.section {
+            
+        case Settings.SectionTitle.FilmCollectionLayout.index:
+            checkCell(inRow: indexPath.row, section: indexPath.section)
+            let selectedLayoutOption = Settings.FilmCollectionLayoutOption.all[indexPath.row]
+            settings.filmCollectionLayout = selectedLayoutOption.rawValue
             appDelegate.saveContext()
-            tableView.reloadSections([indexPath.section], with: .automatic)
+            
+            // Notify observers about the layout change
+            let name = NSNotification.Name(NotificationKey.filmCollectionLayoutChanged.rawValue)
+            NotificationCenter.default.post(name: name, object: selectedLayoutOption)
+        
+        case Settings.SectionTitle.Notifications.index:
+            switch indexPath.row{
+            case 0:
+                // Notifications on/off
+                break
+            case 1:
+                // Start
+                pickNotificationStartTime()
+            case 2:
+                // TODO: - Repeat
+                break
+            default:
+                print("case \(indexPath.row) not handled")
+                break
+            }
+            
+            
         default:
             break
         }
     }
     
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    func pickNotificationStartTime(){
+        print("pickNotificationStartTime")
+        startDateCellExpanded = !startDateCellExpanded
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 1{
+            if !notificationsSwitch.isOn && indexPath.row > 0{
+                return 0
+            }
+            if indexPath.row == 1{
+                return startDateCellExpanded ? 250 : 50
+            }
+        }
+        return 50
     }
-    */
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    func checkCell(inRow row: Int, section: Int, unCheckOthers: Bool = true){
+        let rows = tableView.numberOfRows(inSection: section)
+        for r in 0..<rows{
+            let indexPath = IndexPath(row: r, section: section)
+            let cell = tableView.cellForRow(at: indexPath)
+            if r == row{
+                cell?.accessoryType = .checkmark
+            }
+            else{
+                cell?.accessoryType = .none
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+    
 }

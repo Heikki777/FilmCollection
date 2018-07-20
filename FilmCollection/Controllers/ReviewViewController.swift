@@ -20,7 +20,7 @@ class ReviewViewController: UIViewController {
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var saveBarButton: UIBarButtonItem!
     
-    var movie: Movie?
+    var film: Movie?
     var backgroundImage: UIImage?
     
     lazy var databaseRef: DatabaseReference = {
@@ -30,9 +30,9 @@ class ReviewViewController: UIViewController {
     @IBAction func save(_ sender: Any) {
         
         if let user = Auth.auth().currentUser{
-            if let movie = movie{
+            if let film = film{
                 
-                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").updateChildValues(
+                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").updateChildValues(
                     [
                         "rating":ratingControl.rating.rawValue,
                         "review":textView.text
@@ -52,16 +52,16 @@ class ReviewViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let movie = movie else{
+        guard let film = film else{
             print("ReviewViewController Error! No movie")
             return
         }
         
-        titleLabel.text = "Review the movie: \(movie.titleYear)"
+        titleLabel.text = "Review the movie: \(film.titleYear)"
         ratingControl.delegate = self
-        ratingControl.rating = movie.rating
+        ratingControl.rating = film.rating
         textView.layer.cornerRadius = 5
-        textView.text = movie.review
+        textView.text = film.review
         
         backgroundImageView.image = backgroundImage
     }

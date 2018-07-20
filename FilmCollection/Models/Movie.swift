@@ -36,6 +36,7 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     var title: String
     var video: Bool?
     var smallPosterImage: UIImage? = nil
+    var largePosterImage: UIImage? = nil
     
     var sortingTitle: String{
         let articles = ["A ", "An ", "The "]
@@ -151,14 +152,18 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
                 let bigPosterURL = TMDBApi.getPosterURL(size: .w780, imagePath: posterPath)
                 let smallPosterURL = TMDBApi.getPosterURL(size: .w92, imagePath: posterPath)
                 let promises = [
-                    Downloader.shared.loadImage(url: bigPosterURL),
-                    Downloader.shared.loadImage(url: smallPosterURL)
+                    Downloader.shared.loadImage(url: smallPosterURL),
+                    Downloader.shared.loadImage(url: bigPosterURL)
                 ]
-                when(fulfilled: promises).done({ (images) in
-                    result.fulfill((small: images[0], big: images[1]))
-                }).catch({ (error) in
+                attempt{
+                    when(fulfilled: promises).done({ (images) in
+                        result.fulfill((small: images[0], big: images[1]))
+                    })
+                }
+                .catch({ (error) in
                     print("Loading poster images for the movie: \(self.title) failed")
                     print(error.localizedDescription)
+                    result.reject(error)
                 })
             }
             else{
@@ -203,6 +208,23 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
             else{
                 result.reject(MovieError.missingData("posterPath"))
             }
+        }
+    }
+    
+    func getSectionTitle(sortingRule: SortingRule) -> String{
+        switch sortingRule {
+        case .rating:
+            return self.rating.description
+        case .title:
+            if let first = self.sortingTitle.first{
+                return String.init(first)
+            }
+            return ""
+        case .year:
+            if let year = self.year{
+                return "\(year)"
+            }
+            return "Unknown"
         }
     }
 }

@@ -11,7 +11,6 @@ import UIKit
 class FilmPreviewViewController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var descriptionTextView: UITextView!
     
     var film: Movie?
     
@@ -22,8 +21,6 @@ class FilmPreviewViewController: UIViewController {
             print("FilmPreviewViewController. No film")
             return
         }
-        
-        descriptionTextView.text = film.overview ?? "No description"
         
         attempt{
             film.loadBigPosterImage()

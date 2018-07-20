@@ -21,7 +21,7 @@ class Downloader{
     
     func loadImage(url: URL) -> Promise<UIImage>{
             return Promise { result in
-                let request = URLRequest.init(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
+                let request = URLRequest.init(url: url, cachePolicy: .returnCacheDataElseLoad)
                 let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
                 
                 Alamofire.request(request)
