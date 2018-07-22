@@ -15,6 +15,7 @@ class HomeTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+                
         createObservers()
         
         guard let layoutOption = Settings.FilmCollectionLayoutOption.init(rawValue: appDelegate.settings.filmCollectionLayout) else{
@@ -60,8 +61,7 @@ class HomeTabBarController: UITabBarController {
             }
         })
         
-        let collectionLayoutChanged = Notification.Name(rawValue: SettingsTableViewController.NotificationKey.filmCollectionLayoutChanged.rawValue)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLayoutChange(notification:)), name: collectionLayoutChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLayoutChange(notification:)), name: filmCollectionLayoutChanged, object: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -16,6 +16,7 @@ class Settings: NSManagedObject{
     @NSManaged var filmCollectionLayout: String
     @NSManaged var notificationsOn: Bool
     @NSManaged var notificationStartDate: Date?
+    @NSManaged var notificationRepetitionOption: Notification.RepetitionOption
 
     var sections: [String] = [
         SectionTitle.FilmCollectionLayout.rawValue,
@@ -53,6 +54,7 @@ class Settings: NSManagedObject{
         }
     }
     
+    typealias RepetitionOption = Notification.RepetitionOption
     enum Notification: String {
         case IsOn = "Notifications on"
         case Starts
@@ -65,8 +67,30 @@ class Settings: NSManagedObject{
         static var all: [Notification]{
             return [.IsOn, .Starts, .Repeat]
         }
-        
+     
+        @objc enum RepetitionOption: Int16{
+            case Never = 0
+            case EveryDay
+            case EveryWeek
+            case EveryMonth
+            
+            var description: String{
+                switch self {
+                case .Never:
+                    return "Never"
+                case .EveryDay:
+                    return "Every Day"
+                case .EveryWeek:
+                    return "Every Week"
+                case .EveryMonth:
+                    return "Every Month"
+                }
+            }
+            
+            static var all: [RepetitionOption]{
+                return [.Never, .EveryDay, .EveryWeek, .EveryMonth]
+            }
+        }
     }
-
 }
 

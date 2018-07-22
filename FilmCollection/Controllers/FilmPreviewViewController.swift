@@ -23,7 +23,7 @@ class FilmPreviewViewController: UIViewController {
         }
         
         attempt{
-            film.loadBigPosterImage()
+            film.loadLargePosterImage()
         }
         .done { (posterImage) in
             DispatchQueue.main.async {

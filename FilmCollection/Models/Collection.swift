@@ -183,14 +183,13 @@ class FilmCollection: NSObject{
                         film.rating = Rating.all[rating]
                         
                         attempt{
-                            film.loadPosterImages()
+                            film.loadSmallPosterImage()
                         }
-                        .done{ (small, large) in
+                        .done{ (small) in
                             film.smallPosterImage = small
-                            film.largePosterImage = large
                         }
                         .catch{ error in
-                            print("Could not load small poster image for the movie \(film.title)")
+                            print("Could not load poster images for the movie \(film.title)")
                             print(error.localizedDescription)
                         }
                         .finally {
@@ -248,11 +247,11 @@ class FilmCollection: NSObject{
                 attempt{
                     film.loadSmallPosterImage()
                 }
-                .done{ (image) in
-                    film.smallPosterImage = image
+                .done{ (small) in
+                    film.smallPosterImage = small
                 }
                 .catch{ error in
-                    print("Could not load small poster image for the film \(film.title)")
+                    print("Could not load poster images for the movie \(film.title)")
                     print(error.localizedDescription)
                 }
                 .finally {

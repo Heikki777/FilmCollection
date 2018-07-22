@@ -88,19 +88,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func createObservers(){
-        let collectionChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmCollectionValueChanged.rawValue)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: filmCollectionLayoutChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsOnChanged(notification:)), name: notificationsOnChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsStartDateChanged(notification:)), name: notificationStartDateChanged, object: nil)
     }
     
     @objc func handleCollectionLoaded(notification: NSNotification){
         registerForLocalNotifications()
     }
+    
+    @objc func handleNotificationsOnChanged(notification: NSNotification){
+        print("AppDelegate: handleNotificationsOnChanged")
+        
+        if settings.notificationsOn {
+            registerForFilmRecommendationNotifications()
+        }
+        else{
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
+        }
+    }
+    
+    @objc func handleNotificationsStartDateChanged(notification: NSNotification){
+        print("AppDelegate: handleNotificationsStartDateChanged")
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
+        registerForFilmRecommendationNotifications()
+    }
 
     // MARK: - Notifications
     func registerForLocalNotifications() {
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+
         configureUserNotificationsCenter()
         
         registerForFilmRecommendationNotifications()
+
     }
     
     private func configureUserNotificationsCenter() {
@@ -122,6 +143,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("AppDelegate.registerForLocalNotifications")
         let filmCollection = FilmCollection.shared
         
+        guard let startDate = settings.notificationStartDate else {
+            print("notificationStartDate is nil")
+            return
+        }
+        
+        let repetitionOption = settings.notificationRepetitionOption
+        
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
             (granted, error) in
@@ -139,17 +167,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     notificationContent.userInfo["filmID"] = randomFilm.id
                     notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
                     
-                    let calendar = Locale.current.calendar
                     
-                    let dateComponents = DateComponents(calendar: calendar, timeZone: nil, era: nil, year: nil, month: nil, day: nil, hour: 15, minute: 35, second: 0, nanosecond: nil, weekday: nil, weekdayOrdinal: nil, quarter: nil, weekOfMonth: nil, weekOfYear: nil, yearForWeekOfYear: nil)
+                    
+                    //let dateComponents = DateComponents(calendar: calendar, timeZone: nil, era: nil, year: nil, month: nil, day: nil, hour: 15, minute: 35, second: 0, nanosecond: nil, weekday: nil, weekdayOrdinal: nil, quarter: nil, weekOfMonth: nil, weekOfYear: nil, yearForWeekOfYear: nil)
                     
                     // FOR testing: 10 second interval trigger
-                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
-                    //let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+                    //let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
                     
+                    let calendar = Locale.current.calendar
+                    var repeats = false
+                    var dateComponents = DateComponents()
+                    
+                    switch repetitionOption{
+                    case .Never:
+                        repeats = false
+                        dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
+                    case .EveryDay:
+                        repeats = true
+                        dateComponents = calendar.dateComponents(Set([.hour, .minute]), from: startDate)
+                    case .EveryWeek:
+                        repeats = true
+                        dateComponents = calendar.dateComponents(Set([.weekday, .hour, .minute]), from: startDate)
+                    case .EveryMonth:
+                        repeats = true
+                        dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
+                    }
+                    
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: repeats)
                     let request = UNNotificationRequest(identifier: FilmNotification.Category.randomRecommendation, content: notificationContent, trigger: trigger)
                     
                     UNUserNotificationCenter.current().add(request)
+                    
                 }
             }
         }

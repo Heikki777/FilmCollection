@@ -382,6 +382,20 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         
-        // TODO:
+        guard let filmPreviewVC = viewControllerToCommit as? FilmPreviewViewController else{
+            print("viewControllerToCommit is not an instance of FilmPreviewViewController")
+            return
+        }
+        
+        guard let film = filmPreviewVC.film else {
+            print("No film in FilmPreviewViewController")
+            return
+        }
+        
+        if let vc = self.storyboard!.instantiateViewController(withIdentifier: "FilmDetailViewController") as? FilmDetailViewController{
+            vc.film = film
+            vc.preferredContentSize = CGSize(width: 0, height: 0)
+            show(vc, sender: self)
+        }
     }
 }

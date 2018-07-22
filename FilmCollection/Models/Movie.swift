@@ -144,20 +144,20 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         self.smallPosterImage = smallPosterImage
     }
     
-    func loadPosterImages() -> Promise<(small: UIImage, big: UIImage)>{
+    func loadPosterImages() -> Promise<(small: UIImage, large: UIImage)>{
         // Load posters
         return Promise { result in
             if let posterPath = self.posterPath{
                 
-                let bigPosterURL = TMDBApi.getPosterURL(size: .w780, imagePath: posterPath)
+                let largePosterURL = TMDBApi.getPosterURL(size: .w500, imagePath: posterPath)
                 let smallPosterURL = TMDBApi.getPosterURL(size: .w92, imagePath: posterPath)
                 let promises = [
                     Downloader.shared.loadImage(url: smallPosterURL),
-                    Downloader.shared.loadImage(url: bigPosterURL)
+                    Downloader.shared.loadImage(url: largePosterURL)
                 ]
                 attempt{
                     when(fulfilled: promises).done({ (images) in
-                        result.fulfill((small: images[0], big: images[1]))
+                        result.fulfill((small: images[0], large: images[1]))
                     })
                 }
                 .catch({ (error) in
@@ -192,10 +192,10 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         }
     }
     
-    func loadBigPosterImage() -> Promise<UIImage>{
+    func loadLargePosterImage() -> Promise<UIImage>{
         return Promise { result in
             if let posterPath = self.posterPath{
-                let bigPosterURL = TMDBApi.getPosterURL(size: .w780, imagePath: posterPath)
+                let bigPosterURL = TMDBApi.getPosterURL(size: .w500, imagePath: posterPath)
                 Downloader.shared.loadImage(url: bigPosterURL)
                 .done({ (image) in
                     result.fulfill(image)

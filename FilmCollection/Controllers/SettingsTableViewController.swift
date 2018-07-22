@@ -9,6 +9,11 @@
 import UIKit
 import CoreData
 
+let filmCollectionLayoutChanged = NSNotification.Name("filmCollectionLayoutChanged")
+let notificationsOnChanged = NSNotification.Name("notificationsOnChanged")
+let notificationStartDateChanged = NSNotification.Name("notificationStartDateChanged")
+
+
 class SettingsTableViewController: UITableViewController {
     
     private let reuseIdentifier = "settingsTableViewCell"
@@ -16,6 +21,7 @@ class SettingsTableViewController: UITableViewController {
     var startDateCellExpanded: Bool = false
 
     @IBOutlet weak var startDetailLabel: UILabel!
+    @IBOutlet weak var repeatDetailLabel: UILabel!
     @IBOutlet weak var notificationsSwitch: UISwitch!
     @IBOutlet weak var notificationStartDatePicker: UIDatePicker!
     
@@ -32,13 +38,14 @@ class SettingsTableViewController: UITableViewController {
         tableView.beginUpdates()
         tableView.endUpdates()
         settings.notificationsOn = sender.isOn
+        if !sender.isOn{
+            startDateCellExpanded = false
+        }
         appDelegate.saveContext()
+        
+        NotificationCenter.default.post(name: notificationsOnChanged, object: nil)
     }
     
-    enum NotificationKey: String{
-        case filmCollectionLayoutChanged = "heikkihamalisto.FilmCollection.collectionLayoutChanged"
-    }
-
     lazy var settings = {
         return appDelegate.settings
     }()
@@ -57,6 +64,8 @@ class SettingsTableViewController: UITableViewController {
                 startDetailLabel.text = dateFormatter.string(from: notificationStartDate)
             }
             appDelegate.saveContext()
+            
+            NotificationCenter.default.post(name: notificationStartDateChanged, object: nil)
         }
     }
     
@@ -69,10 +78,27 @@ class SettingsTableViewController: UITableViewController {
         let filmCollectionLayoutIndex = Settings.FilmCollectionLayoutOption.all.index(of: filmCollectionLayout) ?? 0
         checkCell(inRow: filmCollectionLayoutIndex, section: 0)
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        repeatDetailLabel.text = settings.notificationRepetitionOption.description
+    }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         appDelegate.saveContext()
+    }
+    
+    // MARK: - Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == Segue.showNotificationRepetitionOptions.rawValue{
+            if let vc = segue.destination as? NotificationRepetitionTableViewController{
+                if let repetitionOption = Settings.RepetitionOption(rawValue: settings.notificationRepetitionOption.rawValue){
+                    vc.selectedRepetitionOption = repetitionOption
+                }
+            }
+        }
     }
 
     // MARK: - Table view data source
@@ -109,8 +135,7 @@ class SettingsTableViewController: UITableViewController {
             appDelegate.saveContext()
             
             // Notify observers about the layout change
-            let name = NSNotification.Name(NotificationKey.filmCollectionLayoutChanged.rawValue)
-            NotificationCenter.default.post(name: name, object: selectedLayoutOption)
+            NotificationCenter.default.post(name: filmCollectionLayoutChanged, object: selectedLayoutOption)
         
         case Settings.SectionTitle.Notifications.index:
             switch indexPath.row{

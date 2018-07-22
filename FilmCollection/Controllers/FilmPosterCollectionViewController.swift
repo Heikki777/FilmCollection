@@ -31,7 +31,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
 
     var sectionCount = 0
     var filmCount = 0
-    var filmBeingPreviewed: Movie?
     
     override func viewDidLoad() {
         print("FilmPosterCollectionViewController")
@@ -234,7 +233,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         
         // Configure the cell
         if let film = filmCollection.getMovie(at: indexPath){
-            cell.posterImageView.image = film.largePosterImage
+            cell.posterImageView.image = film.smallPosterImage
             cell.filmId = film.id
         }
     
@@ -318,37 +317,34 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
         
         guard let film = filmCollection.getMovie(at: indexPath) else {
             print("No film at indexPath")
-            filmBeingPreviewed = nil
             return nil
         }
         
-        guard let cellImage = cell.posterImageView.image else {
-            print("No image in the cell")
+        guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else{
+            print("A FilmPreviewViewController could not be instantiated")
             return nil
         }
         
-        filmBeingPreviewed = film
+        previewingContext.sourceRect = self.view.convert(cell.frame, from: self.collectionView)
+        filmPreviewVC.film = film
         
-        if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
-            previewingContext.sourceRect = self.view.convert(cell.frame, from: self.collectionView)
-            vc.image = cellImage
-            vc.preferredContentSize = cellImage.size
-
-            return vc
-        }
-        
-        return nil
+        return filmPreviewVC
     }
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         
-        guard let filmBeingPreviewed = filmBeingPreviewed else {
-            print("There is no film being previewed")
+        guard let filmPreviewVC = viewControllerToCommit as? FilmPreviewViewController else{
+            print("viewControllerToCommit is not an instance of FilmPreviewViewController")
+            return
+        }
+        
+        guard let film = filmPreviewVC.film else {
+            print("No film in FilmPreviewViewController")
             return
         }
             
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "FilmDetailViewController") as? FilmDetailViewController{
-            vc.film = filmBeingPreviewed
+            vc.film = film
             vc.preferredContentSize = CGSize(width: 0, height: 0)
             show(vc, sender: self)
         }

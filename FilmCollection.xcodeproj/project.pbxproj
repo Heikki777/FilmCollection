@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		730C54C8206AD17C00367B0A /* Retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730C54C7206AD17C00367B0A /* Retry.swift */; };
 		7344E8EE20FCCB90004CB00A /* FilmNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8ED20FCCB90004CB00A /* FilmNotification.swift */; };
+		7344E8F021049C79004CB00A /* SettingsTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7344E8EF21049C79004CB00A /* SettingsTab.storyboard */; };
+		7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */; };
 		7357F72420EE4B0900BCE9FD /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72320EE4B0900BCE9FD /* Collection.swift */; };
 		7357F72620F103A300BCE9FD /* FilmPosterCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72520F103A200BCE9FD /* FilmPosterCollectionViewController.swift */; };
 		7357F72820F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */; };
@@ -92,6 +94,8 @@
 /* Begin PBXFileReference section */
 		730C54C7206AD17C00367B0A /* Retry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Retry.swift; sourceTree = "<group>"; };
 		7344E8ED20FCCB90004CB00A /* FilmNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmNotification.swift; sourceTree = "<group>"; };
+		7344E8EF21049C79004CB00A /* SettingsTab.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsTab.storyboard; sourceTree = "<group>"; };
+		7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRepetitionTableViewController.swift; sourceTree = "<group>"; };
 		7357F72320EE4B0900BCE9FD /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		7357F72520F103A200BCE9FD /* FilmPosterCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPosterCollectionViewController.swift; sourceTree = "<group>"; };
 		7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPosterCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -210,7 +214,6 @@
 			isa = PBXGroup;
 			children = (
 				737B7BA22030F30E00EEEEAC /* AddFilmTableViewController.swift */,
-				73EEB09A207A5C3C00726933 /* Authentication */,
 				737219B12090EF62002A712D /* BiographyViewController.swift */,
 				C357438C2020743400DC5F7B /* FilmCollectionTableViewController.swift */,
 				C34BA0212021C4500041EFD4 /* FilmDetailViewController.swift */,
@@ -222,7 +225,7 @@
 				C36CB4B62023079F00346E80 /* ImagePageViewController.swift */,
 				73FB10ED202256B600B89532 /* ImagePreviewController.swift */,
 				73D5375C2072A67E0088CBA5 /* LoadingIndicatorViewController.swift */,
-				C31BC9D820403C0D00BC2FBD /* Popover */,
+				7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */,
 				73F38FDD207D29E70063F7E6 /* ProfileViewController.swift */,
 				73E350A220266FE700FFDB6E /* RatingControlDelegate.swift */,
 				C354001D206E3EB100BC6706 /* ReviewViewController.swift */,
@@ -230,6 +233,8 @@
 				C3942D9320738F89002FD5DC /* UIViewControllerExtensions.swift */,
 				73DF1ABE203E007B009955FA /* VideoPlayerViewController.swift */,
 				73E719292071584B009A4FFB /* ViewingHistoryTableViewController.swift */,
+				73EEB09A207A5C3C00726933 /* Authentication */,
+				C31BC9D820403C0D00BC2FBD /* Popover */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -265,21 +270,22 @@
 		73FB10E920224E8D00B89532 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */,
-				C38487B62065344100988A7B /* ImageCollectionReusableView.swift */,
-				C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */,
-				C35743AC2020798900DC5F7B /* FilmTableViewCellExpanded.swift */,
-				C35743952020743400DC5F7B /* LaunchScreen.storyboard */,
-				C35743902020743400DC5F7B /* Main.storyboard */,
-				C366AB4E20E3543500BEC556 /* FilmTableViewCellSimple.swift */,
-				737219AF208BCCCF002A712D /* FilmographyCollectionReusableView.swift */,
-				737219AB20892416002A712D /* FilmographyCollectionViewCell.swift */,
 				C38F682C206E06A000601F7B /* CastCollectionViewCell.swift */,
 				C3E2F86C2073A19B00F53F6C /* CrewCollectionViewCell.swift */,
+				737219AF208BCCCF002A712D /* FilmographyCollectionReusableView.swift */,
+				737219AB20892416002A712D /* FilmographyCollectionViewCell.swift */,
+				7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */,
+				C34B3FDB2034437100503CB3 /* FilmSearchResultTableViewCell.swift */,
+				C35743AC2020798900DC5F7B /* FilmTableViewCellExpanded.swift */,
+				C366AB4E20E3543500BEC556 /* FilmTableViewCellSimple.swift */,
+				C38487B62065344100988A7B /* ImageCollectionReusableView.swift */,
+				C3E4B8C42064E61300F0BE90 /* ImageCollectionViewCell.swift */,
+				C35743952020743400DC5F7B /* LaunchScreen.storyboard */,
+				73D5375D2072A67E0088CBA5 /* LoadingIndicatorViewController.xib */,
+				C35743902020743400DC5F7B /* Main.storyboard */,
 				C35CD3A3204425C100967E1F /* PopoverTableViewCell.swift */,
 				73E3509C2023A18900FFDB6E /* RatingControl.swift */,
-				C3E4B8C42064E61300F0BE90 /* ImageCollectionViewCell.swift */,
-				73D5375D2072A67E0088CBA5 /* LoadingIndicatorViewController.xib */,
+				7344E8EF21049C79004CB00A /* SettingsTab.storyboard */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -454,6 +460,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C35743972020743400DC5F7B /* LaunchScreen.storyboard in Resources */,
+				7344E8F021049C79004CB00A /* SettingsTab.storyboard in Resources */,
 				73D5375F2072A67E0088CBA5 /* LoadingIndicatorViewController.xib in Resources */,
 				73EEB0972079E34F00726933 /* GoogleService-Info.plist in Resources */,
 				C35743942020743400DC5F7B /* Assets.xcassets in Resources */,
@@ -600,6 +607,7 @@
 				C36CB4B72023079F00346E80 /* ImagePageViewController.swift in Sources */,
 				730C54C8206AD17C00367B0A /* Retry.swift in Sources */,
 				C31BC9D32040348000BC2FBD /* SortingRule.swift in Sources */,
+				7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */,
 				73F38FDE207D29E70063F7E6 /* ProfileViewController.swift in Sources */,
 				C31BC9D12040337100BC2FBD /* PopoverTableViewController.swift in Sources */,
 				737219AA20890698002A712D /* FilmographyCollectionViewController.swift in Sources */,

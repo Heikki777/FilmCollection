@@ -30,7 +30,7 @@ class TMDBApi{
     static let posterImageBaseURL: String = "https://image.tmdb.org/t/p/"
     static let version: Int = 3
     
-    private let apiKey: String = TMDB_API_KEY
+    private let apiKey: String = "a62c4199a4ee1f2fcec39ddffc60199f" //TMDB_API_KEY
     
     private init(){
         return
