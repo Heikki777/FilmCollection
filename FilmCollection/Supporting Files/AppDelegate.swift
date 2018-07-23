@@ -164,15 +164,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     notificationContent.title = "Film recommendation"
                     notificationContent.subtitle = "Watch today"
                     notificationContent.body = randomFilm.title
+                    notificationContent.badge = 0
                     notificationContent.userInfo["filmID"] = randomFilm.id
                     notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
-                    
-                    
-                    
-                    //let dateComponents = DateComponents(calendar: calendar, timeZone: nil, era: nil, year: nil, month: nil, day: nil, hour: 15, minute: 35, second: 0, nanosecond: nil, weekday: nil, weekdayOrdinal: nil, quarter: nil, weekOfMonth: nil, weekOfYear: nil, yearForWeekOfYear: nil)
-                    
-                    // FOR testing: 10 second interval trigger
-                    //let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10.0, repeats: false)
                     
                     let calendar = Locale.current.calendar
                     var repeats = false

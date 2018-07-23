@@ -159,6 +159,8 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleFilmDictionaryChange(notification: NSNotification){
+        let sectionIndices: IndexSet = IndexSet(0..<tableView.numberOfSections)
+        tableView.deleteSections(sectionIndices, with: .automatic)
         tableView.reloadData()
     }
     

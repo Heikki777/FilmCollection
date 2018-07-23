@@ -36,6 +36,9 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         print("FilmPosterCollectionViewController")
         super.viewDidLoad()
         
+        collectionView?.dataSource = self
+        collectionView?.delegate = self
+        
         // Setup the search controller
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
@@ -81,6 +84,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         let filmRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.filmRemoved.rawValue)
         let progressChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.loadingProgressChanged.rawValue)
         let filmDictionaryChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmDictionaryChanged.rawValue)
+        let collectionFiltered = Notification.Name(rawValue: FilmCollection.NotificationKey.collectionFiltered.rawValue)
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionChanged(notification:)), name: collectionChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
@@ -88,6 +92,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmRemoval(notification:)), name: filmRemoved, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleLoadingProgressChange(notification:)), name: progressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmDictionaryChange(notification:)), name: filmDictionaryChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
 
     }
     
@@ -106,6 +111,10 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         else{
             print("Error! handleFilmRemoval. film.id does not match with cell's filmId")
         }
+    }
+    
+    @objc func handleCollectionFiltered(notification: NSNotification){
+        collectionView?.reloadData()
     }
     
     @objc func handleCollectionChanged(notification: NSNotification){
@@ -217,7 +226,16 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     // MARK: UICollectionViewDataSource
 
     override func indexTitles(for collectionView: UICollectionView) -> [String]? {
-        return filmCollection.sectionIndexTitles()
+        let titles = filmCollection.sectionIndexTitles()
+        print("titles: \(titles)")
+        return titles
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, indexPathForIndexTitle title: String, at index: Int) -> IndexPath {
+        if let sections = indexTitles(for: collectionView), let index = sections.index(of: title){
+            return IndexPath(row: index, section: 0)
+        }
+        return IndexPath(row: 0, section: 0)
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

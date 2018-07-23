@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="itr-6w-UUC">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -18,7 +18,7 @@
             <objects>
                 <collectionViewController storyboardIdentifier="FilmPosterCollectionViewController" id="cJT-5R-yox" customClass="FilmPosterCollectionViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="ZsW-J9-8OR">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Akc-0h-1kk">
@@ -52,12 +52,12 @@
                                 </connections>
                             </collectionViewCell>
                         </cells>
-                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="ImageCollectionReusableView" id="4OS-iB-V4j" customClass="ImageCollectionReusableView" customModule="FilmCollection" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="375" height="35"/>
+                        <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" misplaced="YES" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="ImageCollectionReusableView" id="4OS-iB-V4j" customClass="ImageCollectionReusableView" customModule="FilmCollection" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="35"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CmC-g2-gdV">
-                                    <rect key="frame" x="8" y="8" width="359" height="19"/>
+                                    <rect key="frame" x="8" y="8" width="398" height="19"/>
                                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <nil key="highlightedColor"/>
@@ -113,38 +113,38 @@
             <objects>
                 <viewController storyboardIdentifier="FilmCollectionTableViewController" id="9pv-A4-QxB" customClass="FilmCollectionTableViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tsR-hK-woN">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="j6N-jI-EW8">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="separatorColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellExpanded" rowHeight="138" id="O0i-KZ-6v6" customClass="FilmTableViewCellExpanded" customModule="FilmCollection" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="138"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellExpanded" rowHeight="138" id="O0i-KZ-6v6" customClass="FilmTableViewCellExpanded" customModule="FilmCollection" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="414" height="138"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="O0i-KZ-6v6" id="UgC-Q9-R3J">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="137.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="137.66666666666666"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ba2-q4-Vmk">
-                                                    <rect key="frame" x="100" y="11" width="260" height="20.5"/>
+                                                    <rect key="frame" x="100" y="10.999999999999998" width="299" height="20.333333333333329"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="17"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Director:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R39-Zi-5L9">
-                                                    <rect key="frame" x="100" y="39.5" width="260" height="17.5"/>
+                                                    <rect key="frame" x="100" y="39.333333333333336" width="299" height="17.666666666666664"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Genre:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H5h-Dx-EZn">
-                                                    <rect key="frame" x="100" y="65" width="260" height="17.5"/>
+                                                    <rect key="frame" x="100" y="65" width="299" height="17.333333333333329"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Rating:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vww-T3-wmp">
-                                                    <rect key="frame" x="100" y="89.5" width="260" height="17.5"/>
+                                                    <rect key="frame" x="100" y="89.333333333333329" width="299" height="17.666666666666671"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -184,15 +184,15 @@
                                             <segue destination="0Te-Bz-sJv" kind="show" identifier="showFilmDetailSegue" id="Buq-Yl-9mD"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellSimple" rowHeight="45" id="hum-nS-2X6" customClass="FilmTableViewCellSimple" customModule="FilmCollection" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="166" width="375" height="45"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="filmCellSimple" rowHeight="45" id="hum-nS-2X6" customClass="FilmTableViewCellSimple" customModule="FilmCollection" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="166" width="414" height="45"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hum-nS-2X6" id="Hm8-b1-DoU">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eT4-Fc-uCb">
-                                                    <rect key="frame" x="6" y="0.0" width="363" height="45"/>
+                                                    <rect key="frame" x="6" y="0.0" width="402" height="45"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Thin" family="Helvetica Neue" pointSize="15"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -253,11 +253,11 @@
             <objects>
                 <viewController storyboardIdentifier="ImagePreviewController" id="Nbv-Oz-HMI" customClass="ImagePreviewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MXi-oR-yq9">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lbH-aW-19P">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
                         </subviews>
@@ -283,34 +283,34 @@
             <objects>
                 <viewController id="hKq-my-BQn" customClass="ReviewViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="D4A-gQ-ujs">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XK1-mp-M89">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Review the movie: " textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6d3-Xv-4bp">
-                                <rect key="frame" x="20" y="28" width="339" height="21"/>
+                                <rect key="frame" x="20" y="28" width="378" height="21"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="18"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="ZJe-0J-q5c">
-                                <rect key="frame" x="16" y="141" width="343" height="518"/>
+                                <rect key="frame" x="16" y="141" width="382" height="587"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.10704730308219178" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Good" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="8" translatesAutoresizingMaskIntoConstraints="NO" id="0Ee-w7-9sS">
-                                <rect key="frame" x="16" y="57" width="343" height="21"/>
+                                <rect key="frame" x="16" y="57" width="382" height="21"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="18"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X1e-j7-mfC" customClass="RatingControl" customModule="FilmCollection" customModuleProvider="target">
-                                <rect key="frame" x="16" y="90" width="343" height="34"/>
+                                <rect key="frame" x="16" y="90" width="382" height="34"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="tintColor" red="0.0" green="0.02040681009289224" blue="0.67001061546903551" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <gestureRecognizers/>
@@ -390,11 +390,11 @@
             <objects>
                 <viewController id="6kl-4c-A5k" customClass="BiographyViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Cgy-An-PoN">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ZHH-Nn-A8x">
-                                <rect key="frame" x="127.5" y="34" width="120" height="180"/>
+                                <rect key="frame" x="147" y="34" width="120" height="180"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="120" id="O9I-nt-EJj">
                                         <variation key="heightClass=compact-widthClass=compact" constant="184"/>
@@ -423,7 +423,7 @@
                                 </variation>
                             </imageView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TUB-dn-BO2">
-                                <rect key="frame" x="0.0" y="225" width="375" height="442"/>
+                                <rect key="frame" x="0.0" y="225" width="414" height="511"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
@@ -530,15 +530,15 @@
             <objects>
                 <tableViewController id="Tjv-uZ-aht" customClass="AddFilmTableViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="qFA-7r-YVo">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filmSearchResultCell" rowHeight="138" id="Lsx-Ci-hOp" customClass="FilmSearchResultTableViewCell" customModule="FilmCollection" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="375" height="138"/>
+                                <rect key="frame" x="0.0" y="28" width="414" height="138"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Lsx-Ci-hOp" id="AkH-BO-T1H">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="137.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="137.66666666666666"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="NfC-Ge-Zco">
@@ -548,19 +548,19 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Hd-60-3Ee">
-                                            <rect key="frame" x="100" y="11" width="259" height="21.5"/>
+                                            <rect key="frame" x="100" y="11.000000000000002" width="298" height="21.666666666666671"/>
                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ymr-6i-pvX">
-                                            <rect key="frame" x="100" y="40.5" width="259" height="20"/>
+                                            <rect key="frame" x="100" y="40.666666666666664" width="298" height="20"/>
                                             <fontDescription key="fontDescription" type="italicSystem" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalCompressionResistancePriority="749" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5yE-5N-oVA">
-                                            <rect key="frame" x="100" y="68.5" width="259" height="58.5"/>
+                                            <rect key="frame" x="100" y="68.666666666666671" width="298" height="58.333333333333329"/>
                                             <string key="text">Label sjdfijdsfjidsif dsj fjidsji jfdsj fjdis jifjsdi jij sdj dsji jidjsi jdsj ijsi ji sdjj disj jisd jij dsij isdj jdsi jijdsij idsj jsdi jids jijsdi</string>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <nil key="textColor"/>
@@ -607,26 +607,26 @@
             <objects>
                 <tableViewController id="aU3-Zm-GLH" customClass="ViewingHistoryTableViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="yty-VI-zuS">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="viewingCell" textLabel="fvY-Aa-3lo" detailTextLabel="Ath-QI-RWo" style="IBUITableViewCellStyleSubtitle" id="kXK-dz-jpM">
-                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="28" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="kXK-dz-jpM" id="6wW-24-nLa">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="fvY-Aa-3lo">
-                                            <rect key="frame" x="16" y="5" width="33.5" height="20.5"/>
+                                            <rect key="frame" x="20.000000000000004" y="5" width="33.333333333333336" height="20.333333333333332"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Ath-QI-RWo">
-                                            <rect key="frame" x="16" y="25.5" width="33" height="14.5"/>
+                                            <rect key="frame" x="19.999999999999996" y="25.333333333333332" width="32.666666666666664" height="14.333333333333334"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                             <nil key="textColor"/>
@@ -652,11 +652,11 @@
             <objects>
                 <viewController id="Se9-Mp-dN3" customClass="ProfileViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="HSc-u6-FCx">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z3n-gP-EiD">
-                                <rect key="frame" x="146.5" y="322" width="82" height="38"/>
+                                <rect key="frame" x="166" y="356.66666666666669" width="82" height="38"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="22"/>
                                 <state key="normal" title="Sign out"/>
                                 <connections>
@@ -664,7 +664,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Profile" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CF7-RO-A7H">
-                                <rect key="frame" x="16" y="294" width="343" height="20"/>
+                                <rect key="frame" x="16" y="328.66666666666669" width="382" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -704,11 +704,11 @@
             <objects>
                 <tableViewController storyboardIdentifier="PopoverTableViewController" id="rnb-EC-AxM" customClass="PopoverTableViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="gnY-9p-PC5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <navigationBar key="tableHeaderView" contentMode="scaleToFill" id="Oby-tq-2td">
-                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <items>
                                 <navigationItem id="pGV-oP-6ur">
@@ -722,14 +722,14 @@
                         </navigationBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="popoverTableCell" textLabel="Cdv-nK-gkb" style="IBUITableViewCellStyleDefault" id="34m-gJ-Oyx" customClass="PopoverTableViewCell" customModule="FilmCollection" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="72" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="72" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="34m-gJ-Oyx" id="ZF4-6C-WZS">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Cdv-nK-gkb">
-                                            <rect key="frame" x="16" y="0.0" width="343" height="43.5"/>
+                                            <rect key="frame" x="20" y="0.0" width="374" height="43.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
@@ -756,7 +756,7 @@
             <objects>
                 <collectionViewController storyboardIdentifier="ImageCollectionViewController" id="g12-iA-uLD" customClass="ImageCollectionViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="sRZ-BQ-JbK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="5" minimumInteritemSpacing="5" id="S4X-JK-Dke">
@@ -790,11 +790,11 @@
                             </collectionViewCell>
                         </cells>
                         <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="ImageCollectionReusableView" id="5jI-C0-dle" customClass="ImageCollectionReusableView" customModule="FilmCollection" customModuleProvider="target">
-                            <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                             <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="N6g-Ke-qM2">
-                                    <rect key="frame" x="8" y="8" width="359" height="34"/>
+                                    <rect key="frame" x="8" y="8" width="398" height="34"/>
                                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="18"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -825,11 +825,11 @@
             <objects>
                 <viewController storyboardIdentifier="FilmPreviewViewController" id="rxX-xp-JU6" customClass="FilmPreviewViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="4q8-wF-rpL">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="lch-rK-KDa">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                             </imageView>
                         </subviews>
                         <constraints>
@@ -853,36 +853,36 @@
             <objects>
                 <viewController restorationIdentifier="loginViewController" storyboardIdentifier="loginViewController" id="HLo-fH-iuq" customClass="SignInViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8yx-US-641">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign in" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m7c-dZ-F3M">
+                                <rect key="frame" x="153.66666666666666" y="20" width="106.99999999999997" height="41"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="35"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email address" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MLn-qX-qMs">
-                                <rect key="frame" x="60" y="289.5" width="255" height="30"/>
+                                <rect key="frame" x="60" y="105" width="294" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" textContentType="email"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="vAF-Nn-wn2">
-                                <rect key="frame" x="60" y="328.5" width="255" height="30"/>
+                                <rect key="frame" x="60" y="144" width="294" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES" textContentType="password"/>
                             </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign in" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m7c-dZ-F3M">
-                                <rect key="frame" x="134" y="20" width="107" height="41"/>
-                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="35"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mDh-b1-beQ">
-                                <rect key="frame" x="161.5" y="617" width="52" height="30"/>
+                                <rect key="frame" x="181" y="333" width="52" height="30"/>
                                 <state key="normal" title="Sign up"/>
                                 <connections>
                                     <segue destination="itr-6w-UUC" kind="presentation" id="7qO-17-eqQ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Sn-KD-KjM">
-                                <rect key="frame" x="153.5" y="365.5" width="68" height="38"/>
+                                <rect key="frame" x="173" y="181" width="68" height="38"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="22"/>
                                 <state key="normal" title="Sign in"/>
                                 <connections>
@@ -890,13 +890,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sQ4-rh-9eZ">
-                                <rect key="frame" x="60" y="436.5" width="255" height="20.5"/>
+                                <rect key="frame" x="60" y="252.00000000000003" width="294" height="20.333333333333343"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lmw-Kx-4f2">
-                                <rect key="frame" x="126" y="579" width="123" height="30"/>
+                                <rect key="frame" x="145.66666666666666" y="295" width="122.99999999999997" height="30"/>
                                 <state key="normal" title="Forgot password?"/>
                                 <connections>
                                     <segue destination="rZb-10-UBP" kind="presentation" id="mMb-JN-Bid"/>
@@ -909,9 +909,9 @@
                             <constraint firstItem="LMo-2C-S2t" firstAttribute="trailing" secondItem="sQ4-rh-9eZ" secondAttribute="trailing" constant="60" id="DGR-uI-3C1"/>
                             <constraint firstItem="mDh-b1-beQ" firstAttribute="top" secondItem="Lmw-Kx-4f2" secondAttribute="bottom" constant="8" id="Dd4-QO-xvg"/>
                             <constraint firstItem="vAF-Nn-wn2" firstAttribute="leading" secondItem="LMo-2C-S2t" secondAttribute="leading" constant="60" id="ER5-mb-FIm"/>
-                            <constraint firstItem="vAF-Nn-wn2" firstAttribute="centerY" secondItem="LMo-2C-S2t" secondAttribute="centerY" id="GRw-C2-cF0"/>
+                            <constraint firstItem="MLn-qX-qMs" firstAttribute="top" secondItem="m7c-dZ-F3M" secondAttribute="bottom" constant="44" id="G9n-pv-GwI"/>
+                            <constraint firstItem="Lmw-Kx-4f2" firstAttribute="top" secondItem="sQ4-rh-9eZ" secondAttribute="bottom" constant="22.5" id="GIG-DR-4ER"/>
                             <constraint firstItem="mDh-b1-beQ" firstAttribute="centerX" secondItem="LMo-2C-S2t" secondAttribute="centerX" id="HU1-Xy-bUM"/>
-                            <constraint firstItem="LMo-2C-S2t" firstAttribute="bottom" secondItem="mDh-b1-beQ" secondAttribute="bottom" constant="20" id="Me2-wN-Jwv"/>
                             <constraint firstItem="sQ4-rh-9eZ" firstAttribute="top" secondItem="9Sn-KD-KjM" secondAttribute="bottom" constant="33" id="OXR-Wy-Vgp"/>
                             <constraint firstItem="9Sn-KD-KjM" firstAttribute="top" secondItem="vAF-Nn-wn2" secondAttribute="bottom" constant="7.5" id="Umy-GO-ra1"/>
                             <constraint firstItem="m7c-dZ-F3M" firstAttribute="centerX" secondItem="LMo-2C-S2t" secondAttribute="centerX" id="VHP-eH-QX1"/>
@@ -941,17 +941,23 @@
             <objects>
                 <viewController id="rZb-10-UBP" customClass="ResetPasswordViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lVq-KC-ztK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6ss-4f-MZA">
+                                <rect key="frame" x="79.666666666666686" y="20" width="255" height="41"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="35"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email address" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DIj-3s-f3p">
-                                <rect key="frame" x="60" y="286.5" width="255" height="30"/>
+                                <rect key="frame" x="60" y="98" width="294" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" textContentType="email"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LZy-0Z-srr">
-                                <rect key="frame" x="161.5" y="575" width="52" height="32"/>
+                                <rect key="frame" x="181" y="250.66666666666663" width="52" height="32"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <state key="normal" title="Sign in"/>
                                 <connections>
@@ -960,24 +966,18 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B6X-sy-Ff6">
-                                <rect key="frame" x="156.5" y="615" width="62" height="32"/>
+                                <rect key="frame" x="176" y="290.66666666666669" width="62" height="32"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <state key="normal" title="Sign Up"/>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reset Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6ss-4f-MZA">
-                                <rect key="frame" x="60" y="20" width="255" height="41"/>
-                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="35"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hds-c3-8Fk">
-                                <rect key="frame" x="60" y="373" width="255" height="20.5"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hds-c3-8Fk">
+                                <rect key="frame" x="60" y="199" width="294" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O1Z-nO-ZgT">
-                                <rect key="frame" x="107" y="324.5" width="161" height="38"/>
+                                <rect key="frame" x="126.66666666666669" y="136" width="161" height="38"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="22"/>
                                 <state key="normal" title="Reset Password"/>
                                 <connections>
@@ -993,11 +993,11 @@
                             <constraint firstItem="6ss-4f-MZA" firstAttribute="top" secondItem="Wnl-a2-grc" secondAttribute="top" id="IVW-CO-GXk"/>
                             <constraint firstItem="B6X-sy-Ff6" firstAttribute="top" secondItem="LZy-0Z-srr" secondAttribute="bottom" constant="8" id="NsV-7f-j6D"/>
                             <constraint firstItem="LZy-0Z-srr" firstAttribute="centerX" secondItem="Wnl-a2-grc" secondAttribute="centerX" id="OIs-2R-JaL"/>
-                            <constraint firstItem="O1Z-nO-ZgT" firstAttribute="centerY" secondItem="Wnl-a2-grc" secondAttribute="centerY" id="RFm-h1-kJA"/>
+                            <constraint firstItem="LZy-0Z-srr" firstAttribute="top" secondItem="hds-c3-8Fk" secondAttribute="bottom" constant="31.5" id="OY7-cZ-wqZ"/>
                             <constraint firstItem="Wnl-a2-grc" firstAttribute="trailing" secondItem="DIj-3s-f3p" secondAttribute="trailing" constant="60" id="Tcx-A1-iDs"/>
                             <constraint firstItem="O1Z-nO-ZgT" firstAttribute="centerX" secondItem="Wnl-a2-grc" secondAttribute="centerX" id="bmk-Tj-rcg"/>
                             <constraint firstItem="hds-c3-8Fk" firstAttribute="centerX" secondItem="Wnl-a2-grc" secondAttribute="centerX" id="dSk-Vp-q7x"/>
-                            <constraint firstItem="Wnl-a2-grc" firstAttribute="bottom" secondItem="B6X-sy-Ff6" secondAttribute="bottom" constant="20" id="ltW-86-XVt"/>
+                            <constraint firstItem="DIj-3s-f3p" firstAttribute="top" secondItem="6ss-4f-MZA" secondAttribute="bottom" constant="37" id="kdL-O9-5pb"/>
                             <constraint firstItem="Wnl-a2-grc" firstAttribute="trailing" secondItem="hds-c3-8Fk" secondAttribute="trailing" constant="60" id="m69-lW-9Yq"/>
                             <constraint firstItem="6ss-4f-MZA" firstAttribute="centerX" secondItem="Wnl-a2-grc" secondAttribute="centerX" id="nfT-t1-EVp"/>
                             <constraint firstItem="DIj-3s-f3p" firstAttribute="leading" secondItem="Wnl-a2-grc" secondAttribute="leading" constant="60" id="vFp-yh-Zef"/>
@@ -1019,43 +1019,37 @@
             <objects>
                 <viewController id="itr-6w-UUC" customClass="SignUpViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="LKT-mt-L1K">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email address" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="atI-9R-vJk">
-                                <rect key="frame" x="60" y="290" width="254" height="30"/>
+                                <rect key="frame" x="60" y="105" width="293" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" textContentType="email"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zJC-2e-b63">
-                                <rect key="frame" x="60" y="328.5" width="254" height="30"/>
+                                <rect key="frame" x="60" y="143" width="293" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Xsu-XO-jXO">
-                                <rect key="frame" x="149.5" y="366" width="76" height="38"/>
+                                <rect key="frame" x="169" y="181" width="76" height="38"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="22"/>
                                 <state key="normal" title="Sign up"/>
                                 <connections>
                                     <action selector="signUp:" destination="itr-6w-UUC" eventType="touchUpInside" id="RXP-oB-1Sb"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jUg-OP-qpS">
-                                <rect key="frame" x="60" y="436.5" width="254" height="20.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign up" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iey-IZ-Brb">
-                                <rect key="frame" x="127.5" y="20" width="120" height="41"/>
+                                <rect key="frame" x="147" y="20" width="120" height="41"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="35"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j9o-Yb-l9T">
-                                <rect key="frame" x="154" y="617" width="67" height="30"/>
+                                <rect key="frame" x="173.66666666666666" y="296" width="67" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="67" id="cNW-Iu-9l6"/>
                                 </constraints>
@@ -1064,17 +1058,22 @@
                                     <segue destination="HLo-fH-iuq" kind="presentation" id="TiP-cO-AZq"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jUg-OP-qpS">
+                                <rect key="frame" x="60" y="252.00000000000003" width="293" height="20.333333333333343"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="0.1561439037322998" green="0.19246660338507759" blue="0.27276174227396649" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstItem="jUg-OP-qpS" firstAttribute="top" secondItem="Xsu-XO-jXO" secondAttribute="bottom" constant="33" id="48X-9F-H2i"/>
                             <constraint firstItem="jUg-OP-qpS" firstAttribute="leading" secondItem="AxA-re-tSv" secondAttribute="leading" constant="60" id="8Kt-ql-1tf"/>
                             <constraint firstItem="zJC-2e-b63" firstAttribute="width" secondItem="atI-9R-vJk" secondAttribute="width" id="CU7-CT-yqj"/>
-                            <constraint firstItem="AxA-re-tSv" firstAttribute="bottom" secondItem="j9o-Yb-l9T" secondAttribute="bottom" constant="20" id="Jkt-Ed-TYq"/>
                             <constraint firstItem="Xsu-XO-jXO" firstAttribute="top" secondItem="zJC-2e-b63" secondAttribute="bottom" constant="7.5" id="LVa-1P-1aT"/>
                             <constraint firstItem="j9o-Yb-l9T" firstAttribute="centerX" secondItem="AxA-re-tSv" secondAttribute="centerX" id="OKX-iZ-HXH"/>
                             <constraint firstItem="zJC-2e-b63" firstAttribute="top" secondItem="atI-9R-vJk" secondAttribute="bottom" constant="8.5" id="OWT-AJ-X6P"/>
                             <constraint firstItem="Xsu-XO-jXO" firstAttribute="centerX" secondItem="AxA-re-tSv" secondAttribute="centerX" id="R4m-XC-whl"/>
+                            <constraint firstItem="j9o-Yb-l9T" firstAttribute="top" secondItem="jUg-OP-qpS" secondAttribute="bottom" constant="23.5" id="RFD-yj-Xd6"/>
                             <constraint firstItem="iey-IZ-Brb" firstAttribute="centerX" secondItem="AxA-re-tSv" secondAttribute="centerX" id="UC4-IO-nmi"/>
                             <constraint firstItem="jUg-OP-qpS" firstAttribute="width" secondItem="zJC-2e-b63" secondAttribute="width" id="Vwn-Xu-eZ0"/>
                             <constraint firstItem="AxA-re-tSv" firstAttribute="trailing" secondItem="jUg-OP-qpS" secondAttribute="trailing" constant="61" id="bPU-Ke-kNa"/>
@@ -1082,7 +1081,8 @@
                             <constraint firstItem="AxA-re-tSv" firstAttribute="trailing" secondItem="atI-9R-vJk" secondAttribute="trailing" constant="61" id="f5D-X3-iHI"/>
                             <constraint firstItem="zJC-2e-b63" firstAttribute="leading" secondItem="AxA-re-tSv" secondAttribute="leading" constant="60" id="k4j-SU-a1k"/>
                             <constraint firstItem="iey-IZ-Brb" firstAttribute="top" secondItem="AxA-re-tSv" secondAttribute="top" id="mDm-KP-pyN"/>
-                            <constraint firstItem="zJC-2e-b63" firstAttribute="centerY" secondItem="AxA-re-tSv" secondAttribute="centerY" id="t7V-pc-3Of"/>
+                            <constraint firstItem="jUg-OP-qpS" firstAttribute="top" secondItem="Xsu-XO-jXO" secondAttribute="bottom" constant="33" id="mNq-V8-pMZ"/>
+                            <constraint firstItem="atI-9R-vJk" firstAttribute="top" secondItem="iey-IZ-Brb" secondAttribute="bottom" constant="44" id="uKs-LA-zLH"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="AxA-re-tSv"/>
                     </view>
@@ -1124,7 +1124,7 @@
                     <tabBarItem key="tabBarItem" title="Collection" image="albums" id="acW-dT-cKf"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="q1g-Mp-geH">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1138,51 +1138,51 @@
             <objects>
                 <viewController storyboardIdentifier="FilmDetailViewController" id="0Te-Bz-sJv" customClass="FilmDetailViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="MVm-Kp-bSA">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="900"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="900"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" alpha="0.5" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fHJ-2a-4cA">
-                                <rect key="frame" x="0.0" y="20" width="375" height="880"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="880"/>
                                 <color key="backgroundColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nfl-vh-6vy">
-                                <rect key="frame" x="0.0" y="20" width="375" height="880"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="880"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Nc-Ar-U84" userLabel="Content View">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="850"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="850"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1964)" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="4" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9oA-9C-6GB">
-                                                <rect key="frame" x="110" y="0.0" width="257" height="59.5"/>
+                                                <rect key="frame" x="110" y="0.0" width="296" height="59.666666666666664"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Director" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e7U-JB-bwR">
-                                                <rect key="frame" x="110" y="66.5" width="257" height="17.5"/>
+                                                <rect key="frame" x="110" y="66.666666666666671" width="296" height="17.666666666666671"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Genres" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="htr-Aw-m6L">
-                                                <rect key="frame" x="8" y="162" width="359" height="18"/>
+                                                <rect key="frame" x="8" y="162" width="398" height="18"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Runtime" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rvz-2e-FlU">
-                                                <rect key="frame" x="8" y="188" width="359" height="17.5"/>
+                                                <rect key="frame" x="8" y="188" width="398" height="17.666666666666657"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Grade" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OzT-us-bPy">
-                                                <rect key="frame" x="110" y="92" width="257" height="17.5"/>
+                                                <rect key="frame" x="110" y="92.333333333333329" width="296" height="17.666666666666671"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="Description" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="koR-1I-BPC">
-                                                <rect key="frame" x="8" y="213.5" width="359" height="34"/>
+                                                <rect key="frame" x="8" y="213.66666666666666" width="398" height="34"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1195,7 +1195,7 @@
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8xb-w4-1Ve">
-                                                <rect key="frame" x="250" y="255.5" width="117" height="18"/>
+                                                <rect key="frame" x="289" y="255.66666666666669" width="117" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="18" id="292-ev-TXp"/>
                                                     <constraint firstAttribute="width" constant="117" id="GZw-Ua-Mbi"/>
@@ -1209,13 +1209,13 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cast" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XZr-jY-MTJ">
-                                                <rect key="frame" x="8" y="281.5" width="359" height="17.5"/>
+                                                <rect key="frame" x="8" y="281.66666666666669" width="398" height="17.333333333333314"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GGJ-tE-BWn">
-                                                <rect key="frame" x="0.0" y="307" width="375" height="164"/>
+                                                <rect key="frame" x="0.0" y="307" width="414" height="164"/>
                                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.050139126712328765" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="164" id="2SX-Ia-m5o"/>
@@ -1283,13 +1283,13 @@
                                                 </cells>
                                             </collectionView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Crew" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V5m-EF-zfq">
-                                                <rect key="frame" x="8" y="479" width="359" height="17.5"/>
+                                                <rect key="frame" x="8" y="479" width="398" height="17.666666666666686"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="bCR-rI-9P7">
-                                                <rect key="frame" x="0.0" y="504.5" width="375" height="164"/>
+                                                <rect key="frame" x="0.0" y="504.66666666666663" width="414" height="164"/>
                                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.050139126710000002" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="164" id="GLO-JS-FeK"/>
@@ -1357,13 +1357,13 @@
                                                 </cells>
                                             </collectionView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Review" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="onK-B8-nLG">
-                                                <rect key="frame" x="8" y="676" width="359" height="17.5"/>
+                                                <rect key="frame" x="8" y="676" width="398" height="17.666666666666629"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="15"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="My Review" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xu6-Ie-Swp">
-                                                <rect key="frame" x="8" y="701" width="359" height="34"/>
+                                                <rect key="frame" x="8" y="701" width="398" height="34"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue-LightItalic" family="Helvetica Neue" pointSize="15"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1470,7 +1470,7 @@
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
-                    <size key="freeformSize" width="375" height="900"/>
+                    <size key="freeformSize" width="414" height="900"/>
                     <connections>
                         <outlet property="additionBarButton" destination="Dmm-h8-J8h" id="e3g-v6-KIU"/>
                         <outlet property="backgroundImageView" destination="fHJ-2a-4cA" id="6zv-lh-gc4"/>
@@ -1508,15 +1508,15 @@
             <objects>
                 <viewController storyboardIdentifier="FilmographyCollectionViewController" id="Kt6-Zg-vbe" customClass="FilmographyCollectionViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DgA-ns-Nk3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rD5-NA-wNU">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.3048212756849315" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ROH-qk-Pn1">
-                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <rect key="frame" x="0.0" y="20" width="414" height="716"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.39969499143835618" colorSpace="custom" customColorSpace="sRGB"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="8" minimumInteritemSpacing="8" id="z6m-N9-M0D">
                                     <size key="itemSize" width="135" height="171"/>
@@ -1573,7 +1573,7 @@
                                     </collectionViewCell>
                                 </cells>
                                 <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="filmographyCollectionViewReusableView" id="L8G-aN-WAz" customClass="FilmographyCollectionReusableView" customModule="FilmCollection" customModuleProvider="target">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="50"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xif-L2-NQK">
@@ -1623,11 +1623,11 @@
             <objects>
                 <viewController id="xzC-HN-bm7" customClass="VideoPlayerViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lnA-RL-CFK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="KBg-Qg-t5Q">
-                                <rect key="frame" x="0.0" y="238" width="375" height="211"/>
+                                <rect key="frame" x="0.0" y="261.66666666666669" width="414" height="232.66666666666669"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="KBg-Qg-t5Q" secondAttribute="height" multiplier="375:211" id="yBt-In-kO8"/>
@@ -1661,7 +1661,7 @@
                     <tabBarItem key="tabBarItem" title="Add Film" image="plus" id="RIQ-yq-yq9"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="jFq-Lp-gmU">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1679,7 +1679,7 @@
                 <navigationController id="WjX-sm-TmS" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Settings" image="settings" selectedImage="settings" id="iS9-Pe-2Ji"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="pg3-5u-Ntx">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -1697,7 +1697,7 @@
                     <tabBarItem key="tabBarItem" title="Viewing history" image="visible" id="7rj-cH-Uqu"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="MYs-3d-mno">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1716,7 +1716,7 @@
                     <tabBarItem key="tabBarItem" title="Profile" image="user_male" selectedImage="user_male" id="npP-SG-nIy"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="x95-a0-Fam">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -1739,7 +1739,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="Sfb-mO-qwg"/>
-        <segue reference="OZX-FN-kvo"/>
+        <segue reference="TiP-cO-AZq"/>
         <segue reference="iDC-VI-RNN"/>
     </inferredMetricsTieBreakers>
 </document>

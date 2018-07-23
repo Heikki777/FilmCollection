@@ -476,6 +476,10 @@ class FilmDetailViewController: UIViewController {
         reviewTextView.text = film.review
         reviewTextView.isHidden = film.review.isEmpty
         reviewHeaderLabel.isHidden = film.review.isEmpty
+        if reviewTextView.isHidden{
+            reviewTextView.heightAnchor.constraint(equalToConstant: 1).isActive = true
+            reviewHeaderLabel.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        }
         
         setContentHeight()
         scrollView.scrollToTop()

@@ -98,16 +98,17 @@ class FilmCollection: NSObject{
         var tempFilms = films
         let secondarySortingRule: SortingRule = (sortingRule == .title) ? .year : .title
         FilmCollection.sort(movies: &tempFilms, sortingRule: secondarySortingRule, order: order)
+        
+        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.beginUpdates.rawValue), object: nil)
         sections = []
+        filteredSections = []
         filmDict = [:]
+        filteredFilmDict = [:]
+        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.filmDictionaryChanged.rawValue), object: nil)
+        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.endUpdates.rawValue), object: nil)
 
         for movie in tempFilms{
             self.addMovieToDictionary(movie)
-        }
-        
-        if notifyObservers{
-            let name = Notification.Name.init(rawValue: NotificationKey.filmDictionaryChanged.rawValue)
-            NotificationCenter.default.post(name: name, object: nil)
         }
     }
     
