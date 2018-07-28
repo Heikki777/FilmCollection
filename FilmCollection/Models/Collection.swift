@@ -114,7 +114,7 @@ class FilmCollection: NSObject{
     
     private func addMovieToDictionary(_ film: Movie){
         let sectionTitle = getSectionTitle(for: film)
-        print("addMovieToDictionary: \(film.title): section: \(sectionTitle)")
+        //print("addMovieToDictionary: \(film.title): section: \(sectionTitle)")
         // Create a new section in the film dictionary
         if filmDict[sectionTitle] == nil{
             NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.beginUpdates.rawValue), object: nil)

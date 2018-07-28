@@ -100,6 +100,7 @@ class FilmDetailViewController: UIViewController {
     }
     
     var film: Movie?
+    var handles: [UInt] = []
     
     var smallPosterImage: UIImage?{
         didSet{
@@ -169,46 +170,28 @@ class FilmDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setup()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
+        setup()
+        setContentHeight()
         fadeableViews.forEach { (view) in
             view.alpha = 0.0
         }
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setContentHeight()
-        
-        var movieIsInCollection = false
-        if let film = film, let user = Auth.auth().currentUser{
-            self.databaseRef.child("user-movies").child("\(user.uid)").observe(.value, with: { (snapshot) in
-
-                movieIsInCollection = snapshot.hasChild("\(film.id)")
-                self.removeBarButton.isEnabled = movieIsInCollection
-                self.watchedBarButton.isEnabled = movieIsInCollection
-                self.reviewBarButton.isEnabled = movieIsInCollection
-                self.additionBarButton.isEnabled = !movieIsInCollection
-                
-                if movieIsInCollection{
-                    self.databaseRef.child("user-movies").child(user.uid).child("\(film.id)").observe(.value, with: { (snapshot) in
-                        if let snapshotValue = snapshot.value as? [String:Any]{
-                            if let ratingValue = snapshotValue["rating"] as? Int, let rating = Rating(rawValue: ratingValue){
-                                self.film?.rating = rating
-                                self.ratingLabel.text = "Rating: \(rating.description)"
-                            }
-                        }
-                    })
-                }
-            })
-        }
-        
         fadeIn()
+    }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Stop receiving updates
+        for handle in handles{
+            self.databaseRef.removeObserver(withHandle: handle)
+        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -290,14 +273,22 @@ class FilmDetailViewController: UIViewController {
             return
         }
         
-        // Observer changes in the movie
+        // Observe changes in the movie
         if let user = Auth.auth().currentUser{
-            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").observe(.childChanged) { (snapshot) in
-                if let snapshotDict = snapshot.value as? [String:AnyObject], let rating = snapshotDict["rating"] as? Int {
-                    film.rating = Rating.all[rating]
-                    self.ratingLabel.text = "Rating: \(film.rating.description)"
+            let handle = self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").observe(.value) { (snapshot) in
+                if let snapshotDict = snapshot.value as? [String:AnyObject]{
+                    print("FilmDetailViewController: film \(film.title) has changed")
+                    if let rating = snapshotDict["rating"] as? Int {
+                        film.rating = Rating.all[rating]
+                        self.ratingLabel.text = "Rating: \(film.rating.description)"
+                    }
+                    if let review = snapshotDict["review"] as? String{
+                        film.review = review
+                        self.setReviewText(reviewText: review)
+                    }
                 }
             }
+            self.handles.append(handle)
         }
         
         // Load background poster and the small poster images
@@ -473,16 +464,16 @@ class FilmDetailViewController: UIViewController {
         })
         
         // Review
-        reviewTextView.text = film.review
-        reviewTextView.isHidden = film.review.isEmpty
-        reviewHeaderLabel.isHidden = film.review.isEmpty
-        if reviewTextView.isHidden{
-            reviewTextView.heightAnchor.constraint(equalToConstant: 1).isActive = true
-            reviewHeaderLabel.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        }
+        setReviewText(reviewText: film.review)
         
-        setContentHeight()
         scrollView.scrollToTop()
+    }
+    
+    func setReviewText(reviewText: String){
+        reviewTextView.text = reviewText
+        reviewTextView.isHidden = reviewText.isEmpty
+        reviewHeaderLabel.isHidden = reviewText.isEmpty
+        setContentHeight()
     }
     
     func showAlert(title: String, message: String){

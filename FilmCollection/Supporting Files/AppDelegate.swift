@@ -104,7 +104,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             registerForFilmRecommendationNotifications()
         }
         else{
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
+            unsubscribeNotifications()
         }
     }
     
@@ -123,6 +123,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         registerForFilmRecommendationNotifications()
 
     }
+    
+    func unsubscribeNotifications(){
+        // Remove all pending notifications
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
+        
+        // Turn of the notifications
+        settings.notificationsOn = false
+        saveContext()
+        
+        guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
+            print("No homeTabBarController")
+            return
+        }
+        
+        homeTabBarController.showBasicAlert(withTitle: "Unsubscribed", message: "You no longer receive notifications.")
+    }
+    
     
     private func configureUserNotificationsCenter() {
         // Configure User Notification Center
@@ -164,6 +181,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     notificationContent.title = "Film recommendation"
                     notificationContent.subtitle = "Watch today"
                     notificationContent.body = randomFilm.title
+                    notificationContent.sound = UNNotificationSound.default()
                     notificationContent.badge = 0
                     notificationContent.userInfo["filmID"] = randomFilm.id
                     notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
@@ -291,46 +309,56 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         switch response.notification.request.identifier {
         case FilmNotification.Category.randomRecommendation:
-            print("Show details of the recommended film")
-            if let filmID = response.notification.request.content.userInfo["filmID"] as? Int{
-                print("Film in notification: \(filmID)")
-                if let film = FilmCollection.shared.getMovie(withId: filmID){
-                    print(film.titleYear)
-
-                    guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
-                        print("No homeTabBarController")
-                        return
-                    }
-                    
-                    guard let navigationController = homeTabBarController.childViewControllers.filter({
-                        $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
-                            print("CollectionTabNavigationController could not be found")
+            switch response.actionIdentifier{
+            case FilmNotification.Action.showDetails:
+                print("Show details of the recommended film")
+                if let filmID = response.notification.request.content.userInfo["filmID"] as? Int{
+                    print("Film in notification: \(filmID)")
+                    if let film = FilmCollection.shared.getMovie(withId: filmID){
+                        print(film.titleYear)
+                        
+                        guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
+                            print("No homeTabBarController")
                             return
+                        }
+                        
+                        guard let navigationController = homeTabBarController.childViewControllers.filter({
+                            $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
+                                print("CollectionTabNavigationController could not be found")
+                                return
+                        }
+                        
+                        guard let indexPath = FilmCollection.shared.getIndexPath(for: film) else{
+                            print("The film has no indexPath")
+                            return
+                        }
+                        
+                        if let filmCollectionTableViewController = navigationController.childViewControllers.first as? FilmCollectionTableViewController{
+                            print("FilmCollectionTableViewController")
+                            filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
+                            filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+                        }
+                        else if let filmPosterCollectionViewController = navigationController.childViewControllers.first as? FilmPosterCollectionViewController{
+                            print("FilmPosterCollectionViewController")
+                            filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+                            filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+                        }
+                        else{
+                            print("ERROR!")
+                        }
+                        
+                        homeTabBarController.selectedIndex = 0
+                        
                     }
-                    
-                    guard let indexPath = FilmCollection.shared.getIndexPath(for: film) else{
-                        print("The film has no indexPath")
-                        return
-                    }
-                    
-                    if let filmCollectionTableViewController = navigationController.childViewControllers.first as? FilmCollectionTableViewController{
-                        print("FilmCollectionTableViewController")
-                        filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
-                        filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-                    }
-                    else if let filmPosterCollectionViewController = navigationController.childViewControllers.first as? FilmPosterCollectionViewController{
-                        print("FilmPosterCollectionViewController")
-                        filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-                        filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-                    }
-                    else{
-                        print("ERROR!")
-                    }
-                    
-                    homeTabBarController.selectedIndex = 0
-
                 }
+                
+            case FilmNotification.Action.unsubscribe:
+                unsubscribeNotifications()
+            
+            default:
+                break
             }
+
         default:
             break
         }

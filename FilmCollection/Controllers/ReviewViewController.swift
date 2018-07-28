@@ -29,18 +29,27 @@ class ReviewViewController: UIViewController {
     
     @IBAction func save(_ sender: Any) {
         
-        if let user = Auth.auth().currentUser{
-            if let film = film{
-                
-                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").updateChildValues(
-                    [
-                        "rating":ratingControl.rating.rawValue,
-                        "review":textView.text
-                    ]
-                )
-                self.showAlert(title: "Saved", message: "The review was saved successfully")
-            }
+        guard let film = film else{
+            return
         }
+        
+        let loadingIndicator = LoadingIndicatorViewController(title: "Saving", message: nil, complete: nil)
+        loadingIndicator.progressView.isHidden = true
+        present(loadingIndicator, animated: true, completion: nil)
+        
+        guard let user = Auth.auth().currentUser else {
+            loadingIndicator.finish()
+            self.showAlert(title: "Error", message: "The changes could not be saved")
+            return
+        }
+    
+        self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").updateChildValues([
+            "rating":ratingControl.rating.rawValue,
+            "review":textView.text
+        ])
+        
+        loadingIndicator.finish()
+        self.showAlert(title: "Saved", message: "The review was saved successfully")
     }
     
     func showAlert(title: String, message: String){

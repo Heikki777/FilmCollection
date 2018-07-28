@@ -71,7 +71,13 @@ class SignInViewController: UIViewController {
     
     @IBAction func signIn(_ sender: Any) {
         if let email = emailTextField.text, let password = passwordTextField.text {
+            // TODO: Add loading indicator that shows the following message: "Signing in"
+            
+            let loadingIndicator = LoadingIndicatorViewController(title: "Signing in", message: nil, complete: nil)
+            present(loadingIndicator, animated: true, completion: nil)
+            
             Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
+                
                 if let error = error{
                     print(error)
                     self.authenticationStatusLabel.text = error.localizedDescription
@@ -83,6 +89,8 @@ class SignInViewController: UIViewController {
                     self.passwordTextField.text = nil
                     self.signedIn = true
                 }
+                
+                loadingIndicator.finish()
             }
         }
     }

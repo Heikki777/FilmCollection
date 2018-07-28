@@ -11,6 +11,7 @@ import Foundation
 enum Segue: String{
     case showFilmDetailSegue
     case unwindFromMovieDetailToMovieCollection
+    case unwindToFilmDetailFromReviewSegue
     case showVideoPlayerSegue
     case showSortOptionsSegue
     case showReviewSegue
