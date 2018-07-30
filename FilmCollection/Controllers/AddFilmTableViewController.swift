@@ -40,6 +40,9 @@ class AddFilmTableViewController: UITableViewController {
     lazy var jsonDecoder: JSONDecoder = {
         return JSONDecoder()
     }()
+    
+    var lastPage: Int = 1
+    var isLoadingPage: Bool = false
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,6 +128,9 @@ class AddFilmTableViewController: UITableViewController {
             let searchResult = searchResults[indexPath.row]
             configure(cell: cell, searchResult: searchResult)
         }
+        if indexPath.row == searchResults.count-1 && !isLoadingPage {
+            loadNextPage()
+        }
         return cell
     }
     
@@ -203,12 +209,47 @@ class AddFilmTableViewController: UITableViewController {
         return 138
     }
     
-    @objc func reload() {
+    func loadNextPage(){
+        let page = lastPage+1
+        print("loadNextPage: \(page)")
+        isLoadingPage = true
         if let text = searchController.searchBar.text{
-            api.search(query: text)
+            api.search(query: text, page: page)
+                .done({ (results) in
+                    DispatchQueue.main.async {
+                        for result in results{
+                            if !self.searchResults.contains(where: { $0.id == result.id } ){
+                                self.searchResults.append(result)
+                            }
+                        }
+                        self.lastPage = page
+                        self.isLoadingPage = false
+                    }
+                })
+                .catch({ (error) in
+                    print(error)
+                })
+        }
+        else{
+            searchResults = []
+            lastPage = 1
+        }
+
+    }
+    
+    @objc func reload() {
+        lastPage = 1
+        isLoadingPage = true
+        if let text = searchController.searchBar.text{
+            api.search(query: text, page: 1)
             .done({ (results) in
                 DispatchQueue.main.async {
-                    self.searchResults = results
+                    for result in results{
+                        if !self.searchResults.contains(where: { $0.id == result.id } ){
+                            self.searchResults.append(result)
+                        }
+                    }
+                    self.isLoadingPage = false
                 }
             })
             .catch({ (error) in
@@ -217,6 +258,7 @@ class AddFilmTableViewController: UITableViewController {
         }
         else{
             searchResults = []
+            lastPage = 1
         }
     }
 }

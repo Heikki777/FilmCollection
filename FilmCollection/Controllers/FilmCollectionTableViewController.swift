@@ -396,7 +396,6 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
         
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "FilmDetailViewController") as? FilmDetailViewController{
             vc.film = film
-            vc.preferredContentSize = CGSize(width: 0, height: 0)
             show(vc, sender: self)
         }
     }

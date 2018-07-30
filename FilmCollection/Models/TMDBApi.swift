@@ -49,7 +49,7 @@ class TMDBApi{
     var searchDataTask: URLSessionDataTask?
     var movieImagesDataTask: URLSessionDataTask?
     
-    func search(query: String, retryCount: Int = 0) -> Promise<[FilmSearchResult]> {
+    func search(query: String, page: Int = 1) -> Promise<[FilmSearchResult]> {
         
         return Promise { result in
             print("search: \(query)")
@@ -59,7 +59,8 @@ class TMDBApi{
                 return
             }
             
-            var urlString = "\(TMDBApi.baseURL)\(TMDBApi.version)/search/movie?api_key=\(self.apiKey)&query=\(query)&language=en-US&include_adult=false"
+            var urlString = "\(TMDBApi.baseURL)\(TMDBApi.version)/search/movie?api_key=\(self.apiKey)&query=\(query)&language=en-US&include_adult=false&page=\(page)"
+            print(urlString)
             urlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             let url = URL.init(string: urlString)!
             let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
