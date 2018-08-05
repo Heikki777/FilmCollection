@@ -43,6 +43,7 @@ class AddFilmTableViewController: UITableViewController {
     
     var lastPage: Int = 1
     var isLoadingPage: Bool = false
+    var endOfResults: Bool = false
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -222,7 +223,8 @@ class AddFilmTableViewController: UITableViewController {
                                 self.searchResults.append(result)
                             }
                         }
-                        self.lastPage = page
+                        self.endOfResults = results.isEmpty
+                        self.lastPage = self.endOfResults ? self.lastPage : page
                         self.isLoadingPage = false
                     }
                 })
@@ -240,15 +242,13 @@ class AddFilmTableViewController: UITableViewController {
     @objc func reload() {
         lastPage = 1
         isLoadingPage = true
+        endOfResults = false
+        
         if let text = searchController.searchBar.text{
             api.search(query: text, page: 1)
             .done({ (results) in
                 DispatchQueue.main.async {
-                    for result in results{
-                        if !self.searchResults.contains(where: { $0.id == result.id } ){
-                            self.searchResults.append(result)
-                        }
-                    }
+                    self.searchResults = results
                     self.isLoadingPage = false
                 }
             })

@@ -1216,6 +1216,7 @@
                                             </label>
                                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GGJ-tE-BWn">
                                                 <rect key="frame" x="0.0" y="307" width="375" height="164"/>
+                                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="164" id="2SX-Ia-m5o"/>
                                                 </constraints>
@@ -1289,6 +1290,7 @@
                                             </label>
                                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="bCR-rI-9P7">
                                                 <rect key="frame" x="0.0" y="504.5" width="375" height="164"/>
+                                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="164" id="GLO-JS-FeK"/>
                                                 </constraints>
@@ -1414,6 +1416,7 @@
                                         </constraints>
                                     </view>
                                 </subviews>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="3Nc-Ar-U84" secondAttribute="trailing" id="9eM-Lq-F2W"/>
                                     <constraint firstAttribute="bottom" secondItem="3Nc-Ar-U84" secondAttribute="bottom" id="GMS-6d-7wy"/>
