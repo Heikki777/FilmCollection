@@ -203,7 +203,6 @@ class TMDBApi{
             .validate()
             .responseData(queue: queue, completionHandler: { (dataResponse) in
                 if let error = dataResponse.error{
-                    //print(error.localizedDescription)
                     if let response = dataResponse.response,
                         let headers = response.allHeaderFields as? [String: Any],
                         let retryAfter = headers["Retry-After"] as? String,
@@ -242,8 +241,21 @@ class TMDBApi{
             DispatchQueue.global().async {
                 Alamofire.request(url)
                 .validate()
-                .responseData(completionHandler: { (response) in
-                    guard let data = response.data else{
+                .responseData(completionHandler: { dataResponse in
+                    if let error = dataResponse.error{
+                        if let response = dataResponse.response,
+                            let headers = response.allHeaderFields as? [String: Any],
+                            let retryAfter = headers["Retry-After"] as? String,
+                            let seconds = Int(retryAfter){
+                            if response.statusCode == 429{
+                                result.reject(TMDBApiError.RequestLimitExceeded(seconds))
+                                return
+                            }
+                        }
+                        result.reject(error)
+                    }
+                    
+                    guard let data = dataResponse.data else{
                         result.reject(TMDBApiError.DataError("No data in response"))
                         return
                     }

@@ -144,6 +144,7 @@ class AddFilmTableViewController: UITableViewController {
                 self.api.loadMovie(id, append: ["credits"])
             }
             .done { movie in
+                print(movie.posterPath)
                 self.addMovie(movie: movie)
             }
             .catch { error in
@@ -163,7 +164,22 @@ class AddFilmTableViewController: UITableViewController {
     
     func addMovie(movie: Movie){
         
-        // Add the movie to database
+        let jsonEncoder = JSONEncoder()
+        
+        self.databaseRef.child("films").child("\(movie.id)").observeSingleEvent(of: .value) { (snapshot) in
+            if !snapshot.exists(){
+                
+                // Add the film to the database
+                if let data = try? jsonEncoder.encode(movie){
+                    print("data: \(data)")
+                    if let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]{
+                        snapshot.ref.updateChildValues(json)
+                    }
+                }
+            }
+        }
+        
+        // Add the film to user's collection
         if let user = Auth.auth().currentUser{
             self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").observeSingleEvent(of: .value) { (snapshot) in
                 var title = "Movie was not added"

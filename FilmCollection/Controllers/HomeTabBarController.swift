@@ -51,12 +51,16 @@ class HomeTabBarController: UITabBarController {
         NotificationCenter.default.addObserver(forName: NetworkReachabilityChanged, object: nil, queue: nil, using: {
             (notification) in
             if let userInfo = notification.userInfo {
-                if let messageTitle = userInfo["summary"] as? String, let reachableOrNot = userInfo["reachableOrNot"] as? String, let reachableStatus = userInfo["reachabilityStatus"] as? String {
-                    let messageFullBody = "\(reachableOrNot)\n\(reachableStatus)"
-                    let alertController = UIAlertController(title: messageTitle, message: messageFullBody, preferredStyle: .alert)
-                    let OKAction = UIAlertAction(title: "OK", style: .default)
-                    alertController.addAction(OKAction)
-                    self.present(alertController, animated: true, completion: nil)
+                if let messageTitle = userInfo["summary"] as? String,
+                let reachableOrNot = userInfo["reachableOrNot"] as? String,
+                let reachableStatus = userInfo["reachabilityStatus"] as? Bool {
+                    if reachableStatus == false{
+                        let messageFullBody = "\(reachableOrNot)\n\(reachableStatus)"
+                        let alertController = UIAlertController(title: messageTitle, message: messageFullBody, preferredStyle: .alert)
+                        let OKAction = UIAlertAction(title: "OK", style: .default)
+                        alertController.addAction(OKAction)
+                        self.present(alertController, animated: true, completion: nil)
+                    }
                 }
             }
         })

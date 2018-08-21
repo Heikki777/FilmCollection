@@ -9,10 +9,34 @@
 import UIKit
 import Firebase
 import FirebaseAuth
+import MessageUI
 
 class ProfileViewController: UIViewController {
 
+    let filmCollection = FilmCollection.shared
+    
     @IBOutlet weak var profileLabel: UILabel!
+    
+    @IBAction func sendCollectionToEmail(_ sender: Any) {
+        if let user = Auth.auth().currentUser, let userEmail = user.email{
+            if MFMailComposeViewController.canSendMail() {
+                let mail = MFMailComposeViewController()
+                mail.mailComposeDelegate = self
+                mail.setToRecipients([userEmail])
+                
+                let titles = filmCollection.getAllFilms().map { (film) -> String in
+                    return "<p>\(film.titleYear)</p>"
+                }.sorted().joined(separator: "")
+
+                mail.setMessageBody(titles, isHTML: true)
+                
+                present(mail, animated: true)
+            } else {
+                // show failure alert
+            }
+        }
+
+    }
     
     @IBAction func signOut(_ sender: Any) {
         do{
@@ -54,4 +78,11 @@ class ProfileViewController: UIViewController {
     }
     */
 
+}
+
+extension ProfileViewController: MFMailComposeViewControllerDelegate{
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
+    }
 }

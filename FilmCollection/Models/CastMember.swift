@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct CastMember: Decodable{
+struct CastMember: Codable{
     var castId: Int?
     var gender: Int?
     var name: String?
@@ -26,7 +26,7 @@ struct CastMember: Decodable{
     var overview: String?
     var order: Int?
     
-    private enum CodingKeys: String, CodingKey{
+    enum CodingKeys: String, CodingKey{
         case character
         case castId = "cast_id"
         case creditId = "credit_id"
@@ -45,3 +45,27 @@ struct CastMember: Decodable{
         case name
     }
 }
+
+//extension CastMember: Encodable {
+//
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(name, forKey: .name)
+//        try container.encode(creditId, forKey: .creditId)
+//        try container.encode(castId, forKey: .castId)
+//        try container.encode(id, forKey: .id)
+//        try container.encode(character, forKey: .character)
+//        try container.encode(title, forKey: .title)
+//        try container.encode(gender, forKey: .gender)
+//        try container.encode(order, forKey: .order)
+//        try container.encode(profilePath, forKey: .profilePath)
+//        try container.encode(genreIDs, forKey: .genreIDs)
+//        try container.encode(backdropPath, forKey: .backdropPath)
+//        try container.encode(posterPath, forKey: .posterPath)
+//        try container.encode(originalLanguage, forKey: .originalLanguage)
+//        try container.encode(originalTitle, forKey: .originalTitle)
+//        try container.encode(overview, forKey: .overview)
+//        try container.encode(order, forKey: .order)
+//
+//    }
+//}

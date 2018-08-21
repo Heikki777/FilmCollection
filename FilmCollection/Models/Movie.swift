@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 // MARK: - Movie
-class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
+class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     
     static var dateFormatter: DateFormatter = {
         return DateFormatter()
@@ -27,7 +27,7 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     var posterPath: String?
     var productionCompanies: [Company]?
     var releaseDate: String?
-    var productionContries: [Country]?
+    var productionCountries: [Country]?
     var revenue: Int?
     var runtime: Int?
     var spokenLanguages: [Language]?
@@ -37,6 +37,7 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     var video: Bool?
     var smallPosterImage: UIImage? = nil
     var largePosterImage: UIImage? = nil
+    var credits: Credits = Credits()
     
     var sortingTitle: String{
         let articles = ["A ", "An ", "The "]
@@ -59,9 +60,6 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     
     // HasVideo
     var videos: [Video] = []
-    
-    // HasCredits
-    var credits: Credits = Credits()
     
     var year: Int?{
         get{
@@ -94,27 +92,42 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         return lhs.id == rhs.id
     }
     
-    struct Genre: Decodable{
+    struct Genre: Codable{
         var id: Int
         var name: String
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case name
+        }
     }
     
-    struct Company: Decodable{
+    struct Company: Codable{
         var name: String?
         var id: Int?
+        
+        enum CodingKeys: String, CodingKey {
+            case id
+            case name
+        }
     }
     
-    struct Country: Decodable{
+    struct Country: Codable{
         var iso_3166_1: String?
         var name: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case iso_3166_1
+            case name
+        }
     }
     
-    struct Language: Decodable{
+    struct Language: Codable{
         var iso_639_1: String?
         var name: String?
     }
     
-    private enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case adult
         case backdropPath = "backdrop_path"
         case budget
@@ -127,7 +140,7 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         case posterPath = "poster_path"
         case productionCompanies = "production_companies"
         case releaseDate = "release_date"
-        case productionContries = "production_contries"
+        case productionCountries = "production_contries"
         case revenue
         case runtime
         case spokenLanguages = "spoken_languages"
@@ -228,3 +241,28 @@ class Movie: Decodable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         }
     }
 }
+
+//extension Movie: Encodable{
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: Movie.CodingKeys.self)
+//        try container.encode(adult, forKey: .adult)
+//        try container.encode(backdropPath, forKey: .backdropPath)
+//        try container.encode(budget, forKey: .budget)
+//        try container.encode(credits, forKey: .credits)
+//        try container.encode(genres, forKey: .genres)
+//        try container.encode(id, forKey: .id)
+//        try container.encode(originalLanguage, forKey: .originalLanguage)
+//        try container.encode(originalTitle, forKey: .originalTitle)
+//        try container.encode(overview, forKey: .overview)
+//        try container.encode(posterPath, forKey: .posterPath)
+//        try container.encode(productionCompanies, forKey: .productionCompanies)
+//        try container.encode(releaseDate, forKey: .releaseDate)
+//        try container.encode(revenue, forKey: .revenue)
+//        try container.encode(runtime, forKey: .runtime)
+//        try container.encode(spokenLanguages, forKey: .spokenLanguages)
+//        try container.encode(status, forKey: .status)
+//        try container.encode(tagline, forKey: .tagline)
+//        try container.encode(title, forKey: .title)
+//        try container.encode(video, forKey: .video)
+//    }
+//}

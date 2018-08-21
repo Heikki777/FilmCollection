@@ -656,7 +656,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z3n-gP-EiD">
-                                <rect key="frame" x="146.5" y="322" width="82" height="38"/>
+                                <rect key="frame" x="146" y="101" width="82" height="38"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="22"/>
                                 <state key="normal" title="Sign out"/>
                                 <connections>
@@ -664,18 +664,38 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Profile" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CF7-RO-A7H">
-                                <rect key="frame" x="16" y="294" width="343" height="20"/>
+                                <rect key="frame" x="16" y="73" width="343" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send the film collection as a list to my email" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H7w-ZP-nL4">
+                                <rect key="frame" x="16" y="179" width="343" height="19"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="16"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vnG-qm-nxn">
+                                <rect key="frame" x="16" y="205.5" width="343" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Send"/>
+                                <connections>
+                                    <action selector="sendCollectionToEmail:" destination="Se9-Mp-dN3" eventType="touchUpInside" id="Kf7-r2-OmL"/>
+                                </connections>
+                            </button>
                         </subviews>
-                        <color key="backgroundColor" red="0.0048598507420000003" green="0.096086271109999996" blue="0.57499289509999996" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
+                            <constraint firstItem="A9d-Ev-7Q9" firstAttribute="trailing" secondItem="H7w-ZP-nL4" secondAttribute="trailing" constant="16" id="3ri-pc-SjH"/>
+                            <constraint firstItem="CF7-RO-A7H" firstAttribute="top" secondItem="A9d-Ev-7Q9" secondAttribute="top" constant="9" id="6Ml-zi-bPj"/>
                             <constraint firstItem="Z3n-gP-EiD" firstAttribute="top" secondItem="CF7-RO-A7H" secondAttribute="bottom" constant="8" id="HU8-M2-OnI"/>
-                            <constraint firstItem="Z3n-gP-EiD" firstAttribute="centerY" secondItem="A9d-Ev-7Q9" secondAttribute="centerY" id="Nd5-bv-YII"/>
+                            <constraint firstItem="A9d-Ev-7Q9" firstAttribute="trailing" secondItem="vnG-qm-nxn" secondAttribute="trailing" constant="16" id="KMJ-Xc-nag"/>
+                            <constraint firstItem="vnG-qm-nxn" firstAttribute="top" secondItem="H7w-ZP-nL4" secondAttribute="bottom" constant="7.5" id="e9l-K4-ojW"/>
+                            <constraint firstItem="vnG-qm-nxn" firstAttribute="leading" secondItem="A9d-Ev-7Q9" secondAttribute="leading" constant="16" id="gE3-We-QRa"/>
                             <constraint firstItem="Z3n-gP-EiD" firstAttribute="centerX" secondItem="A9d-Ev-7Q9" secondAttribute="centerX" id="gWk-Kf-0Un"/>
                             <constraint firstItem="A9d-Ev-7Q9" firstAttribute="trailing" secondItem="CF7-RO-A7H" secondAttribute="trailing" constant="16" id="lBQ-fg-C7D"/>
+                            <constraint firstItem="H7w-ZP-nL4" firstAttribute="leading" secondItem="A9d-Ev-7Q9" secondAttribute="leading" constant="16" id="qML-6n-4c2"/>
+                            <constraint firstItem="H7w-ZP-nL4" firstAttribute="top" secondItem="Z3n-gP-EiD" secondAttribute="bottom" constant="40" id="t70-Ta-v8S"/>
                             <constraint firstItem="CF7-RO-A7H" firstAttribute="leading" secondItem="A9d-Ev-7Q9" secondAttribute="leading" constant="16" id="yEM-8u-ilP"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="A9d-Ev-7Q9"/>
@@ -687,7 +707,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zr2-K0-y2h" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-575" y="1991"/>
+            <point key="canvasLocation" x="-575.20000000000005" y="1990.2548725637182"/>
         </scene>
         <!--SettingsTab-->
         <scene sceneID="xN5-Cr-lvA">

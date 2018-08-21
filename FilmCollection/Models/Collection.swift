@@ -152,75 +152,102 @@ class FilmCollection: NSObject{
     private override init(){
         super.init()
         
+        var loaded: Int = 0
+        var totalNumberOfFilms: Int = 0
+
+        let filmLoadingCompletionClosure: (Movie) -> Void = { film in
+            // Load the small poster image for the film
+            // And then add the film to the collection.
+            attempt{
+                film.loadSmallPosterImage()
+            }
+            .done { (small) in
+                film.smallPosterImage = small
+            }
+            .catch { error in
+                print("Could not load poster images for the movie \(film.title)")
+                print(error.localizedDescription)
+            }
+            .finally {
+                self.films.append(film)
+                self.addMovieToDictionary(film)
+                loaded += 1
+                
+                // Progress
+                let progress: Float = Float(loaded) / Float(totalNumberOfFilms)
+                print("Loaded: \(loaded) / \(totalNumberOfFilms) (\(Int(progress*100)) %)")
+                let progressNotificationName = NSNotification.Name(NotificationKey.loadingProgressChanged.rawValue)
+                NotificationCenter.default.post(name: progressNotificationName, object: progress)
+                
+                if loaded == totalNumberOfFilms{
+                    NotificationCenter.default.post(name: NSNotification.Name(NotificationKey.filmCollectionValueChanged.rawValue), object: nil)
+                }
+            }
+        }
+        
         guard let user = Auth.auth().currentUser else{
             print("Error! No user")
             return
         }
         
         self.user = user
+        
+        let jsonDecoder = JSONDecoder()
     
-        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { (snapshot) in
+        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { snapshot in
             
             if let dbFilms = snapshot.value as? [String:AnyObject]{
-                
+                totalNumberOfFilms = dbFilms.count
                 guard dbFilms.count > 0 else{
                     NotificationCenter.default.post(name: NSNotification.Name(NotificationKey.filmCollectionValueChanged.rawValue), object: nil)
                     return
                 }
                 
                 print("Movie list value changed: \(dbFilms.count)")
-                var loaded: Int = 0
                 for (_,dbFilm) in dbFilms{
-                    guard let id = dbFilm["id"] as? Int, let rating = dbFilm["rating"] as? Int else {
+                    guard let id = dbFilm["id"] as? Int else {
                         print("No Film ID")
                         continue
                     }
                     
-                    attempt{
-                        self.api.loadMovie(id, append: ["credits"])
-                    }
-                    .done{ film in
-                        film.review = dbFilm["review"] as? String ?? ""
-                        film.rating = Rating.all[rating]
+                    self.databaseRef.child("films").child("\(id)").observeSingleEvent(of: .value) { filmSnapshot in
                         
-                        attempt{
-                            film.loadSmallPosterImage()
-                        }
-                        .done{ (small) in
-                            film.smallPosterImage = small
-                        }
-                        .catch{ error in
-                            print("Could not load poster images for the movie \(film.title)")
-                            print(error.localizedDescription)
-                        }
-                        .finally {
-                            self.films.append(film)
-                            self.addMovieToDictionary(film)
-                            loaded += 1
+                        if filmSnapshot.exists(), let filmDictionary = filmSnapshot.value as? [String:Any], let jsonData = try? JSONSerialization.data(withJSONObject: filmDictionary, options: []), let film = try? jsonDecoder.decode(Movie.self, from: jsonData){
                             
-                            // Progress
-                            let progress: Float = Float(loaded) / Float(dbFilms.count)
-                            print("Loaded: \(loaded) / \(dbFilms.count) (\(Int(progress*100)) %)")
-                            //print("\(self.films.count) / \(dbFilms.count)")
-                            let progressNotificationName = NSNotification.Name(NotificationKey.loadingProgressChanged.rawValue)
-                            NotificationCenter.default.post(name: progressNotificationName, object: progress)
-                            
-                            if loaded == dbFilms.count{
-                                NotificationCenter.default.post(name: NSNotification.Name(NotificationKey.filmCollectionValueChanged.rawValue), object: nil)
-                            }
+                            // The film was successfully loaded from Firebase
+                            film.review = dbFilm["review"] as? String ?? ""
+                            let rating = dbFilm["rating"] as? Int ?? 0
+                            film.rating = Rating.all[rating]
+                            filmLoadingCompletionClosure(film)
                         }
-                    }
-                    .catch{ error in
-
-                        print(error.localizedDescription)
+                        else {
+                            // Load the film from TMDB
+                            loadFilmFromTMDB(dbFilm: dbFilm, id: id, completed: filmLoadingCompletionClosure)
+                            return
+                        }
                     }
                 }
             }
         }
         
+        func loadFilmFromTMDB(dbFilm: AnyObject, id: Int, completed: @escaping (_ film: Movie) -> Void){
+            attempt{
+                self.api.loadMovie(id, append: ["credits"])
+            }
+            .done{ film in
+                film.review = dbFilm["review"] as? String ?? ""
+                let rating = dbFilm["rating"] as? Int ?? 0
+                film.rating = Rating.all[rating]
+            }
+            .catch { error in
+                print(error.localizedDescription)
+                print("The film with id: \(id) could not be loaded")
+                loaded += 1
+            }
+        }
+        
         // Listen for new movies in the Firebase database
         databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
-            
             
             // Use this handler only if the movies have been loaded
             guard !self.films.isEmpty else{
@@ -323,6 +350,13 @@ class FilmCollection: NSObject{
         }
     }
     
+    func removeFilm(withId id: Int){
+        if let user = Auth.auth().currentUser{
+            // Remove the movie from the database
+            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(id)").removeValue()
+        }
+    }
+    
     private func removeFilm(_ film: Movie){
         let sectionTitle = getSectionTitle(for: film)
         if let index = films.index(of: film){
@@ -363,6 +397,10 @@ class FilmCollection: NSObject{
             }
         }
         return nil
+    }
+    
+    func getAllFilms() -> [Movie]{
+        return films
     }
     
     func getSectionTitle(section: Int) -> String?{

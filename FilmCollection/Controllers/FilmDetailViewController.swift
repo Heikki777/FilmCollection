@@ -174,10 +174,15 @@ class FilmDetailViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         setup()
-        setContentHeight()
         fadeableViews.forEach { (view) in
             view.alpha = 0.0
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        setContentHeight()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -203,6 +208,11 @@ class FilmDetailViewController: UIViewController {
     
     func setContentHeight(){
         var contentRect = CGRect.zero
+        
+        if let homeTabBarController = self.tabBarController as? HomeTabBarController {
+            let tabBarHeight = homeTabBarController.tabBar.frame.height
+            contentRect.union(CGRect(origin: .zero, size: CGSize(width: 0, height: tabBarHeight)))
+        }
         
         for view in contentView.subviews {
             contentRect = contentRect.union(view.frame)

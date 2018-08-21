@@ -31,6 +31,7 @@ class LoadingIndicatorViewController: UIViewController {
         }
     }
     var complete: (() -> Void)?
+    var dismissWhenBecomesVisible: Bool = false
     
     init(title: String?, message: String?, complete: (() -> Void)?){
         super.init(nibName: "LoadingIndicatorViewController", bundle: nil)
@@ -51,11 +52,9 @@ class LoadingIndicatorViewController: UIViewController {
     }
     
     func setProgress(_ progress: Float){
-        
         self.progressView.setProgress(progress, animated: true)
-        
-        if progress == 1 && self.isVisible{
-            self.dismiss(animated: true, completion: complete)
+        if progress.isEqual(to: 1.0){
+            finish()
         }
         else if progress < 1 && !self.activityIndicator.isAnimating{
             self.activityIndicator.startAnimating()
@@ -63,6 +62,9 @@ class LoadingIndicatorViewController: UIViewController {
     }
     
     func finish(){
+        if !self.isVisible{
+            dismissWhenBecomesVisible = true
+        }
         self.dismiss(animated: true, completion: complete)
     }
     
@@ -75,6 +77,15 @@ class LoadingIndicatorViewController: UIViewController {
         self.activityIndicator.hidesWhenStopped = true
         self.progressView.setProgress(0, animated: false)
         self.backgroundView.layer.cornerRadius = 10
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if dismissWhenBecomesVisible{
+            self.dismiss(animated: true, completion: complete)
+            dismissWhenBecomesVisible = false
+        }
     }
 
     override func didReceiveMemoryWarning() {

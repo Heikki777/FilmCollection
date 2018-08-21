@@ -24,18 +24,20 @@ func attempt<T>(_ body: @escaping () -> Promise<T>) -> Promise<T>{
             if let tmdbApiError = error as? TMDBApiError{
                 switch tmdbApiError{
                 case .RequestLimitExceeded(let retryAfterSeconds):
+                    print("Retry after \(retryAfterSeconds) seconds")
                     let milliseconds = retryAfterSeconds * 1000
                     return after(DispatchTimeInterval.milliseconds(milliseconds)).then(attempt)
                 default:
+                    print("default")
                     break
                 }
             }
-
-            //Wait for (2 * attempts) second before attempting.
-            let seconds: Double = Double(2 * attempts) + drand48()
-            let milliseconds: Int = Int(seconds * 1000)
-            //print("Retry after \(milliseconds) ms")
-            return after(DispatchTimeInterval.milliseconds(milliseconds)).then(attempt)
+            
+            print(error.localizedDescription)
+//            let seconds: Double = Double(2 * attempts) + drand48()
+//            let milliseconds: Int = Int(seconds * 1000)
+//            print("Retry after \(milliseconds) ms")
+            return Promise.init(error: error)
         }
     }
     return attempt()

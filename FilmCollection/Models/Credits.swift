@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Credits: Decodable{
+class Credits: Decodable {
     var crew: [CrewMember] = []
     var cast: [CastMember] = []
     
@@ -22,8 +22,26 @@ struct Credits: Decodable{
         self.cast = cast
     }
     
-    private enum CodingKeys: String, CodingKey {
+    required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        crew = try values.decode([CrewMember].self, forKey: .crew)
+        cast = try values.decode([CastMember].self, forKey: .cast)
+    }
+    
+    enum CodingKeys: String, CodingKey {
         case crew
         case cast
     }
+    
+
+}
+
+extension Credits: Encodable {
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(crew, forKey: .crew)
+        try container.encode(cast, forKey: .cast)
+    }
+    
 }
