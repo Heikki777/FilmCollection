@@ -65,7 +65,7 @@ class HomeTabBarController: UITabBarController {
             }
         })
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLayoutChange(notification:)), name: filmCollectionLayoutChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLayoutChange(notification:)), name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {

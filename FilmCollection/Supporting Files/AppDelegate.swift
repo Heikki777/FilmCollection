@@ -20,9 +20,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
+    var filmIdWithinNotification: Int?{
+        didSet{
+            print("filmDetailToBeShown: \(String(describing: filmIdWithinNotification))")
+        }
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
+        
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            print("granted")
+        }
+        configureUserNotificationsCenter()
         
         setupNetworkReachabilityManager()
         createObservers()
@@ -88,9 +99,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func createObservers(){
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: filmCollectionLayoutChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsOnChanged(notification:)), name: notificationsOnChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsStartDateChanged(notification:)), name: notificationStartDateChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsOnChanged(notification:)), name: Notifications.SettingsNotification.notificationsOnChanged.name, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsStartDateChanged(notification:)), name: Notifications.SettingsNotification.notificationStartDateChanged.name, object: nil)
     }
     
     @objc func handleCollectionLoaded(notification: NSNotification){
@@ -117,11 +128,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Notifications
     func registerForLocalNotifications() {
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-
-        configureUserNotificationsCenter()
-        
         registerForFilmRecommendationNotifications()
-
     }
     
     func unsubscribeNotifications(){
@@ -167,51 +174,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let repetitionOption = settings.notificationRepetitionOption
         
+        if repetitionOption == .Never{
+            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        }
+        
+        
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
             (granted, error) in
             print("Notifications permission granted: \(granted)")
             
-            if granted{
-                
-                if let randomFilm = filmCollection.randomFilm(){
-                    print("Random film: \(randomFilm.title)")
-                    
-                    let notificationContent = UNMutableNotificationContent()
-                    notificationContent.title = "Film recommendation"
-                    notificationContent.subtitle = "Watch today"
-                    notificationContent.body = randomFilm.title
-                    notificationContent.sound = UNNotificationSound.default()
-                    notificationContent.badge = 0
-                    notificationContent.userInfo["filmID"] = randomFilm.id
-                    notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
-                    
-                    let calendar = Locale.current.calendar
-                    var repeats = false
-                    var dateComponents = DateComponents()
-                    
-                    switch repetitionOption{
-                    case .Never:
-                        repeats = false
-                        dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
-                    case .EveryDay:
-                        repeats = true
-                        dateComponents = calendar.dateComponents(Set([.hour, .minute]), from: startDate)
-                    case .EveryWeek:
-                        repeats = true
-                        dateComponents = calendar.dateComponents(Set([.weekday, .hour, .minute]), from: startDate)
-                    case .EveryMonth:
-                        repeats = true
-                        dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
-                    }
-                    
-                    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: repeats)
-                    let request = UNNotificationRequest(identifier: FilmNotification.Category.randomRecommendation, content: notificationContent, trigger: trigger)
-                    
-                    UNUserNotificationCenter.current().add(request)
-                    
-                }
+            guard granted && filmCollection.size > 0 else{
+                return
             }
+            
+            guard let randomFilm = filmCollection.randomFilm() else{
+                return
+            }
+                
+            let notificationContent = UNMutableNotificationContent()
+            notificationContent.title = "Film recommendation"
+            notificationContent.subtitle = "Watch today"
+            notificationContent.body = randomFilm.title
+            notificationContent.sound = UNNotificationSound.default()
+            notificationContent.badge = 0
+            notificationContent.userInfo["filmID"] = randomFilm.id
+            notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
+            
+            let calendar = Locale.current.calendar
+            var dateComponents = DateComponents()
+            
+            switch repetitionOption{
+            case .Never:
+                dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
+            case .EveryDay:
+                dateComponents = calendar.dateComponents(Set([.hour, .minute]), from: startDate)
+            case .EveryWeek:
+                dateComponents = calendar.dateComponents(Set([.weekday, .hour, .minute]), from: startDate)
+            case .EveryMonth:
+                dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
+            }
+            
+            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+            let request = UNNotificationRequest(identifier: FilmNotification.Category.randomRecommendation, content: notificationContent, trigger: trigger)
+            UNUserNotificationCenter.current().add(request)
+
         }
     }
     
@@ -295,11 +302,16 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     //for displaying notification when app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        
+        print("willPresent")
         //If you don't want to show notification when app is open, do something here else and make a return here.
         //Even you don't implement this delegate method, you will not see the notification on the specified controller. So, you have to implement this delegate and make sure the below line execute. i.e. completionHandler.
         
-        completionHandler([.alert, .badge, .sound])
+        if notification.request.identifier == FilmNotification.Category.randomRecommendation{
+            if settings.notificationRepetitionOption != .Never{
+                print("Repeat notification")
+                registerForFilmRecommendationNotifications()
+            }
+        }
     }
     
     // For handling tap and user actions
@@ -356,7 +368,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 unsubscribeNotifications()
             
             default:
-                break
+                // Show film details
+                guard let filmID = response.notification.request.content.userInfo["filmID"] as? Int else{
+                    return
+                }
+                
+                filmIdWithinNotification = filmID
+                NotificationCenter.default.post(name: NSNotification.Name.init("showDetailOfNotifiedFilm"), object: filmID)
             }
 
         default:

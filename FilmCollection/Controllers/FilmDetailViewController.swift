@@ -283,11 +283,16 @@ class FilmDetailViewController: UIViewController {
             return
         }
         
+        // Bar buttons
+        let filmIsInCollection = FilmCollection.shared.contains(film)
+        additionBarButton.isEnabled = !filmIsInCollection
+        removeBarButton.isEnabled = filmIsInCollection
+        
         // Observe changes in the movie
         if let user = Auth.auth().currentUser{
             let handle = self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").observe(.value) { (snapshot) in
                 if let snapshotDict = snapshot.value as? [String:AnyObject]{
-                    print("FilmDetailViewController: film \(film.title) has changed")
+                    // print("FilmDetailViewController: film \(film.title) has changed")
                     if let rating = snapshotDict["rating"] as? Int {
                         film.rating = Rating.all[rating]
                         self.ratingLabel.text = "Rating: \(film.rating.description)"

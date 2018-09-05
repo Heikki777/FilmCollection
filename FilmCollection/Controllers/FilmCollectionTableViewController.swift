@@ -106,17 +106,17 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     func createObservers(){
-        let collectionLoaded = Notification.Name(rawValue: FilmCollection.NotificationKey.filmCollectionValueChanged.rawValue)
-        let filmAddedToCollection = Notification.Name(rawValue: FilmCollection.NotificationKey.filmAddedToCollection.rawValue)
-        let filmChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmChanged.rawValue)
-        let filmRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.filmRemoved.rawValue)
-        let progressChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.loadingProgressChanged.rawValue)
-        let filmDictionaryChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmDictionaryChanged.rawValue)
-        let newSectionAdded = Notification.Name(rawValue: FilmCollection.NotificationKey.newSectionAddedToDictionary.rawValue)
-        let sectionRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.sectionRemovedFromDictionary.rawValue)
-        let beginUpdates = Notification.Name(rawValue: FilmCollection.NotificationKey.beginUpdates.rawValue)
-        let endUpdates = Notification.Name(rawValue: FilmCollection.NotificationKey.endUpdates.rawValue)
-        let collectionFiltered = Notification.Name(rawValue: FilmCollection.NotificationKey.collectionFiltered.rawValue)
+        let collectionLoaded = Notifications.FilmCollectionNotification.filmCollectionValueChanged.name
+        let filmAddedToCollection = Notifications.FilmCollectionNotification.filmAddedToCollection.name
+        let filmChanged = Notifications.FilmCollectionNotification.filmChanged.name
+        let filmRemoved = Notifications.FilmCollectionNotification.filmRemoved.name
+        let progressChanged = Notifications.FilmCollectionNotification.loadingProgressChanged.name
+        let filmDictionaryChanged = Notifications.FilmCollectionNotification.filmDictionaryChanged.name
+        let newSectionAdded = Notifications.FilmCollectionNotification.newSectionAddedToDictionary.name
+        let sectionRemoved = Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name
+        let beginUpdates = Notifications.FilmCollectionNotification.beginUpdates.name
+        let endUpdates = Notifications.FilmCollectionNotification.endUpdates.name
+        let collectionFiltered = Notifications.FilmCollectionNotification.collectionFiltered.name
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionLoaded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
@@ -129,6 +129,9 @@ class FilmCollectionTableViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(beginUpdates(notification:)), name: beginUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(endUpdates(notification:)), name: endUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleShowDetailOfNotifiedFilm(notification:)), name: NSNotification.Name.init("showDetailOfNotifiedFilm"), object: nil)
+
 
     }
     
@@ -176,8 +179,33 @@ class FilmCollectionTableViewController: UIViewController {
 
     }
     
+    @objc func handleShowDetailOfNotifiedFilm(notification: NSNotification){
+        print("handleShowDetailOfNotifiedFilm")
+        guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
+            return
+        }
+        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: notifiedFilm){
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+        }
+    }
+    
     @objc func handleCollectionLoaded(notification: NSNotification){
-        print(filmCollection.size)
+        print("Film collection loaded. \(filmCollection.size) films")
+        
+        guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
+            return
+        }
+        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: notifiedFilm){
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+        }
     }
     
     @objc func handleCollectionAddition(notification: NSNotification){

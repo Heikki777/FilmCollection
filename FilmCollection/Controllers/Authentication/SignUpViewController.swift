@@ -25,13 +25,21 @@ class SignUpViewController: UIViewController {
         didSet{
             print("signedIn: \(signedIn)")
             if signedIn {
-                let appDelegate = UIApplication.shared.delegate! as! AppDelegate
-                
-                let initialViewController = self.storyboard!.instantiateViewController(withIdentifier: "initialTabBarController")
-                appDelegate.window?.rootViewController = initialViewController
-                appDelegate.window?.makeKeyAndVisible()
+                showInitialViewController()
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedIn.name, object: nil)
+            }
+            else {
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedOut.name, object: nil)
             }
         }
+    }
+    
+    func showInitialViewController(){
+        let appDelegate = UIApplication.shared.delegate! as! AppDelegate
+        
+        let initialViewController = self.storyboard!.instantiateViewController(withIdentifier: "initialTabBarController")
+        appDelegate.window?.rootViewController = initialViewController
+        appDelegate.window?.makeKeyAndVisible()
     }
     
     @IBAction func signUp(_ sender: Any) {
@@ -41,13 +49,18 @@ class SignUpViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let loadingIndicator = LoadingIndicatorViewController(title: "Signing in", message: nil, complete: nil)
+        present(loadingIndicator, animated: true, completion: nil)
+        
         if let user = Auth.auth().currentUser, let email = user.email{
             self.authenticationStatusLabel.text = "Signed in as \(email)"
             self.signedIn = true
+            loadingIndicator.finish()
         }
         else{
             self.authenticationStatusLabel.text = "Signed out"
             self.signedIn = false
+            loadingIndicator.finish()
         }
     }
 
@@ -82,6 +95,7 @@ class SignUpViewController: UIViewController {
     func signOut(){
         do{
             try Auth.auth().signOut()
+            signedIn = false
         }
         catch let error{
             print(error.localizedDescription)

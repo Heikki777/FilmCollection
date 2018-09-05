@@ -41,6 +41,10 @@ class AddFilmTableViewController: UITableViewController {
         return JSONDecoder()
     }()
     
+    lazy var jsonEncoder: JSONEncoder = {
+        return JSONEncoder()
+    }()
+    
     var lastPage: Int = 1
     var isLoadingPage: Bool = false
     var endOfResults: Bool = false
@@ -144,7 +148,6 @@ class AddFilmTableViewController: UITableViewController {
                 self.api.loadMovie(id, append: ["credits"])
             }
             .done { movie in
-                print(movie.posterPath)
                 self.addMovie(movie: movie)
             }
             .catch { error in
@@ -164,13 +167,12 @@ class AddFilmTableViewController: UITableViewController {
     
     func addMovie(movie: Movie){
         
-        let jsonEncoder = JSONEncoder()
         
         self.databaseRef.child("films").child("\(movie.id)").observeSingleEvent(of: .value) { (snapshot) in
             if !snapshot.exists(){
                 
                 // Add the film to the database
-                if let data = try? jsonEncoder.encode(movie){
+                if let data = try? self.jsonEncoder.encode(movie){
                     print("data: \(data)")
                     if let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]{
                         snapshot.ref.updateChildValues(json)

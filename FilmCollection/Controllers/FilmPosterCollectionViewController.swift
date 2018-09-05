@@ -78,15 +78,15 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     func createObservers(){
-        let collectionChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmCollectionValueChanged.rawValue)
-        let filmAddedToCollection = Notification.Name(rawValue: FilmCollection.NotificationKey.filmAddedToCollection.rawValue)
-        let filmChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmChanged.rawValue)
-        let filmRemoved = Notification.Name(rawValue: FilmCollection.NotificationKey.filmRemoved.rawValue)
-        let progressChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.loadingProgressChanged.rawValue)
-        let filmDictionaryChanged = Notification.Name(rawValue: FilmCollection.NotificationKey.filmDictionaryChanged.rawValue)
-        let collectionFiltered = Notification.Name(rawValue: FilmCollection.NotificationKey.collectionFiltered.rawValue)
+        let collectionLoaded = Notifications.FilmCollectionNotification.filmCollectionValueChanged.name
+        let filmAddedToCollection = Notifications.FilmCollectionNotification.filmAddedToCollection.name
+        let filmChanged = Notifications.FilmCollectionNotification.filmChanged.name
+        let filmRemoved = Notifications.FilmCollectionNotification.filmRemoved.name
+        let progressChanged = Notifications.FilmCollectionNotification.loadingProgressChanged.name
+        let filmDictionaryChanged = Notifications.FilmCollectionNotification.filmDictionaryChanged.name
+        let collectionFiltered = Notifications.FilmCollectionNotification.collectionFiltered.name
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionChanged(notification:)), name: collectionChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionLoaded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleChangeInFilmData(notification:)), name: filmChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmRemoval(notification:)), name: filmRemoved, object: nil)
@@ -114,12 +114,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleCollectionFiltered(notification: NSNotification){
-        collectionView?.reloadData()
-    }
-    
-    @objc func handleCollectionChanged(notification: NSNotification){
-        print("handleCollectionChanged")
-        print(filmCollection.size)
         collectionView?.reloadData()
     }
     
@@ -153,6 +147,23 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         if let progress = notification.object as? Float{
             let percentage: Int = Int(progress * 100)
             homeTabBarController.showLoadingIndicator(withTitle: "Loading films", message: "\(percentage) %", progress: progress, complete: nil)
+        }
+    }
+    
+    @objc func handleCollectionLoaded(notification: NSNotification){
+        guard let collectionView = collectionView else{
+            return
+        }
+        guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
+            return
+        }
+        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
+            return
+        }
+        
+        if let indexPath = filmCollection.getIndexPath(for: notifiedFilm){
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
         }
     }
     

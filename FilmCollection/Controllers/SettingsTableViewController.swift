@@ -9,11 +9,6 @@
 import UIKit
 import CoreData
 
-let filmCollectionLayoutChanged = NSNotification.Name("filmCollectionLayoutChanged")
-let notificationsOnChanged = NSNotification.Name("notificationsOnChanged")
-let notificationStartDateChanged = NSNotification.Name("notificationStartDateChanged")
-
-
 class SettingsTableViewController: UITableViewController {
     
     private let reuseIdentifier = "settingsTableViewCell"
@@ -42,8 +37,8 @@ class SettingsTableViewController: UITableViewController {
             startDateCellExpanded = false
         }
         appDelegate.saveContext()
-        
-        NotificationCenter.default.post(name: notificationsOnChanged, object: nil)
+    
+        NotificationCenter.default.post(name: Notifications.SettingsNotification.notificationsOnChanged.name, object: nil)
     }
     
     lazy var settings = {
@@ -65,7 +60,7 @@ class SettingsTableViewController: UITableViewController {
             }
             appDelegate.saveContext()
             
-            NotificationCenter.default.post(name: notificationStartDateChanged, object: nil)
+            NotificationCenter.default.post(name: Notifications.SettingsNotification.notificationStartDateChanged.name, object: nil)
         }
     }
     
@@ -135,7 +130,7 @@ class SettingsTableViewController: UITableViewController {
             appDelegate.saveContext()
             
             // Notify observers about the layout change
-            NotificationCenter.default.post(name: filmCollectionLayoutChanged, object: selectedLayoutOption)
+            NotificationCenter.default.post(name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: selectedLayoutOption)
         
         case Settings.SectionTitle.Notifications.index:
             switch indexPath.row{

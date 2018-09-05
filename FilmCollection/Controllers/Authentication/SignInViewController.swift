@@ -19,7 +19,12 @@ class SignInViewController: UIViewController {
     var signedIn: Bool = false{
         didSet{
             if signedIn{
+                print("SIGNED IN")
                 showInitialViewController()
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedIn.name, object: nil)
+            }
+            else{
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedOut.name, object: nil)
             }
         }
     }
@@ -27,13 +32,18 @@ class SignInViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let loadingIndicator = LoadingIndicatorViewController(title: "Signing in", message: nil, complete: nil)
+        present(loadingIndicator, animated: true, completion: nil)
+
         if let user = Auth.auth().currentUser, let email = user.email{
             self.authenticationStatusLabel.text = "Signed in as \(email)"
             signedIn = true
+            loadingIndicator.finish()
         }
         else{
             self.authenticationStatusLabel.text = "Signed out"
             signedIn = false
+            loadingIndicator.finish()
         }
     }
 

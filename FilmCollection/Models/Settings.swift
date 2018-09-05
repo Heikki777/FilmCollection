@@ -74,6 +74,7 @@ class Settings: NSManagedObject{
             case EveryWeek
             case EveryMonth
             
+            
             var description: String{
                 switch self {
                 case .Never:

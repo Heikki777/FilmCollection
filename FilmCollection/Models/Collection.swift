@@ -11,20 +11,6 @@ import Firebase
 
 class FilmCollection: NSObject{
     
-    enum NotificationKey: String{
-        case filmCollectionValueChanged = "heikkihamalisto.FilmCollection.collectionChanged"
-        case filmAddedToCollection = "heikkihamalisto.FilmCollection.filmAdded"
-        case filmChanged = "heikkihamalisto.FilmCollection.filmChanged"
-        case filmRemoved = "heikkihamalisto.FilmCollection.filmRemoved"
-        case loadingProgressChanged = "heikki.FilmCollection.loadingProgressChanged"
-        case filmDictionaryChanged = "heikki.FilmCollection.filmDictionaryChanged"
-        case newSectionAddedToDictionary = "heikki.FilmCollection.newSectionAddedToDictionary"
-        case sectionRemovedFromDictionary = "heikki.FilmCollection.sectionRemovedFromDictionary"
-        case beginUpdates = "heikki.FilmCollection.beginUpdates"
-        case endUpdates = "heikki.FilmCollection.endUpdates"
-        case collectionFiltered = "heikki.FilmCollection.collectionFiltered"
-    }
-    
     static let shared = FilmCollection()
     
     static func sort(movies: inout [Movie], sortingRule: SortingRule, order: SortOrder = .ascending){
@@ -69,6 +55,10 @@ class FilmCollection: NSObject{
         return appDelegate?.settings
     }()
     
+    lazy var jsonEncoder: JSONEncoder = {
+        return JSONEncoder()
+    }()
+    
     var size: Int{
         return films.count
     }
@@ -99,13 +89,13 @@ class FilmCollection: NSObject{
         let secondarySortingRule: SortingRule = (sortingRule == .title) ? .year : .title
         FilmCollection.sort(movies: &tempFilms, sortingRule: secondarySortingRule, order: order)
         
-        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.beginUpdates.rawValue), object: nil)
+        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
         sections = []
         filteredSections = []
         filmDict = [:]
         filteredFilmDict = [:]
-        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.filmDictionaryChanged.rawValue), object: nil)
-        NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.endUpdates.rawValue), object: nil)
+        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmDictionaryChanged.name, object: nil)
+        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
 
         for movie in tempFilms{
             self.addMovieToDictionary(movie)
@@ -117,7 +107,7 @@ class FilmCollection: NSObject{
         //print("addMovieToDictionary: \(film.title): section: \(sectionTitle)")
         // Create a new section in the film dictionary
         if filmDict[sectionTitle] == nil{
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.beginUpdates.rawValue), object: nil)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
             
             sections.append(sectionTitle)
             filmDict[sectionTitle] = []
@@ -125,14 +115,14 @@ class FilmCollection: NSObject{
                 return (order == .ascending) ? a < b : a > b
             })
             
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.newSectionAddedToDictionary.rawValue), object: sections.index(of: sectionTitle)!)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.newSectionAddedToDictionary.name, object: sections.index(of: sectionTitle)!)
             
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.endUpdates.rawValue), object: nil)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
 
         }
         
         if var sectionMovies = filmDict[sectionTitle], !sectionMovies.contains(film){
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.beginUpdates.rawValue), object: nil)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
             
             // Add movie to temp array
             sectionMovies.append(film)
@@ -143,8 +133,8 @@ class FilmCollection: NSObject{
             // Add movie to the dictionary
             filmDict[sectionTitle]?.insert(film, at: index)
             
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.filmAddedToCollection.rawValue), object: film)
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: NotificationKey.endUpdates.rawValue), object: nil)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmAddedToCollection.name, object: film)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
 
         }
     }
@@ -154,6 +144,7 @@ class FilmCollection: NSObject{
         
         var loaded: Int = 0
         var totalNumberOfFilms: Int = 0
+        var filmsToAddToFirebase: [Int: Movie] = [:]
 
         let filmLoadingCompletionClosure: (Movie) -> Void = { film in
             // Load the small poster image for the film
@@ -176,14 +167,32 @@ class FilmCollection: NSObject{
                 // Progress
                 let progress: Float = Float(loaded) / Float(totalNumberOfFilms)
                 print("Loaded: \(loaded) / \(totalNumberOfFilms) (\(Int(progress*100)) %)")
-                let progressNotificationName = NSNotification.Name(NotificationKey.loadingProgressChanged.rawValue)
+                let progressNotificationName = Notifications.FilmCollectionNotification.loadingProgressChanged.name
                 NotificationCenter.default.post(name: progressNotificationName, object: progress)
                 
                 if loaded == totalNumberOfFilms{
-                    NotificationCenter.default.post(name: NSNotification.Name(NotificationKey.filmCollectionValueChanged.rawValue), object: nil)
+                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmCollectionValueChanged.name, object: nil)
+                    print("Films to add to firebase: \(filmsToAddToFirebase.count)")
+                    
+                    if !filmsToAddToFirebase.isEmpty{
+                        for (filmId, film) in filmsToAddToFirebase{
+                            self.databaseRef.child("films").child("\(filmId)").observeSingleEvent(of: .value) { (snapshot) in
+                                if !snapshot.exists(){
+                                    // Add the film to the database
+                                    if let data = try? self.jsonEncoder.encode(film){
+                                        if let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]{
+                                            snapshot.ref.updateChildValues(json)
+                                            print("Film: \(film.title) added to Firebase")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+        
         
         guard let user = Auth.auth().currentUser else{
             print("Error! No user")
@@ -193,13 +202,13 @@ class FilmCollection: NSObject{
         self.user = user
         
         let jsonDecoder = JSONDecoder()
-    
+        
         databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { snapshot in
             
             if let dbFilms = snapshot.value as? [String:AnyObject]{
                 totalNumberOfFilms = dbFilms.count
                 guard dbFilms.count > 0 else{
-                    NotificationCenter.default.post(name: NSNotification.Name(NotificationKey.filmCollectionValueChanged.rawValue), object: nil)
+                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmCollectionValueChanged.name, object: nil)
                     return
                 }
                 
@@ -223,7 +232,6 @@ class FilmCollection: NSObject{
                         else {
                             // Load the film from TMDB
                             loadFilmFromTMDB(dbFilm: dbFilm, id: id, completed: filmLoadingCompletionClosure)
-                            return
                         }
                     }
                 }
@@ -231,6 +239,7 @@ class FilmCollection: NSObject{
         }
         
         func loadFilmFromTMDB(dbFilm: AnyObject, id: Int, completed: @escaping (_ film: Movie) -> Void){
+            print("loadFilmFromTMDB: \(id)")
             attempt{
                 self.api.loadMovie(id, append: ["credits"])
             }
@@ -238,11 +247,13 @@ class FilmCollection: NSObject{
                 film.review = dbFilm["review"] as? String ?? ""
                 let rating = dbFilm["rating"] as? Int ?? 0
                 film.rating = Rating.all[rating]
+                filmsToAddToFirebase[id] = film
+                completed(film)
+                
             }
             .catch { error in
                 print(error.localizedDescription)
                 print("The film with id: \(id) could not be loaded")
-                loaded += 1
             }
         }
         
@@ -304,8 +315,7 @@ class FilmCollection: NSObject{
                 if let rating = snapshotValue["rating"] as? Int{
                     film.rating = Rating.all[rating]
                     self.createMovieDictionary()
-                    let name = NSNotification.Name(NotificationKey.filmChanged.rawValue)
-                    NotificationCenter.default.post(name: name, object: film)
+                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmChanged.name, object: film)
                 }
             }
         })
@@ -317,30 +327,34 @@ class FilmCollection: NSObject{
                     if let indexPath = self.getIndexPath(for: film){
                         
                         // Remove film
-                        NotificationCenter.default.post(name: Notification.Name.init(NotificationKey.beginUpdates.rawValue), object: nil)
+                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
                         self.removeFilm(film)
-                        NotificationCenter.default.post(name: Notification.Name.init(NotificationKey.filmRemoved.rawValue), object: (film, indexPath))
+                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmRemoved.name, object: (film, indexPath))
                         
                         // Check if section needs to be removed as well
                         let sectionTitle = self.getSectionTitle(for: film)
                         if self.filterOn{
                             if self.filteredFilmDict[sectionTitle] == nil || self.filteredFilmDict[sectionTitle]!.isEmpty{
                                 self.filteredFilmDict[sectionTitle] = nil
-                                NotificationCenter.default.post(name: Notification.Name.init(NotificationKey.sectionRemovedFromDictionary.rawValue), object: indexPath.section)
+                                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
                             }
                         }
                         else{
                             if self.filmDict[sectionTitle] == nil || self.filmDict[sectionTitle]!.isEmpty{
                                 self.filmDict[sectionTitle] = nil
-                                NotificationCenter.default.post(name: Notification.Name.init(NotificationKey.sectionRemovedFromDictionary.rawValue), object: indexPath.section)
+                                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
                             }
                         }
 
-                        NotificationCenter.default.post(name: Notification.Name.init(NotificationKey.endUpdates.rawValue), object: nil)
+                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
                     }
                 }
             }
         })
+    }
+    
+    func contains(_ film: Movie) -> Bool{
+        return films.contains(film)
     }
     
     func removeFilmFromDatabase(_ film: Movie){
@@ -458,7 +472,7 @@ class FilmCollection: NSObject{
         filterOn = !searchText.isEmpty || scope != "All"
         
         guard filterOn else{
-            NotificationCenter.default.post(name: Notification.Name(NotificationKey.collectionFiltered.rawValue), object: nil)
+            NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.collectionFiltered.name, object: nil)
             return
         }
         
@@ -492,7 +506,7 @@ class FilmCollection: NSObject{
                 }
             }
         }
-        NotificationCenter.default.post(name: Notification.Name(NotificationKey.collectionFiltered.rawValue), object: nil)
+        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.collectionFiltered.name, object: nil)
     }
     
     func sectionIndexTitles() -> [String]{
