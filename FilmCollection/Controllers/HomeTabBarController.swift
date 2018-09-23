@@ -47,6 +47,10 @@ class HomeTabBarController: UITabBarController {
     
     func createObservers(){
         
+        // Observer for user having signed in
+        let userSignedIn = Notifications.AuthorizationNotification.SignedIn.name
+        NotificationCenter.default.addObserver(self, selector: #selector(userSignedIn(notification:)), name: userSignedIn, object: nil)
+        
         // Observer for network reachability status
         NotificationCenter.default.addObserver(forName: NetworkReachabilityChanged, object: nil, queue: nil, using: {
             (notification) in
@@ -110,6 +114,20 @@ class HomeTabBarController: UITabBarController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         show(alert, sender: self)
     }
+    
+    @objc func userSignedIn(notification: NSNotification){
+        print("userSignedIn")
+        showLoadingIndicator(withTitle: "Loading", message: "Film collection", progress: nil, complete: nil)
+    }
+    
+    @objc func userSignedOut(notification: NSNotification){
+        print("userSignedOut")
+        let signInViewController = self.storyboard!.instantiateViewController(withIdentifier: "signInViewController")
+        appDelegate.window?.rootViewController = signInViewController
+        appDelegate.window?.makeKeyAndVisible()
+    }
+    
+    
     
 
 }

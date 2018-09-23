@@ -29,6 +29,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
         
+        Auth.auth().addStateDidChangeListener { (auth, user) in
+            if let currentUser = user{
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedIn.name, object: user)
+            }
+            else{
+                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedOut.name, object: user)
+            }
+        }
+        
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
             print("granted")

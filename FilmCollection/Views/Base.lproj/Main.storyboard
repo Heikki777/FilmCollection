@@ -871,7 +871,7 @@
         <!--Sign In View Controller-->
         <scene sceneID="ZNQ-Q5-Mz1">
             <objects>
-                <viewController restorationIdentifier="loginViewController" storyboardIdentifier="loginViewController" id="HLo-fH-iuq" customClass="SignInViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController restorationIdentifier="signInViewController" storyboardIdentifier="signInViewController" id="HLo-fH-iuq" customClass="SignInViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8yx-US-641">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

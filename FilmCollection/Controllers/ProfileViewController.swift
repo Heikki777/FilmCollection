@@ -43,8 +43,8 @@ class ProfileViewController: UIViewController {
             try Auth.auth().signOut()
             let appDelegate = UIApplication.shared.delegate! as! AppDelegate
             
-            let loginViewController = self.storyboard!.instantiateViewController(withIdentifier: "loginViewController")
-            appDelegate.window?.rootViewController = loginViewController
+            let signInViewController = self.storyboard!.instantiateViewController(withIdentifier: "signInViewController")
+            appDelegate.window?.rootViewController = signInViewController
             appDelegate.window?.makeKeyAndVisible()
         }
         catch let error{

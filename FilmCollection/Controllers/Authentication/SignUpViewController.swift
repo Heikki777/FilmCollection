@@ -23,7 +23,7 @@ class SignUpViewController: UIViewController {
     
     var signedIn: Bool = false{
         didSet{
-            print("signedIn: \(signedIn)")
+            print("SignUpViewController signedIn: \(signedIn)")
             if signedIn {
                 showInitialViewController()
                 NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedIn.name, object: nil)

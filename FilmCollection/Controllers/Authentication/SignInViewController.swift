@@ -31,7 +31,7 @@ class SignInViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         let loadingIndicator = LoadingIndicatorViewController(title: "Signing in", message: nil, complete: nil)
         present(loadingIndicator, animated: true, completion: nil)
 
