@@ -525,7 +525,7 @@ class FilmDetailViewController: UIViewController {
             loadMovieImages()
             .done { (movieImages) in
                 self.movieImages = movieImages
-                self.showImageCollectionViewController()
+                self.showMovieImages()
             }
             .catch { (error) in
                 print(error.localizedDescription)
@@ -534,7 +534,7 @@ class FilmDetailViewController: UIViewController {
         }
         
         // Images have already been loaded
-        self.showImageCollectionViewController()
+        self.showMovieImages()
     }
     
     func loadMovieImages() -> Promise<MovieImages>{
@@ -637,7 +637,7 @@ class FilmDetailViewController: UIViewController {
         }
     }
     
-    func showImageCollectionViewController(){
+    func showMovieImages(){
         guard let movieImages = self.movieImages else{
             print("No images")
             return
@@ -983,9 +983,31 @@ extension FilmDetailViewController: UICollectionViewDelegate{
             
         })
         
+        let showImagesAction = UIAlertAction.init(title: "Show images", style: .default) { (action) in
+            
+            let loadingIndicator = LoadingIndicatorViewController.init(title: "Loading images", message: personName, complete: nil)
+            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
+            
+            attempt {
+                self.api.loadImages(personId: personID, progressHandler: { (progress) in
+                    loadingIndicator.setProgress(progress)
+                })
+            }
+            .done({(images) in
+                guard images.count > 0 else { return }
+                let imageCollectionViewController = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as! ImageCollectionViewController
+                imageCollectionViewController.images = [personName : images]
+                self.show(imageCollectionViewController, sender: nil)
+            })
+            .catch({ (error) in
+                print(error.localizedDescription)
+            })
+        }
+        
         let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
         actionSheet.addAction(showBiographyAction)
         actionSheet.addAction(showFilmographyAction)
+        actionSheet.addAction(showImagesAction)
         actionSheet.addAction(cancelAction)
         
         self.present(actionSheet, animated: true) {
