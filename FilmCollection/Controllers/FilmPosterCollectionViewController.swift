@@ -19,6 +19,10 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         orderBarButton.title = String(filmCollection.order.symbol)
     }
     
+    @IBAction func unwindFromDetailToFilmPosterCollectionVC(_ segue: UIStoryboardSegue){
+        
+    }
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let filmCollection = FilmCollection.shared
     let scopeButtonTitles: [String] = ["All"] + Genre.all.map {$0.rawValue}
@@ -66,6 +70,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        setNavigationBarTitle("\(filmCollection.size) films")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,7 +98,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleLoadingProgressChange(notification:)), name: progressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmDictionaryChange(notification:)), name: filmDictionaryChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
-
     }
     
     func setNavigationBarTitle(_ title: String){
@@ -101,6 +105,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleFilmRemoval(notification: NSNotification){
+        print("handleFilmRemoval")
         guard let (film, indexPath) = notification.object as? (Movie, IndexPath) else {
             return
         }

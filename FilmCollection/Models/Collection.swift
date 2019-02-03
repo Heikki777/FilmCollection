@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import Firebase
+import UIKit
 
-class FilmCollection: NSObject{
+class FilmCollection: NSObject {
     
     static let shared = FilmCollection()
     
@@ -49,10 +49,10 @@ class FilmCollection: NSObject{
         }
     }
     
-    weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     lazy var settings = {
-        return appDelegate?.settings
+        return appDelegate.settings
     }()
     
     lazy var jsonEncoder: JSONEncoder = {
@@ -75,14 +75,8 @@ class FilmCollection: NSObject{
         }
     }
     
-    // Firebase
-    lazy var databaseRef: DatabaseReference = {
-        return Database.database().reference()
-    }()
-    
     // TMDB API
     let api: TMDBApi = TMDBApi.shared
-    var user: User?
     
     private func createMovieDictionary(notifyObservers: Bool = true){
         var tempFilms = films
@@ -104,7 +98,6 @@ class FilmCollection: NSObject{
     
     private func addMovieToDictionary(_ film: Movie){
         let sectionTitle = getSectionTitle(for: film)
-        //print("addMovieToDictionary: \(film.title): section: \(sectionTitle)")
         // Create a new section in the film dictionary
         if filmDict[sectionTitle] == nil{
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
@@ -116,9 +109,7 @@ class FilmCollection: NSObject{
             })
             
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.newSectionAddedToDictionary.name, object: sections.index(of: sectionTitle)!)
-            
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
-
         }
         
         if var sectionMovies = filmDict[sectionTitle], !sectionMovies.contains(film){
@@ -142,14 +133,26 @@ class FilmCollection: NSObject{
     private override init(){
         super.init()
         
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmReviewed(notification:)), name: Notifications.FilmCollectionNotification.filmReviewed.name, object: nil)
+        
         var loaded: Int = 0
-        var totalNumberOfFilms: Int = 0
-        var filmsToAddToFirebase: [Int: Movie] = [:]
-
-        let filmLoadingCompletionClosure: (Movie) -> Void = { film in
+        var failed: Int = 0
+        var numberOfFilmsHandled: Int {
+            return loaded + failed
+        }
+        
+        func updateLoadingProgress(){
+            let progress: Float = Float(numberOfFilmsHandled) / Float(appDelegate.filmEntities.count)
+            print("Loaded: \(numberOfFilmsHandled) / \(appDelegate.filmEntities.count) (\(Int(progress*100)) %)")
+            let progressNotificationName = Notifications.FilmCollectionNotification.loadingProgressChanged.name
+            NotificationCenter.default.post(name: progressNotificationName, object: progress)
+        }
+        
+        let filmLoadedSuccessfullyHandler: (Movie) -> Void = { film in
             // Load the small poster image for the film
             // And then add the film to the collection.
-            attempt{
+            
+            attempt {
                 film.loadSmallPosterImage()
             }
             .done { (small) in
@@ -163,224 +166,107 @@ class FilmCollection: NSObject{
                 self.films.append(film)
                 self.addMovieToDictionary(film)
                 loaded += 1
-                
-                // Progress
-                let progress: Float = Float(loaded) / Float(totalNumberOfFilms)
-                print("Loaded: \(loaded) / \(totalNumberOfFilms) (\(Int(progress*100)) %)")
-                let progressNotificationName = Notifications.FilmCollectionNotification.loadingProgressChanged.name
-                NotificationCenter.default.post(name: progressNotificationName, object: progress)
-                
-                if loaded == totalNumberOfFilms{
-                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmCollectionValueChanged.name, object: nil)
-                    print("Films to add to firebase: \(filmsToAddToFirebase.count)")
-                    
-                    if !filmsToAddToFirebase.isEmpty{
-                        for (filmId, film) in filmsToAddToFirebase{
-                            self.databaseRef.child("films").child("\(filmId)").observeSingleEvent(of: .value) { (snapshot) in
-                                if !snapshot.exists(){
-                                    // Add the film to the database
-                                    if let data = try? self.jsonEncoder.encode(film){
-                                        if let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]{
-                                            snapshot.ref.updateChildValues(json)
-                                            print("Film: \(film.title) added to Firebase")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                updateLoadingProgress()
             }
         }
         
-        
-        guard let user = Auth.auth().currentUser else{
-            print("Error! No user")
-            return
+        let filmLoadingFailed: (Error) -> Void = { error in
+            print(error.localizedDescription)
+            failed += 1
+            updateLoadingProgress()
         }
         
-        self.user = user
-        
-        let jsonDecoder = JSONDecoder()
-        
-        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value) { snapshot in
-            
-            if let dbFilms = snapshot.value as? [String:AnyObject]{
-                totalNumberOfFilms = dbFilms.count
-                guard dbFilms.count > 0 else{
-                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmCollectionValueChanged.name, object: nil)
-                    return
-                }
-                
-                print("Movie list value changed: \(dbFilms.count)")
-                for (_,dbFilm) in dbFilms{
-                    guard let id = dbFilm["id"] as? Int else {
-                        print("No Film ID")
-                        continue
-                    }
-                    
-                    self.databaseRef.child("films").child("\(id)").observeSingleEvent(of: .value) { filmSnapshot in
-                        
-                        if filmSnapshot.exists(), let filmDictionary = filmSnapshot.value as? [String:Any], let jsonData = try? JSONSerialization.data(withJSONObject: filmDictionary, options: []), let film = try? jsonDecoder.decode(Movie.self, from: jsonData){
-                            
-                            // The film was successfully loaded from Firebase
-                            film.review = dbFilm["review"] as? String ?? ""
-                            let rating = dbFilm["rating"] as? Int ?? 0
-                            film.rating = Rating.all[rating]
-                            filmLoadingCompletionClosure(film)
-                        }
-                        else {
-                            // Load the film from TMDB
-                            loadFilmFromTMDB(dbFilm: dbFilm, id: id, completed: filmLoadingCompletionClosure)
-                        }
-                    }
-                }
-            }
+        appDelegate.filmEntities.compactMap { $0 }.forEach { filmEntity in
+            loadFilmFromTMDB(filmEntity, success: filmLoadedSuccessfullyHandler, failure: filmLoadingFailed)
         }
-        
-        func loadFilmFromTMDB(dbFilm: AnyObject, id: Int, completed: @escaping (_ film: Movie) -> Void){
-            print("loadFilmFromTMDB: \(id)")
-            attempt{
-                self.api.loadMovie(id, append: ["credits"])
-            }
-            .done{ film in
-                film.review = dbFilm["review"] as? String ?? ""
-                let rating = dbFilm["rating"] as? Int ?? 0
-                film.rating = Rating.all[rating]
-                filmsToAddToFirebase[id] = film
-                completed(film)
-                
-            }
-            .catch { error in
-                print(error.localizedDescription)
-                print("The film with id: \(id) could not be loaded")
-            }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Movie) -> Void, failure: @escaping (_ error: Error) -> Void) {
+        print("loadFilmFromTMDB: \(filmEntity.id)")
+        attempt {
+            self.api.loadMovie(Int(filmEntity.id), append: ["credits"])
         }
-        
-        // Listen for new movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childAdded, with: { (dataSnapshot) in
-            
-            // Use this handler only if the movies have been loaded
-            guard !self.films.isEmpty else{
-                return
-            }
-            
-            guard let snapshotValue = dataSnapshot.value as? [String:AnyObject],
-                let id = snapshotValue["id"] as? Int,
-                let rating = snapshotValue["rating"] as? Int else {
-                    return
-            }
-            
-            // Make sure that the movie is not already in the movies array before loading it.
-            if !self.films.filter({ (film) -> Bool in
-                return film.id == id
-            }).isEmpty{
-                return
-            }
-            
-            attempt{
-                self.api.loadMovie(id, append: ["credits"])
-            }
-            .done{ film in
-                film.rating = Rating.all[rating]
-                attempt{
-                    film.loadSmallPosterImage()
-                }
-                .done{ (small) in
-                    film.smallPosterImage = small
-                }
-                .catch{ error in
-                    print("Could not load poster images for the movie \(film.title)")
-                    print(error.localizedDescription)
-                }
-                .finally {
-                    self.films.append(film)
-                    self.addMovieToDictionary(film)
-                }
-            }
-            .catch{ error in
-                print(error.localizedDescription)
-            }
-        })
-        
-        // Listen for changed movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childChanged, with: { (dataSnapshot) in
-            
-            guard let snapshotValue = dataSnapshot.value as? [String:AnyObject] else {
-                return
-            }
-            
-            if let id = snapshotValue["id"] as? Int, let film = (self.films.filter { $0.id == id }).first{
-                // Rating changed
-                if let rating = snapshotValue["rating"] as? Int{
-                    film.rating = Rating.all[rating]
-                    self.createMovieDictionary()
-                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmChanged.name, object: film)
-                }
-            }
-        })
-        
-        // Listen for deleted movies in the Firebase database
-        databaseRef.child("user-movies").child(user.uid).observe(.childRemoved, with: { (dataSnapshot) in
-            if let value = dataSnapshot.value as? [String:Any]{
-                if let id = value["id"] as? Int, let film = (self.films.filter { $0.id == id }).first {
-                    if let indexPath = self.getIndexPath(for: film){
-                        
-                        // Remove film
-                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
-                        self.removeFilm(film)
-                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmRemoved.name, object: (film, indexPath))
-                        
-                        // Check if section needs to be removed as well
-                        let sectionTitle = self.getSectionTitle(for: film)
-                        if self.filterOn{
-                            if self.filteredFilmDict[sectionTitle] == nil || self.filteredFilmDict[sectionTitle]!.isEmpty{
-                                self.filteredFilmDict[sectionTitle] = nil
-                                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
-                            }
-                        }
-                        else{
-                            if self.filmDict[sectionTitle] == nil || self.filmDict[sectionTitle]!.isEmpty{
-                                self.filmDict[sectionTitle] = nil
-                                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
-                            }
-                        }
-
-                        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
-                    }
-                }
-            }
-        })
+        .done { film in
+            film.review = filmEntity.review
+            let ratingNumber = Int(filmEntity.rating)
+            film.rating = Rating.all[ratingNumber]
+            success(film)
+        }
+        .catch { error in
+            failure(error)
+        }
     }
     
     func contains(_ film: Movie) -> Bool{
         return films.contains(film)
     }
     
-    func removeFilmFromDatabase(_ film: Movie){
-        if let user = Auth.auth().currentUser{
-            // Remove the movie from the database
-            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").removeValue()
+    func removeFilm(_ film: Movie){
+        
+        if let filmEntity = film.entity {
+            appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
+            appDelegate.saveContext()
         }
-    }
-    
-    func removeFilm(withId id: Int){
-        if let user = Auth.auth().currentUser{
-            // Remove the movie from the database
-            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(id)").removeValue()
-        }
-    }
-    
-    private func removeFilm(_ film: Movie){
+
         let sectionTitle = getSectionTitle(for: film)
         if let index = films.index(of: film){
             films.remove(at: index)
         }
         if let index = filmDict[sectionTitle]?.index(of: film){
             filmDict[sectionTitle]?.remove(at: index)
-            if filterOn{
+            print("remove row \(index) in section \(sectionTitle)")
+            if filmDict[sectionTitle]?.count == 0 {
+                print("Remove section: \(sectionTitle)")
+                filmDict.removeValue(forKey: sectionTitle)
+                if let sectionIndex = sections.firstIndex(of: sectionTitle){
+                    sections.remove(at: sectionIndex)
+                }
+            }
+            if filterOn {
                 filterCollection(scope: filteringScope, searchText: filteringText)
             }
+            self.createMovieDictionary(notifyObservers: true)
+        }
+    }
+    
+    func addNewFilm(withId id: Int){
+        let filmEntity = FilmEntity(context: appDelegate.persistentContainer.viewContext)
+        filmEntity.id = Int32(id)
+        appDelegate.filmCollectionEntity.addToFilms(filmEntity)
+        appDelegate.saveContext()
+        TMDBApi.shared.loadMovie(id, append: ["credits"])
+        .done { [weak self] (film) in
+            self?.addFilm(film)
+        }
+        .catch { (error) in
+            print(error.localizedDescription)
+        }
+    }
+    
+    func addFilm(_ film: Movie){
+        guard !films.contains(film) else { return }
+        guard film.smallPosterImage == nil else {
+            films.append(film)
+            createMovieDictionary(notifyObservers: true)
+            return
+        }
+
+        attempt {
+            film.loadSmallPosterImage()
+        }
+        .done { (smallPosterImage) in
+            film.smallPosterImage = smallPosterImage
+        }
+        .catch { (error) in
+            print(error.localizedDescription)
+        }
+        .finally { [weak self] in
+            self?.films.append(film)
+            self?.createMovieDictionary(notifyObservers: true)
         }
     }
     
@@ -463,6 +349,11 @@ class FilmCollection: NSObject{
         }
     }
     
+    
+    @objc func handleFilmReviewed(notification: Notification) {
+        createMovieDictionary()
+    }
+    
     func filterCollection(scope: String = "All", searchText: String){
         filteringScope = scope
         filteringText = searchText
@@ -519,7 +410,7 @@ class FilmCollection: NSObject{
     }
 }
 
-extension FilmCollection: UITableViewDataSource{
+extension FilmCollection: UITableViewDataSource {
     
     // MARK: UITableViewDataSource
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -545,7 +436,7 @@ extension FilmCollection: UITableViewDataSource{
         
         if let movie = self.getMovie(at: indexPath){
             
-            switch settings?.filmCollectionLayout {
+            switch settings.filmCollectionLayout {
                 
             case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "filmCellExpanded") as! FilmTableViewCellExpanded
@@ -575,8 +466,23 @@ extension FilmCollection: UITableViewDataSource{
         
         if editingStyle == .delete{
             print("DELETE")
-            if let film = self.getMovie(at: indexPath){
-                self.removeFilmFromDatabase(film)
+            if let film = self.getMovie(at: indexPath), let filmEntity = film.entity {
+
+                let sectionTitle = getSectionTitle(for: film)
+
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
+                removeFilm(film)
+
+                if filmDict[sectionTitle] == nil || filmDict[sectionTitle]?.count == 0 {
+                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
+                }
+                else {
+                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmRemoved.name, object: (film, indexPath))
+                }
+                
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
+                appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
+                appDelegate.saveContext()
             }
         }
     }

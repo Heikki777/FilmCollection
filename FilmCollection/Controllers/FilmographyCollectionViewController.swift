@@ -8,7 +8,6 @@
 
 import UIKit
 import PromiseKit
-import Firebase
 
 private let reuseIdentifier = "filmographyMovieCell"
 
@@ -21,8 +20,8 @@ class FilmographyCollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var backgroundImageView: UIImageView!
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let filmCollection = FilmCollection.shared
-    var user: User?
     var personCredits: PersonCredits = PersonCredits()
     var backgroundImage: UIImage?{
         didSet{
@@ -35,15 +34,8 @@ class FilmographyCollectionViewController: UIViewController {
         return TMDBApi.shared
     }()
     
-    // Firebase
-    lazy var databaseRef: DatabaseReference = {
-        return Database.database().reference()
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.user = Auth.auth().currentUser
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -211,152 +203,121 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        guard let user = user else{
-            print("Error! No user")
+        guard let filmID = (indexPath.section == 0) ? personCredits.castRoles[indexPath.row].id : personCredits.crewRoles[indexPath.row].id else {
             return
         }
         
-        guard let id = (indexPath.section == 0) ? personCredits.castRoles[indexPath.row].id : personCredits.crewRoles[indexPath.row].id else{
+        guard let filmTitle = (indexPath.section == 0) ? personCredits.castRoles[indexPath.row].title : personCredits.crewRoles[indexPath.row].title else {
             return
         }
-        
-        guard let movieTitle = (indexPath.section == 0) ? personCredits.castRoles[indexPath.row].title : personCredits.crewRoles[indexPath.row].title else {
-            return
-        }
-        
-        databaseRef.child("user-movies").child(user.uid).observeSingleEvent(of: .value, with: { (snapshot) in
-            guard let snapshotValue = snapshot.value as? [String:[String:Any]] else{
-                print("No snapshot value")
-                return
-            }
-            
-            let movieIsInCollection = snapshotValue["\(id)"] != nil
-            let message = movieIsInCollection ? "In the collection" : "Not in the collection"
-            let alert = UIAlertController.init(title: movieTitle, message: message, preferredStyle: .actionSheet)
-            
-            
-            if !movieIsInCollection{
-                // The movie is not in the collection
-                
-                // Add movie action
-                let addMovieToCollectionAction = UIAlertAction(title: "Add to collection", style: .default, handler: { (action) in
-            
-                    let title = "Movie added"
-                    let message = "The movie \(movieTitle) was added."
-            
-                    self.databaseRef.child("user-movies").child("\(user.uid)").child("\(id)").setValue(
-                        [
-                            "id": id,
-                            "rating": Rating.NotRated.rawValue,
-                            "review": ""
-                        ]
-                    )
-            
-                    let movieAdditionAlert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-                    let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
-                    movieAdditionAlert.addAction(okAction)
-                    self.present(movieAdditionAlert, animated: true, completion: nil)
-                })
-                
-                // Show movie detail action
-                let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
-                    let loadingIndicator = LoadingIndicatorViewController(title: "Loading movie", message: movieTitle, complete: nil)
-                    var progress: Float = 0
-                    var loaded: Float = 0
-                    let thingsToLoad: Float = 1
-                    
-                    self.tabBarController?.present(loadingIndicator, animated: true, completion: {
-                        
-                        let progressChanged: (String) -> () = { (infoMessage) in
-                            print(infoMessage)
-                            loaded += 1
-                            progress = loaded / thingsToLoad
-                            loadingIndicator.setProgress(progress)
-                            if loaded == thingsToLoad{
-                                loadingIndicator.finish()
-                            }
-                        }
-                        
-                        loadingIndicator.setProgress(progress)
-                        
-                        attempt{
-                            self.api.loadMovie(id, append: ["credits"]).ensure { progressChanged("Movie loaded") }
-                        }
-                        .done{ (film) in
-                            if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
-                                return vc is FilmDetailViewController
-                            }).first as? FilmDetailViewController){
-                                filmDetailVC.reset()
-                                filmDetailVC.film = film
-                                filmDetailVC.setup()
-                                self.navigationController?.popToViewController(filmDetailVC, animated: true)
-                            }
-                        }
-                        .catch{ (error) in
-                            print(error.localizedDescription)
-                        }
-                    })
-                })
-            
-                alert.addAction(showMovieDetailAction)
-                alert.addAction(addMovieToCollectionAction)
-            }
-            else{
-                // The movie is in the collection
-                
-                // Show movie detail action
-                let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
-                    if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
-                        return vc is FilmDetailViewController
-                    }).first as? FilmDetailViewController){
-                        filmDetailVC.reset()
-                        filmDetailVC.film = self.filmCollection.getMovie(withId: id)
-                        filmDetailVC.setup()
-                        self.navigationController?.popToViewController(filmDetailVC, animated: true)
-                    }
-                })
-                
-                let removeMovieFromCollectionAction = UIAlertAction(title: "Remove from the collection", style: .destructive, handler: { (action) in
-                    if let user = self.user{
-                        self.databaseRef.child("user-movies").child(user.uid).child("\(id)").removeValue()
-                    }
-                })
-                
-                alert.addAction(showMovieDetailAction)
-                alert.addAction(removeMovieFromCollectionAction)
-            }
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        })
-    }
-
-    /*
-    // Uncomment this method to specify if the specified item should be highlighted during tracking
-    func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment this method to specify if the specified item should be selected
-    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    */
-
-    /*
-    // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-
-    func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-
-    func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
     
+        let filmIsInCollection = appDelegate.filmEntities.filter { Int($0.id) == filmID }.count == 1
+        let message = filmIsInCollection ? "In the collection" : "Not in the collection"
+        let alert = UIAlertController.init(title: filmTitle, message: message, preferredStyle: .actionSheet)
+        
+        if !filmIsInCollection{
+            // The film is not in the collection
+            
+            // Add film action
+            let addMovieToCollectionAction = UIAlertAction(title: "Add to collection", style: .default, handler: { (action) in
+                
+                let context = self.appDelegate.persistentContainer.viewContext
+                let newFilm = FilmEntity(context: context)
+                newFilm.id = Int32(filmID)
+                
+                if self.appDelegate.filmEntities.filter({ $0.id == filmID }).isEmpty {
+                    let title = "Add a new film"
+                    let message = "Are you sure that you want to add the film: \"\(filmTitle)\" to your collection?"
+                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+                    let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
+                        self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
+                        self.appDelegate.saveContext()
+                        FilmCollection.shared.addNewFilm(withId: filmID)
+                    })
+                    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                    alert.addAction(cancelAction)
+                    alert.addAction(yesAction)
+                    self.present(alert, animated: true, completion: nil)
+                }
+                else {
+                    let title = "The film was not added"
+                    let message = "The film: \"\(filmTitle)\" is already in the collection"
+                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+                    let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
+                    alert.addAction(okAction)
+                    self.present(alert, animated: true, completion: nil)
+                }
+            })
+            
+            // Show film detail action
+            let showMovieDetailAction = UIAlertAction(title: "Show film detail", style: .default, handler: { (action) in
+                let loadingIndicator = LoadingIndicatorViewController(title: "Loading film", message: filmTitle, complete: nil)
+                var progress: Float = 0
+                var loaded: Float = 0
+                let thingsToLoad: Float = 1
+                
+                self.tabBarController?.present(loadingIndicator, animated: true, completion: {
+                    
+                    let progressChanged: (String) -> () = { (infoMessage) in
+                        print(infoMessage)
+                        loaded += 1
+                        progress = loaded / thingsToLoad
+                        loadingIndicator.setProgress(progress)
+                        if loaded == thingsToLoad{
+                            loadingIndicator.finish()
+                        }
+                    }
+                    
+                    loadingIndicator.setProgress(progress)
+                    
+                    attempt{
+                        self.api.loadMovie(filmID, append: ["credits"]).ensure { progressChanged("Film loaded") }
+                    }
+                    .done{ (film) in
+                        if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
+                            return vc is FilmDetailViewController
+                        }).first as? FilmDetailViewController){
+                            filmDetailVC.reset()
+                            filmDetailVC.film = film
+                            filmDetailVC.setup()
+                            self.navigationController?.popToViewController(filmDetailVC, animated: true)
+                        }
+                    }
+                    .catch{ (error) in
+                        print(error.localizedDescription)
+                    }
+                })
+            })
+        
+            alert.addAction(showMovieDetailAction)
+            alert.addAction(addMovieToCollectionAction)
+        }
+        else{
+            // The movie is in the collection
+            
+            // Show movie detail action
+            let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
+                if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
+                    return vc is FilmDetailViewController
+                }).first as? FilmDetailViewController){
+                    filmDetailVC.reset()
+                    filmDetailVC.film = self.filmCollection.getMovie(withId: filmID)
+                    filmDetailVC.setup()
+                    self.navigationController?.popToViewController(filmDetailVC, animated: true)
+                }
+            })
+            
+            let removeMovieFromCollectionAction = UIAlertAction(title: "Remove from the collection", style: .destructive, handler: { (action) in
+                if let film = FilmCollection.shared.getMovie(withId: filmID){
+                    FilmCollection.shared.removeFilm(film)
+                }
+            })
+            
+            alert.addAction(showMovieDetailAction)
+            alert.addAction(removeMovieFromCollectionAction)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
-    */
 }

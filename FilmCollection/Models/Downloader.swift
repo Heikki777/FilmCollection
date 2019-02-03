@@ -46,7 +46,7 @@ class Downloader{
             
             var result: Result = .Success("")
             
-            defer{
+            defer {
                 complete(result)
             }
             

@@ -8,12 +8,11 @@
 
 import UIKit
 import PromiseKit
-import Firebase
-
-
+import CoreData
 
 class ViewingHistoryTableViewController: UITableViewController {
 
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let reuseIdentifier = "viewingCell"
     let api = TMDBApi.shared
     var viewings: [Viewing] = []
@@ -24,42 +23,22 @@ class ViewingHistoryTableViewController: UITableViewController {
         return formatter
     }()
     
-    // Firebase
-    lazy var databaseRef: DatabaseReference = {
-        return Database.database().reference()
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let user = Auth.auth().currentUser else{
-            print("User")
-            return
-        }
-        
         tableView.delegate = self
         tableView.dataSource = self
-        
-        databaseRef.child("user-viewing-history").child(user.uid).child("watched").observe(.childAdded) { (snapshot) in
-            if let dict = snapshot.value as? [String: AnyObject]{
-                if let dateString = dict["date"] as? String,
-                    let movieTitle = dict["movieTitle"] as? String,
-                    let movieId = dict["movieId"] as? Int,
-                    let date = self.dateFormatter.date(from: dateString){
-                    self.viewings.append(Viewing(date: date, title: movieTitle, id: movieId))
-                }
-                self.viewings.sort { $0.date > $1.date }
-            }
-        }
-        
-        databaseRef.child("user-viewing-history").child(user.uid).child("watched").observe(.value) { (snapshot) in
-            self.tableView.reloadData()
-        }
-
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        self.viewings = appDelegate.viewingEntities
+        
+        print(viewings)
+        
+        self.viewings.sort { $0.date! > $1.date! }
+        self.tableView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -79,8 +58,10 @@ class ViewingHistoryTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
-        cell.textLabel?.text = viewings[indexPath.row].title
-        cell.detailTextLabel?.text = dateFormatter.string(from: viewings[indexPath.row].date)
+        if let title = viewings[indexPath.row].title {
+            cell.textLabel?.text = title
+            cell.detailTextLabel?.text = dateFormatter.string(from: viewings[indexPath.row].date!)
+        }
 
         return cell
     }
@@ -92,8 +73,29 @@ class ViewingHistoryTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            print("Delete viewing")
+            
+            let selectedViewingToBeRemoved = viewings[indexPath.row]
+            
+            let context = appDelegate.persistentContainer.viewContext
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Viewing")
+            
+            do {
+                if let viewingEntities = try context.fetch(request) as? [Viewing] {
+                    for object in viewingEntities {
+                        if object.objectID == selectedViewingToBeRemoved.objectID {
+                            context.delete(object)
+                            appDelegate.saveContext()
+                            break
+                        }
+                    }
+                }
+            }
+            catch let error {
+                print(error.localizedDescription)
+            }
+            
+            appDelegate.saveContext()
+
             tableView.beginUpdates()
             viewings.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)

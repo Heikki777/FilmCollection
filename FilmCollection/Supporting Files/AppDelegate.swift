@@ -8,7 +8,6 @@
 
 import UIKit
 import PromiseKit
-import Firebase
 import UserNotifications
 import CoreData
 import AFNetworking
@@ -20,23 +19,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
-    var filmIdWithinNotification: Int?{
+    var filmIdWithinNotification: Int? {
         didSet{
             print("filmDetailToBeShown: \(String(describing: filmIdWithinNotification))")
         }
     }
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        FirebaseApp.configure()
-        
-        Auth.auth().addStateDidChangeListener { (auth, user) in
-            if let currentUser = user{
-                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedIn.name, object: user)
-            }
-            else{
-                NotificationCenter.default.post(name: Notifications.AuthorizationNotification.SignedOut.name, object: user)
-            }
-        }
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {        
         
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
@@ -287,8 +276,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         do{
             if let settingsArray = try context.fetch(request) as? [Settings], let settings = settingsArray.first{
-                print("settings array")
-                print(settingsArray)
                 return settings
             }
         }
@@ -301,6 +288,45 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return settings
     }()
     
+    
+    lazy var filmCollectionEntity: FilmCollectionEntity = {
+        let context = persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "FilmCollectionEntity")
+        
+        do {
+            if let filmCollectionEntity = try (context.fetch(request) as? [FilmCollectionEntity])?.first {
+                return filmCollectionEntity
+            }
+        }
+        catch let error {
+            print(error.localizedDescription)
+        }
+        
+        let filmCollectionEntity = FilmCollectionEntity(context: context)
+        saveContext()
+        return filmCollectionEntity
+    }()
+    
+    var filmEntities: Set<FilmEntity> {
+        return self.filmCollectionEntity.films as! Set<FilmEntity>
+    }
+    
+    var viewingEntities: [Viewing] {
+        let context = persistentContainer.viewContext
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Viewing")
+        
+        do {
+            if let viewings = try (context.fetch(request) as? [Viewing]){
+                return viewings
+            }
+        }
+        catch let error {
+            print(error.localizedDescription)
+        }
+        
+        return []
+    }
+
 }
 
 enum NotificationRequest: String{

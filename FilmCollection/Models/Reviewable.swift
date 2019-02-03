@@ -9,5 +9,5 @@
 import Foundation
 
 protocol Reviewable{
-    var review: String { get set }
+    var review: String? { get set }
 }

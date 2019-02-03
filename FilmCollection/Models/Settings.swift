@@ -12,7 +12,7 @@ import CoreData
 typealias FilmCollectionLayoutOption = Settings.FilmCollectionLayoutOption
 typealias NotificationSettings = Settings.Notification
 
-class Settings: NSManagedObject{
+class Settings: NSManagedObject {
     @NSManaged var filmCollectionLayout: String
     @NSManaged var notificationsOn: Bool
     @NSManaged var notificationStartDate: Date?

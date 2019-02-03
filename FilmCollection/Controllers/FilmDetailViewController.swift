@@ -9,9 +9,6 @@
 import UIKit
 import Alamofire
 import PromiseKit
-import Firebase
-import FirebaseAuth
-import FirebaseDatabase
 
 class FilmDetailViewController: UIViewController {
     
@@ -37,6 +34,7 @@ class FilmDetailViewController: UIViewController {
     @IBOutlet weak var reviewHeaderLabel: UILabel!
     @IBOutlet weak var reviewTextView: UITextView!
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let castLabel = UILabel()
     let crewLabel = UILabel()
     
@@ -46,61 +44,80 @@ class FilmDetailViewController: UIViewController {
             return
         }
         
-        if let user = Auth.auth().currentUser{
-            let alert = UIAlertController.init(title: "Remove film", message: "Are you sure that you want to remove the movie \(film.title) from the collection?", preferredStyle: .alert)
+        guard let filmEntities: Set<FilmEntity> = appDelegate.filmCollectionEntity.films as? Set<FilmEntity> else { return }
+        if let filmEntity = filmEntities.filter({ Int($0.id) == film.id }).first {
+            let alert = UIAlertController.init(title: "Remove film", message: "Are you sure that you want to remove the movie \"\(film.title)\" from the collection?", preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "Remove", style: .destructive, handler: { (action) in
-                self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").removeValue()
-                self.performSegue(withIdentifier: Segue.unwindFromMovieDetailToMovieCollection.rawValue, sender: self)
+                // Remove
+                self.appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
+                self.appDelegate.saveContext()
+                FilmCollection.shared.removeFilm(film)
+                self.navigationController?.popViewController(animated: true)
             }))
             alert.addAction(UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil))
             present(alert, animated: true, completion: nil)
         }
     }
     
-    @IBAction func addMovie(_ sender: UIBarButtonItem) {
-        guard let user = Auth.auth().currentUser, let film = film else{
+    @IBAction func handlePlusButtonTap(_ sender: UIBarButtonItem) {
+        guard let film = film else {
             return
         }
         
-        self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").setValue(
-            [
-                "id": film.id,
-                "rating": Rating.NotRated.rawValue,
-                "review": ""
-            ]
-        )
+        let context = appDelegate.persistentContainer.viewContext
+        let newFilm = FilmEntity(context: context)
+        newFilm.id = Int32(film.id)
+        
+        if appDelegate.filmEntities.filter({ $0.id == film.id }).isEmpty {
+            let title = "Add a new film"
+            let message = "Are you sure that you want to add the film: \"\(film.title)\" to your collection?"
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
+                self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
+                self.appDelegate.saveContext()
+                FilmCollection.shared.addFilm(film)
+            })
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            alert.addAction(cancelAction)
+            alert.addAction(yesAction)
+            self.present(alert, animated: true, completion: nil)
+        }
+        else {
+            let title = "The film was not added"
+            let message = "The film: \"\(film.title)\" is already in the collection"
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     @IBAction func watched(_ sender: UIBarButtonItem) {
         
-        guard let user = Auth.auth().currentUser, let film = film else{
+        guard let film = film else{
             return
         }
         print("Watched film \(film.title)")
-        
-        let date = Date()
-        self.databaseRef.child("user-viewing-history").child("\(user.uid)").child("watched").childByAutoId().setValue(
-            [
-                "date": dateFormatter.string(from: date),
-                "movieTitle": film.title,
-                "movieId": film.id
-            ]
-        )
-        self.showAlert(title: "Viewing saved", message: "\(film.title)\n\(self.dateFormatter.string(from: date))")
+        if let filmEntity = appDelegate.filmEntities.filter({ (entity) -> Bool in
+            return Int(entity.id) == film.id
+        }).first {
+            let context = appDelegate.persistentContainer.viewContext
+            let viewing = Viewing(context: context)
+            viewing.date = Date()
+            viewing.title = film.title
+            filmEntity.addToViewings(viewing)
+            appDelegate.saveContext()
+            self.showAlert(title: "Viewing saved", message: "\(film.title)\n\(self.dateFormatter.string(from: viewing.date!))")
+        }
     }
     
     var fadeableViews: [UIView] = []
-    
-    lazy var databaseRef: DatabaseReference = {
-       return Database.database().reference()
-    }()
     
     enum ReuseIdentifiers: String{
         case creditCollectionViewCell
     }
     
     var film: Movie?
-    var handles: [UInt] = []
     
     var smallPosterImage: UIImage?{
         didSet{
@@ -164,15 +181,16 @@ class FilmDetailViewController: UIViewController {
         return JSONDecoder()
     }()
     
-    @objc func back(sender: UIBarButtonItem) {
-        performSegue(withIdentifier: Segue.unwindFromMovieDetailToMovieCollection.rawValue, sender: self)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmReviewed(notification:)), name: Notifications.FilmCollectionNotification.filmReviewed.name, object: nil)
     }
     
+
+    
     override func viewWillAppear(_ animated: Bool) {
+
         setup()
         fadeableViews.forEach { (view) in
             view.alpha = 0.0
@@ -192,11 +210,6 @@ class FilmDetailViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        // Stop receiving updates
-        for handle in handles{
-            self.databaseRef.removeObserver(withHandle: handle)
-        }
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -204,6 +217,16 @@ class FilmDetailViewController: UIViewController {
         
         print("Orientation changed")
         setContentHeight()
+    }
+    
+    @objc func handleFilmReviewed(notification: Notification) {
+        guard let film = notification.object as? Movie else { return }
+        if let filmEntity = film.entity {
+            film.rating = Rating(rawValue: Int(filmEntity.rating)) ?? .NotRated
+            film.review = filmEntity.review
+        }
+        ratingLabel.text = film.rating.description
+        reviewTextView.text = film.review
     }
     
     func setContentHeight(){
@@ -287,24 +310,6 @@ class FilmDetailViewController: UIViewController {
         let filmIsInCollection = FilmCollection.shared.contains(film)
         additionBarButton.isEnabled = !filmIsInCollection
         removeBarButton.isEnabled = filmIsInCollection
-        
-        // Observe changes in the movie
-        if let user = Auth.auth().currentUser{
-            let handle = self.databaseRef.child("user-movies").child("\(user.uid)").child("\(film.id)").observe(.value) { (snapshot) in
-                if let snapshotDict = snapshot.value as? [String:AnyObject]{
-                    // print("FilmDetailViewController: film \(film.title) has changed")
-                    if let rating = snapshotDict["rating"] as? Int {
-                        film.rating = Rating.all[rating]
-                        self.ratingLabel.text = "Rating: \(film.rating.description)"
-                    }
-                    if let review = snapshotDict["review"] as? String{
-                        film.review = review
-                        self.setReviewText(reviewText: review)
-                    }
-                }
-            }
-            self.handles.append(handle)
-        }
         
         // Load background poster and the small poster images
         film.loadPosterImages().done({ (smallPosterImage, bigPosterImage) in
@@ -479,7 +484,7 @@ class FilmDetailViewController: UIViewController {
         })
         
         // Review
-        setReviewText(reviewText: film.review)
+        setReviewText(reviewText: film.review ?? "")
         
         scrollView.scrollToTop()
     }

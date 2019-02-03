@@ -21,7 +21,6 @@
 		737219B0208BCCCF002A712D /* FilmographyCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737219AF208BCCCF002A712D /* FilmographyCollectionReusableView.swift */; };
 		737219B22090EF62002A712D /* BiographyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737219B12090EF62002A712D /* BiographyViewController.swift */; };
 		737B7BA32030F30E00EEEEAC /* AddFilmTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737B7BA22030F30E00EEEEAC /* AddFilmTableViewController.swift */; };
-		73AB6E1B2083D68B0060EA7C /* Viewing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AB6E1A2083D68B0060EA7C /* Viewing.swift */; };
 		73C0203D20DFAD4500CE4281 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C0203C20DFAD4500CE4281 /* SettingsTableViewController.swift */; };
 		73C0203F20DFB3C400CE4281 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73C0203E20DFB3C400CE4281 /* Settings.swift */; };
 		73C0206320E0291500CE4281 /* FilmCollection.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 73C0206120E0291500CE4281 /* FilmCollection.xcdatamodeld */; };
@@ -38,12 +37,8 @@
 		73E350A1202522C600FFDB6E /* Rating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E350A0202522C600FFDB6E /* Rating.swift */; };
 		73E350A320266FE700FFDB6E /* RatingControlDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E350A220266FE700FFDB6E /* RatingControlDelegate.swift */; };
 		73E7192A2071584B009A4FFB /* ViewingHistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E719292071584B009A4FFB /* ViewingHistoryTableViewController.swift */; };
-		73E777D1207E77DF001980C0 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E777D0207E77DF001980C0 /* ResetPasswordViewController.swift */; };
 		73EEB0972079E34F00726933 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 73EEB0962079E34F00726933 /* GoogleService-Info.plist */; };
-		73EEB0992079EF5D00726933 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EEB0982079EF5D00726933 /* SignInViewController.swift */; };
-		73EEB09C207A5C8000726933 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EEB09B207A5C8000726933 /* SignUpViewController.swift */; };
 		73EEB09E207A8C2000726933 /* HomeTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EEB09D207A8C2000726933 /* HomeTabBarController.swift */; };
-		73F38FDE207D29E70063F7E6 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F38FDD207D29E70063F7E6 /* ProfileViewController.swift */; };
 		73FB10EC202251DF00B89532 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FB10EB202251DF00B89532 /* Helpers.swift */; };
 		73FB10EE202256B600B89532 /* ImagePreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73FB10ED202256B600B89532 /* ImagePreviewController.swift */; };
 		A2CCDC8D625B7697658EA98D /* Pods_FilmCollection.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9041CB6945A6973BFACE378 /* Pods_FilmCollection.framework */; };
@@ -107,7 +102,6 @@
 		737219AF208BCCCF002A712D /* FilmographyCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmographyCollectionReusableView.swift; sourceTree = "<group>"; };
 		737219B12090EF62002A712D /* BiographyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiographyViewController.swift; sourceTree = "<group>"; };
 		737B7BA22030F30E00EEEEAC /* AddFilmTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddFilmTableViewController.swift; path = FilmCollection/Controllers/AddFilmTableViewController.swift; sourceTree = SOURCE_ROOT; };
-		73AB6E1A2083D68B0060EA7C /* Viewing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewing.swift; sourceTree = "<group>"; };
 		73C0203C20DFAD4500CE4281 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
 		73C0203E20DFB3C400CE4281 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		73C0206220E0291500CE4281 /* FilmCollection.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FilmCollection.xcdatamodel; sourceTree = "<group>"; };
@@ -124,13 +118,9 @@
 		73E350A0202522C600FFDB6E /* Rating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rating.swift; sourceTree = "<group>"; };
 		73E350A220266FE700FFDB6E /* RatingControlDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RatingControlDelegate.swift; path = FilmCollection/Controllers/RatingControlDelegate.swift; sourceTree = SOURCE_ROOT; };
 		73E719292071584B009A4FFB /* ViewingHistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewingHistoryTableViewController.swift; sourceTree = "<group>"; };
-		73E777D0207E77DF001980C0 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
 		73EEB0932075570400726933 /* FilmCollection.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FilmCollection.entitlements; sourceTree = "<group>"; };
 		73EEB0962079E34F00726933 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		73EEB0982079EF5D00726933 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
-		73EEB09B207A5C8000726933 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
 		73EEB09D207A8C2000726933 /* HomeTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTabBarController.swift; sourceTree = "<group>"; };
-		73F38FDD207D29E70063F7E6 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		73FB10EB202251DF00B89532 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		73FB10ED202256B600B89532 /* ImagePreviewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewController.swift; sourceTree = "<group>"; };
 		AE8B2C44433E130D47760F99 /* Pods-FilmCollection.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FilmCollection.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FilmCollection/Pods-FilmCollection.debug.xcconfig"; sourceTree = "<group>"; };
@@ -202,14 +192,11 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		73EEB09A207A5C3C00726933 /* Authentication */ = {
+		731401642204ED2A00908E03 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
-				73EEB09B207A5C8000726933 /* SignUpViewController.swift */,
-				73EEB0982079EF5D00726933 /* SignInViewController.swift */,
-				73E777D0207E77DF001980C0 /* ResetPasswordViewController.swift */,
 			);
-			path = Authentication;
+			path = "Core Data";
 			sourceTree = "<group>";
 		};
 		73FB10E720224E6700B89532 /* Controllers */ = {
@@ -228,14 +215,12 @@
 				73FB10ED202256B600B89532 /* ImagePreviewController.swift */,
 				73D5375C2072A67E0088CBA5 /* LoadingIndicatorViewController.swift */,
 				7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */,
-				73F38FDD207D29E70063F7E6 /* ProfileViewController.swift */,
 				73E350A220266FE700FFDB6E /* RatingControlDelegate.swift */,
 				C354001D206E3EB100BC6706 /* ReviewViewController.swift */,
 				73C0203C20DFAD4500CE4281 /* SettingsTableViewController.swift */,
 				C3942D9320738F89002FD5DC /* UIViewControllerExtensions.swift */,
 				73DF1ABE203E007B009955FA /* VideoPlayerViewController.swift */,
 				73E719292071584B009A4FFB /* ViewingHistoryTableViewController.swift */,
-				73EEB09A207A5C3C00726933 /* Authentication */,
 				C31BC9D820403C0D00BC2FBD /* Popover */,
 			);
 			path = Controllers;
@@ -250,6 +235,7 @@
 				C3B03633209C397F0089D0AE /* CrewMember.swift */,
 				C39C63592032DF9E0028B7CB /* Downloader.swift */,
 				7344E8ED20FCCB90004CB00A /* FilmNotification.swift */,
+				731401642204ED2A00908E03 /* Core Data */,
 				C3BE027220209BF100F78495 /* Genre.swift */,
 				73CBE4B1203A017300935F54 /* HasCredits.swift */,
 				73CBE4A32038F0B900935F54 /* HasVideo.swift */,
@@ -264,7 +250,6 @@
 				C31BC9D22040348000BC2FBD /* SortingRule.swift */,
 				73D7D5B9204363A200DF648C /* SortOrder.swift */,
 				C39C63572032D2FB0028B7CB /* TMDBApi.swift */,
-				73AB6E1A2083D68B0060EA7C /* Viewing.swift */,
 				73DADA77203E0EF1008E4D42 /* Youtube.swift */,
 			);
 			path = Models;
@@ -490,21 +475,13 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-FilmCollection/Pods-FilmCollection-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
-				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
-				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -555,7 +532,6 @@
 				C3B03634209C397F0089D0AE /* CrewMember.swift in Sources */,
 				C3E4B8BD2064E3DA00F0BE90 /* ImageCollectionViewController.swift in Sources */,
 				C35CD3A220441BA200967E1F /* PopoverTableItemSelectionDelegate.swift in Sources */,
-				73AB6E1B2083D68B0060EA7C /* Viewing.swift in Sources */,
 				7350DF1A2131CB9F0040F720 /* Notifications.swift in Sources */,
 				73EEB09E207A8C2000726933 /* HomeTabBarController.swift in Sources */,
 				737219B0208BCCCF002A712D /* FilmographyCollectionReusableView.swift in Sources */,
@@ -569,7 +545,6 @@
 				C35743AD2020798900DC5F7B /* FilmTableViewCellExpanded.swift in Sources */,
 				C39C635A2032DF9E0028B7CB /* Downloader.swift in Sources */,
 				737219AE208B206A002A712D /* PersonCredits.swift in Sources */,
-				73EEB0992079EF5D00726933 /* SignInViewController.swift in Sources */,
 				7357F72620F103A300BCE9FD /* FilmPosterCollectionViewController.swift in Sources */,
 				7357F72820F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift in Sources */,
 				73C0206320E0291500CE4281 /* FilmCollection.xcdatamodeld in Sources */,
@@ -580,7 +555,6 @@
 				73C0203D20DFAD4500CE4281 /* SettingsTableViewController.swift in Sources */,
 				C34B3FDC2034437100503CB3 /* FilmSearchResultTableViewCell.swift in Sources */,
 				C3C7073120651A81008773F9 /* MovieImages.swift in Sources */,
-				73E777D1207E77DF001980C0 /* ResetPasswordViewController.swift in Sources */,
 				73DADA78203E0EF1008E4D42 /* Youtube.swift in Sources */,
 				C3E2F86D2073A19B00F53F6C /* CrewCollectionViewCell.swift in Sources */,
 				73FB10EC202251DF00B89532 /* Helpers.swift in Sources */,
@@ -604,7 +578,6 @@
 				73E3509D2023A18900FFDB6E /* RatingControl.swift in Sources */,
 				73DF1ABF203E007B009955FA /* VideoPlayerViewController.swift in Sources */,
 				C3B03636209C39BC0089D0AE /* CastMember.swift in Sources */,
-				73EEB09C207A5C8000726933 /* SignUpViewController.swift in Sources */,
 				7357F72420EE4B0900BCE9FD /* Collection.swift in Sources */,
 				737219B22090EF62002A712D /* BiographyViewController.swift in Sources */,
 				7344E8EE20FCCB90004CB00A /* FilmNotification.swift in Sources */,
@@ -612,7 +585,6 @@
 				730C54C8206AD17C00367B0A /* Retry.swift in Sources */,
 				C31BC9D32040348000BC2FBD /* SortingRule.swift in Sources */,
 				7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */,
-				73F38FDE207D29E70063F7E6 /* ProfileViewController.swift in Sources */,
 				C31BC9D12040337100BC2FBD /* PopoverTableViewController.swift in Sources */,
 				737219AA20890698002A712D /* FilmographyCollectionViewController.swift in Sources */,
 				73CBE4B2203A017300935F54 /* HasCredits.swift in Sources */,

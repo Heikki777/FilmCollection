@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17G65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="18C54" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="FilmCollectionEntity" representedClassName=".FilmCollectionEntity" syncable="YES" codeGenerationType="class">
+        <relationship name="films" toMany="YES" deletionRule="Cascade" destinationEntity="FilmEntity" inverseName="collection" inverseEntity="FilmEntity" syncable="YES"/>
+    </entity>
+    <entity name="FilmEntity" representedClassName=".FilmEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rating" attributeType="Integer 16" minValueString="0" maxValueString="7" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="review" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="collection" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FilmCollectionEntity" inverseName="films" inverseEntity="FilmCollectionEntity" syncable="YES"/>
+        <relationship name="viewings" toMany="YES" deletionRule="No Action" destinationEntity="Viewing" inverseName="film" inverseEntity="Viewing" syncable="YES"/>
+    </entity>
     <entity name="Settings" representedClassName=".Settings" syncable="YES">
         <attribute name="filmCollectionLayout" optional="YES" attributeType="String" defaultValueString="Poster, title and overview" syncable="YES"/>
         <attribute name="notificationRepetitionOption" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="notificationsOn" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="notificationStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
     </entity>
+    <entity name="Viewing" representedClassName=".Viewing" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="film" maxCount="1" deletionRule="No Action" destinationEntity="FilmEntity" inverseName="viewings" inverseEntity="FilmEntity" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="Settings" positionX="-63" positionY="-18" width="128" height="105"/>
+        <element name="FilmCollectionEntity" positionX="-146.5703125" positionY="-38.94921875" width="128" height="58"/>
+        <element name="FilmEntity" positionX="67.546875" positionY="-83.73046875" width="128" height="118"/>
+        <element name="Settings" positionX="-335.3515625" positionY="-43.140625" width="128" height="103"/>
+        <element name="Viewing" positionX="301.73046875" positionY="-38.6015625" width="128" height="88"/>
     </elements>
 </model>

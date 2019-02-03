@@ -47,10 +47,6 @@ class HomeTabBarController: UITabBarController {
     
     func createObservers(){
         
-        // Observer for user having signed in
-        let userSignedIn = Notifications.AuthorizationNotification.SignedIn.name
-        NotificationCenter.default.addObserver(self, selector: #selector(userSignedIn(notification:)), name: userSignedIn, object: nil)
-        
         // Observer for network reachability status
         NotificationCenter.default.addObserver(forName: NetworkReachabilityChanged, object: nil, queue: nil, using: {
             (notification) in
@@ -117,7 +113,6 @@ class HomeTabBarController: UITabBarController {
     
     @objc func userSignedIn(notification: NSNotification){
         print("userSignedIn")
-        showLoadingIndicator(withTitle: "Loading", message: "Film collection", progress: nil, complete: nil)
     }
     
     @objc func userSignedOut(notification: NSNotification){

@@ -29,6 +29,7 @@ struct Notifications{
         case filmAddedToCollection = "filmAddedToCollectionNotification"
         case filmChanged = "filmChangedNotification"
         case filmRemoved = "filmRemovedNotification"
+        case filmReviewed = "filmReviewed"
         case loadingProgressChanged = "loadingProgressChangedNotification"
         case filmDictionaryChanged = "filmDictionaryChangedNotification"
         case newSectionAddedToDictionary = "newSectionAddedToDictionaryNotification"
@@ -36,21 +37,6 @@ struct Notifications{
         case beginUpdates = "beginUpdatesNotification"
         case endUpdates = "endUpdatesNotification"
         case collectionFiltered = "collectionFilteredNotification"
-        
-        var notification: NSNotification{
-            return NSNotification.init(name: self.name, object: nil)
-        }
-        
-        var name: NSNotification.Name{
-            return NSNotification.Name(rawValue: self.rawValue)
-        }
-    }
-    
-    enum AuthorizationNotification: String {
-        case SigningIn = "SigningInNotification"
-        case SigningUp = "SigningUpNotification"
-        case SignedIn = "SignedInNotification"
-        case SignedOut = "SignedOutNotification"
         
         var notification: NSNotification{
             return NSNotification.init(name: self.name, object: nil)

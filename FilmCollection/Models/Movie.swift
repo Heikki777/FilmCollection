@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 // MARK: - Movie
-class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
+class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable {
     
     static var dateFormatter: DateFormatter = {
         return DateFormatter()
@@ -39,6 +39,12 @@ class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     var largePosterImage: UIImage? = nil
     var credits: Credits = Credits()
     
+    weak var entity: FilmEntity? {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        guard let entity = (appDelegate.filmEntities.filter { Int($0.id) == self.id }).first else { return nil }
+        return entity
+    }
+    
     var sortingTitle: String{
         let articles = ["A ", "An ", "The "]
         for article in articles{
@@ -56,7 +62,7 @@ class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
     var rating: Rating = .NotRated
     
     // Reviewable
-    var review: String = ""
+    var review: String? = nil
     
     // HasVideo
     var videos: [Video] = []
@@ -155,6 +161,12 @@ class Movie: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable{
         self.id = id
         self.originalTitle = originalTitle
         self.smallPosterImage = smallPosterImage
+        
+        if let filmEntity = entity {
+            self.rating = Rating(rawValue: Int(filmEntity.rating)) ?? .NotRated
+            self.review = filmEntity.review
+        }
+
     }
     
     func loadPosterImages() -> Promise<(small: UIImage, large: UIImage)>{

@@ -9,9 +9,7 @@
 import UIKit
 import Alamofire
 import PromiseKit
-import Firebase
-import FirebaseAuth
-import FirebaseDatabase
+import CoreData
 
 
 class AddFilmTableViewController: UITableViewController {
@@ -23,9 +21,7 @@ class AddFilmTableViewController: UITableViewController {
         }
     }
     
-    lazy var databaseRef: DatabaseReference = {
-        return Database.database().reference()
-    }()
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     let searchController = UISearchController.init(searchResultsController: nil)
     
@@ -166,45 +162,31 @@ class AddFilmTableViewController: UITableViewController {
     }
     
     func addMovie(movie: Movie){
+        let context = appDelegate.persistentContainer.viewContext
+        let newFilm = FilmEntity(context: context)
+        newFilm.id = Int32(movie.id)
         
-        
-        self.databaseRef.child("films").child("\(movie.id)").observeSingleEvent(of: .value) { (snapshot) in
-            if !snapshot.exists(){
-                
-                // Add the film to the database
-                if let data = try? self.jsonEncoder.encode(movie){
-                    print("data: \(data)")
-                    if let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]{
-                        snapshot.ref.updateChildValues(json)
-                    }
-                }
-            }
+        if appDelegate.filmEntities.filter({ $0.id == movie.id }).isEmpty {
+            let title = "Add a new film"
+            let message = "Are you sure that you want to add the film: \"\(movie.title)\" to your collection?"
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
+                self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
+                self.appDelegate.saveContext()
+                FilmCollection.shared.addFilm(movie)
+            })
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            alert.addAction(cancelAction)
+            alert.addAction(yesAction)
+            self.present(alert, animated: true, completion: nil)
         }
-        
-        // Add the film to user's collection
-        if let user = Auth.auth().currentUser{
-            self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").observeSingleEvent(of: .value) { (snapshot) in
-                var title = "Movie was not added"
-                var message = "The movie \(movie.titleYear) is already in the collection."
-
-                if !snapshot.exists(){
-                    title = "Movie added"
-                    message = "The movie \(movie.titleYear) added."
-                    self.databaseRef.child("user-movies").child("\(user.uid)").child("\(movie.id)").setValue(
-                        [
-                            "id": movie.id,
-                            "rating": movie.rating.rawValue
-                        ]
-                    )
-                }
-                // Show alert to inform the user about whether the movie was added or not.
-                let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
-                let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
-                alert.addAction(okAction)
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true, completion: nil)
-                }
-            }
+        else {
+            let title = "The film was not added"
+            let message = "The film: \"\(movie.title)\" is already in the collection"
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
         }
     }
     

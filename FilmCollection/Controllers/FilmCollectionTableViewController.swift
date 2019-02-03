@@ -103,6 +103,7 @@ class FilmCollectionTableViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         print("FilmCollectionTableViewController viewDidAppear")
+        
     }
     
     func createObservers(){
@@ -129,9 +130,7 @@ class FilmCollectionTableViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(beginUpdates(notification:)), name: beginUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(endUpdates(notification:)), name: endUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
-
         NotificationCenter.default.addObserver(self, selector: #selector(handleShowDetailOfNotifiedFilm(notification:)), name: NSNotification.Name.init("showDetailOfNotifiedFilm"), object: nil)
-
 
     }
     
@@ -158,6 +157,7 @@ class FilmCollectionTableViewController: UIViewController {
         if let sectionIndex = notification.object as? Int{
             print("remove section at index: \(sectionIndex)")
             self.tableView.deleteSections([sectionIndex], with: .automatic)
+            self.setNavigationBarTitle("\(self.filmCollection.size) films")
         }
     }
     
@@ -174,9 +174,13 @@ class FilmCollectionTableViewController: UIViewController {
         print("Remove: \(film.title) at indexPath: \(indexPath)")
     
         // Remove the corresponding tableview cell
-        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        if (self.tableView.numberOfRows(inSection: indexPath.section) == 1) {
+            self.tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+        }
+        else {
+            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+        }
         self.setNavigationBarTitle("\(self.filmCollection.size) films")
-
     }
     
     @objc func handleShowDetailOfNotifiedFilm(notification: NSNotification){
@@ -226,7 +230,6 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleLoadingProgressChange(notification: NSNotification){
-        //print("handleLoadingProgressChange: \(Int(notification.object as! Float * 100)) %")
         guard let homeTabBarController = self.tabBarController as? HomeTabBarController else{
             return
         }
@@ -234,10 +237,6 @@ class FilmCollectionTableViewController: UIViewController {
             let percentage: Int = Int(progress * 100)
             homeTabBarController.showLoadingIndicator(withTitle: "Loading films", message: "\(percentage) %", progress: progress, complete: nil)
         }
-    }
-    
-    @IBAction func unwindToFilmCollectionTableVC(segue: UIStoryboardSegue){
-        print("unwindToFilmCollectionTableVC")
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
