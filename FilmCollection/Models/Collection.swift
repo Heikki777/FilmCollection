@@ -229,7 +229,6 @@ class FilmCollection: NSObject {
             if filterOn {
                 filterCollection(scope: filteringScope, searchText: filteringText)
             }
-            self.createMovieDictionary(notifyObservers: true)
         }
     }
     
