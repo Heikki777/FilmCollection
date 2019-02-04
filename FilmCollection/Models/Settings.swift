@@ -46,7 +46,7 @@ class Settings: NSManagedObject {
     
     enum FilmCollectionLayoutOption: String {
         case poster = "Poster"
-        case posterTitleOverview = "Poster, title and overview"
+        case posterTitleOverview = "Poster, title, director, genre, rating"
         case title = "Title"
         
         static var all: [FilmCollectionLayoutOption]{
