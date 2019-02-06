@@ -19,7 +19,7 @@ class ReviewViewController: UIViewController {
     @IBOutlet weak var saveBarButton: UIBarButtonItem!
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    var film: Movie?
+    var film: Film?
     var backgroundImage: UIImage?
     
     @IBAction func save(_ sender: Any) {

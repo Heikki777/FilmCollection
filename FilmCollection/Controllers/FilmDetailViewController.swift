@@ -71,7 +71,7 @@ class FilmDetailViewController: UIViewController {
         if appDelegate.filmEntities.filter({ $0.id == film.id }).isEmpty {
             let title = "Add a new film"
             let message = "Are you sure that you want to add the film: \"\(film.title)\" to your collection?"
-            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                 self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                 self.appDelegate.saveContext()
@@ -85,7 +85,7 @@ class FilmDetailViewController: UIViewController {
         else {
             let title = "The film was not added"
             let message = "The film: \"\(film.title)\" is already in the collection"
-            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
@@ -117,7 +117,7 @@ class FilmDetailViewController: UIViewController {
         case creditCollectionViewCell
     }
     
-    var film: Movie?
+    var film: Film?
     
     var smallPosterImage: UIImage?{
         didSet{
@@ -220,7 +220,7 @@ class FilmDetailViewController: UIViewController {
     }
     
     @objc func handleFilmReviewed(notification: Notification) {
-        guard let film = notification.object as? Movie else { return }
+        guard let film = notification.object as? Film else { return }
         if let filmEntity = film.entity {
             film.rating = Rating(rawValue: Int(filmEntity.rating)) ?? .NotRated
             film.review = filmEntity.review

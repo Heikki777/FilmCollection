@@ -228,7 +228,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                 if self.appDelegate.filmEntities.filter({ $0.id == filmID }).isEmpty {
                     let title = "Add a new film"
                     let message = "Are you sure that you want to add the film: \"\(filmTitle)\" to your collection?"
-                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
                     let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                         self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                         self.appDelegate.saveContext()
@@ -242,7 +242,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                 else {
                     let title = "The film was not added"
                     let message = "The film: \"\(filmTitle)\" is already in the collection"
-                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+                    let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
                     let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
                     alert.addAction(okAction)
                     self.present(alert, animated: true, completion: nil)

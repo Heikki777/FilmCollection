@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {        
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {        
         
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
@@ -194,7 +194,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             notificationContent.title = "Film recommendation"
             notificationContent.subtitle = "Watch today"
             notificationContent.body = randomFilm.title
-            notificationContent.sound = UNNotificationSound.default()
+            notificationContent.sound = UNNotificationSound.default
             notificationContent.badge = 0
             notificationContent.userInfo["filmID"] = randomFilm.id
             notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
@@ -369,7 +369,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                             return
                         }
                         
-                        guard let navigationController = homeTabBarController.childViewControllers.filter({
+                        guard let navigationController = homeTabBarController.children.filter({
                             $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
                                 print("CollectionTabNavigationController could not be found")
                                 return
@@ -380,12 +380,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                             return
                         }
                         
-                        if let filmCollectionTableViewController = navigationController.childViewControllers.first as? FilmCollectionTableViewController{
+                        if let filmCollectionTableViewController = navigationController.children.first as? FilmCollectionTableViewController{
                             print("FilmCollectionTableViewController")
                             filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
                             filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
                         }
-                        else if let filmPosterCollectionViewController = navigationController.childViewControllers.first as? FilmPosterCollectionViewController{
+                        else if let filmPosterCollectionViewController = navigationController.children.first as? FilmPosterCollectionViewController{
                             print("FilmPosterCollectionViewController")
                             filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
                             filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)

@@ -18,14 +18,14 @@ class FilmTableViewCellExpanded: UITableViewCell {
     @IBOutlet weak var genreLabel: UILabel!
     @IBOutlet weak var ratingLabel: UILabel!
     
-    var movie: Movie?
+    var movie: Film?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
     }
@@ -44,7 +44,7 @@ class FilmTableViewCellExpanded: UITableViewCell {
         super.setHighlighted(highlighted, animated: animated)
     }
     
-    func configure(withMovie movie: Movie){
+    func configure(withMovie movie: Film){
         
         self.movie = movie
         

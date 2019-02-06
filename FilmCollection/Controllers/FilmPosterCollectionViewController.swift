@@ -106,7 +106,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     
     @objc func handleFilmRemoval(notification: NSNotification){
         print("handleFilmRemoval")
-        guard let (film, indexPath) = notification.object as? (Movie, IndexPath) else {
+        guard let (film, indexPath) = notification.object as? (Film, IndexPath) else {
             return
         }
         let cell = collectionView?.cellForItem(at: indexPath) as! FilmPosterCollectionViewCell
@@ -125,7 +125,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     @objc func handleCollectionAddition(notification: NSNotification){
         print("handleCollectionAddition")
         
-        if let film = notification.object as? Movie{
+        if let film = notification.object as? Film{
             print("Film added: \(film.title)")
             setNavigationBarTitle("\(filmCollection.size) films")
             collectionView!.reloadData()
@@ -138,7 +138,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleChangeInFilmData(notification: NSNotification){
-        if let film = notification.object as? Movie, let indexPath = filmCollection.getIndexPath(for: film){
+        if let film = notification.object as? Film, let indexPath = filmCollection.getIndexPath(for: film){
             // Reload the tableView cell that displays the changed film
             collectionView?.reloadItems(at: [indexPath])
         }
@@ -281,7 +281,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         switch kind {
-        case UICollectionElementKindSectionHeader:
+        case UICollectionView.elementKindSectionHeader:
             let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                 withReuseIdentifier: "ImageCollectionReusableView",
                 for: indexPath) as! ImageCollectionReusableView

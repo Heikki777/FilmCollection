@@ -69,7 +69,6 @@ class TMDBApi{
             .validate()
             .responseData(queue: queue, completionHandler: { (dataResponse) in
                 if let error = dataResponse.error{
-                    //print(error.localizedDescription)
                     if let response = dataResponse.response,
                         let headers = response.allHeaderFields as? [String: Any],
                         let retryAfter = headers["Retry-After"] as? String,
@@ -90,10 +89,9 @@ class TMDBApi{
         }
     }
     
-    func loadMovie(_ movieId: Int, append: [String] = []) -> Promise<Movie> {
+    func loadMovie(_ movieId: Int, append: [String] = []) -> Promise<Film> {
         return Promise { result in
-            let appendToResponse = "&append_to_response=" + append.joined(separator: ",")
-
+            let appendToResponse = (append.isEmpty) ? "" : "&append_to_response=" + append.joined(separator: ",")
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)?api_key=\(self.apiKey)&language=en-US\(appendToResponse)")!
             let queue = DispatchQueue.init(label: "bgThread1", qos: .background, attributes: .concurrent)
 
@@ -115,7 +113,7 @@ class TMDBApi{
                     result.reject(error)
                 }
                 else if let data = dataResponse.data{
-                    if let movie = try? self.jsonDecoder.decode(Movie.self, from: data){
+                    if let movie = try? self.jsonDecoder.decode(Film.self, from: data){
                         result.fulfill(movie)
                     }
                     else{

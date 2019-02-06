@@ -13,7 +13,7 @@ class FilmCollection: NSObject {
     
     static let shared = FilmCollection()
     
-    static func sort(movies: inout [Movie], sortingRule: SortingRule, order: SortOrder = .ascending){
+    static func sort(movies: inout [Film], sortingRule: SortingRule, order: SortOrder = .ascending){
         movies.sort { (movie_A, movie_B) -> Bool in
             switch sortingRule{
             case .title:
@@ -32,11 +32,11 @@ class FilmCollection: NSObject {
         }
     }
     
-    private var films: [Movie] = []
+    private var films: [Film] = []
     private var sections: [String] = []
     private var filteredSections: [String] = []
-    private var filmDict: [String:[Movie]] = [:]
-    private var filteredFilmDict: [String: [Movie]] = [:]
+    private var filmDict: [String:[Film]] = [:]
+    private var filteredFilmDict: [String: [Film]] = [:]
     private var filteringScope: String = ""
     private var filteringText: String = ""
     private var filterOn: Bool = false{
@@ -96,7 +96,7 @@ class FilmCollection: NSObject {
         }
     }
     
-    private func addMovieToDictionary(_ film: Movie){
+    private func addMovieToDictionary(_ film: Film){
         let sectionTitle = getSectionTitle(for: film)
         // Create a new section in the film dictionary
         if filmDict[sectionTitle] == nil{
@@ -148,7 +148,7 @@ class FilmCollection: NSObject {
             NotificationCenter.default.post(name: progressNotificationName, object: progress)
         }
         
-        let filmLoadedSuccessfullyHandler: (Movie) -> Void = { film in
+        let filmLoadedSuccessfullyHandler: (Film) -> Void = { film in
             // Load the small poster image for the film
             // And then add the film to the collection.
             
@@ -185,7 +185,7 @@ class FilmCollection: NSObject {
         NotificationCenter.default.removeObserver(self)
     }
     
-    private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Movie) -> Void, failure: @escaping (_ error: Error) -> Void) {
+    private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Film) -> Void, failure: @escaping (_ error: Error) -> Void) {
         print("loadFilmFromTMDB: \(filmEntity.id)")
         attempt {
             self.api.loadMovie(Int(filmEntity.id), append: ["credits"])
@@ -201,11 +201,11 @@ class FilmCollection: NSObject {
         }
     }
     
-    func contains(_ film: Movie) -> Bool{
+    func contains(_ film: Film) -> Bool{
         return films.contains(film)
     }
     
-    func removeFilm(_ film: Movie){
+    func removeFilm(_ film: Film){
         
         if let filmEntity = film.entity {
             appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
@@ -246,7 +246,7 @@ class FilmCollection: NSObject {
         }
     }
     
-    func addFilm(_ film: Movie){
+    func addFilm(_ film: Film){
         guard !films.contains(film) else { return }
         guard film.smallPosterImage == nil else {
             films.append(film)
@@ -269,7 +269,7 @@ class FilmCollection: NSObject {
         }
     }
     
-    func randomFilm() -> Movie?{
+    func randomFilm() -> Film?{
 
         guard size > 0 else{
             return nil
@@ -279,11 +279,11 @@ class FilmCollection: NSObject {
         return films[random]
     }
     
-    func getMovie(withId id: Int) -> Movie?{
+    func getMovie(withId id: Int) -> Film?{
         return films.filter { $0.id == id }.first
     }
     
-    func getMovie(at indexPath: IndexPath) -> Movie?{
+    func getMovie(at indexPath: IndexPath) -> Film?{
         let sectionTitle = getSectionTitle(atIndex: indexPath.section)
         if filterOn{
             if indexPath.row < filteredFilmDict[sectionTitle]?.count ?? 0{
@@ -298,7 +298,7 @@ class FilmCollection: NSObject {
         return nil
     }
     
-    func getAllFilms() -> [Movie]{
+    func getAllFilms() -> [Film]{
         return films
     }
     
@@ -306,7 +306,7 @@ class FilmCollection: NSObject {
         return (filterOn) ? filteredSections[section] : sections[section]
     }
     
-    func getIndexPath(for movie: Movie) -> IndexPath?{
+    func getIndexPath(for movie: Film) -> IndexPath?{
         let sectionTitle = getSectionTitle(for: movie)
         if filterOn{
             if let row = filteredFilmDict[sectionTitle]?.index(of: movie), let section = filteredSections.index(of: sectionTitle){
@@ -319,19 +319,19 @@ class FilmCollection: NSObject {
         return nil
     }
     
-    func filmsInSection(_ sectionTitle: String) -> [Movie]{
+    func filmsInSection(_ sectionTitle: String) -> [Film]{
         let sectionFilms = filterOn ? filteredFilmDict[sectionTitle] : filmDict[sectionTitle]
         return sectionFilms ?? []
     }
     
-    func filmsInSection(_ section: Int) -> [Movie]{
+    func filmsInSection(_ section: Int) -> [Film]{
         let sectionTitle = getSectionTitle(atIndex: section)
         let sectionFilms = filterOn ? filteredFilmDict[sectionTitle] : filmDict[sectionTitle]
         let result = sectionFilms ?? []
         return result
     }
     
-    func getSectionTitle(for movie: Movie) -> String{
+    func getSectionTitle(for movie: Film) -> String{
         switch sortingRule {
         case .rating:
             return movie.rating.description
@@ -461,7 +461,7 @@ extension FilmCollection: UITableViewDataSource {
         return true
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete{
             print("DELETE")

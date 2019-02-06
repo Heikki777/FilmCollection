@@ -23,9 +23,16 @@ class Credits: Decodable {
     }
     
     required init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        crew = try values.decode([CrewMember].self, forKey: .crew)
-        cast = try values.decode([CastMember].self, forKey: .cast)
+        do {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            crew = try values.decode([CrewMember].self, forKey: .crew)
+            cast = try values.decode([CastMember].self, forKey: .cast)
+        }
+        catch let error {
+            print(error.localizedDescription)
+            crew = []
+            cast = []
+        }
     }
     
     enum CodingKeys: String, CodingKey {

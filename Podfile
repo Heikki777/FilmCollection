@@ -5,3 +5,9 @@ target 'FilmCollection' do
     pod 'Alamofire'
     pod 'PromiseKit'
 end
+
+target 'FilmCollectionTests' do
+    pod 'AFNetworking'
+    pod 'Alamofire'
+    pod 'PromiseKit'
+end

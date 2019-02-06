@@ -12,14 +12,14 @@ class FilmTableViewCellSimple: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
     
-    var movie: Movie?
+    var movie: Film?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
     
@@ -38,7 +38,7 @@ class FilmTableViewCellSimple: UITableViewCell {
     }
     
     
-    func configure(withMovie movie: Movie){
+    func configure(withMovie movie: Film){
         self.movie = movie
         titleLabel.text = movie.titleYear
     }

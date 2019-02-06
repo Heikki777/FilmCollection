@@ -40,7 +40,7 @@ class RatingControl: UIControl {
         }
     }
     
-    @IBInspectable var alignment: UIControlContentHorizontalAlignment = .center
+    @IBInspectable var alignment: UIControl.ContentHorizontalAlignment = .center
     
     var delegate: RatingControlDelegate?
     

@@ -12,7 +12,7 @@ class FilmPreviewViewController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
     
-    var film: Movie?
+    var film: Film?
     
     override func viewDidLoad() {
         super.viewDidLoad()

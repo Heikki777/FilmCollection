@@ -168,7 +168,7 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleFilmRemoval(notification: NSNotification){
-        guard let (film, indexPath) = notification.object as? (Movie, IndexPath) else {
+        guard let (film, indexPath) = notification.object as? (Film, IndexPath) else {
             return
         }
         print("Remove: \(film.title) at indexPath: \(indexPath)")
@@ -213,7 +213,7 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleCollectionAddition(notification: NSNotification){
-        if let film = notification.object as? Movie{
+        if let film = notification.object as? Film{
 
             if let indexPath = filmCollection.getIndexPath(for: film){
                 self.tableView.insertRows(at: [indexPath], with: .automatic)
@@ -223,7 +223,7 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleChangeInFilmData(notification: NSNotification){
-        if let film = notification.object as? Movie, let indexPath = filmCollection.getIndexPath(for: film){
+        if let film = notification.object as? Film, let indexPath = filmCollection.getIndexPath(for: film){
             // Reload the tableView cell that displays the changed film
             tableView.reloadRows(at: [indexPath], with: .automatic)
         }
@@ -278,8 +278,8 @@ class FilmCollectionTableViewController: UIViewController {
         }
     }
     
-    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-        if event?.subtype == UIEventSubtype.motionShake{
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if event?.subtype == UIEvent.EventSubtype.motionShake{
             handleShakeGesture()
         }
     }
@@ -319,7 +319,7 @@ extension FilmCollectionTableViewController: UITableViewDelegate{
         }
     }
    
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
     }
     

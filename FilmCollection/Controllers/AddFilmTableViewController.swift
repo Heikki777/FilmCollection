@@ -161,7 +161,7 @@ class AddFilmTableViewController: UITableViewController {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     
-    func addMovie(movie: Movie){
+    func addMovie(movie: Film){
         let context = appDelegate.persistentContainer.viewContext
         let newFilm = FilmEntity(context: context)
         newFilm.id = Int32(movie.id)
@@ -169,7 +169,7 @@ class AddFilmTableViewController: UITableViewController {
         if appDelegate.filmEntities.filter({ $0.id == movie.id }).isEmpty {
             let title = "Add a new film"
             let message = "Are you sure that you want to add the film: \"\(movie.title)\" to your collection?"
-            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                 self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                 self.appDelegate.saveContext()
@@ -183,7 +183,7 @@ class AddFilmTableViewController: UITableViewController {
         else {
             let title = "The film was not added"
             let message = "The film: \"\(movie.title)\" is already in the collection"
-            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
@@ -214,23 +214,23 @@ class AddFilmTableViewController: UITableViewController {
         let page = lastPage+1
         print("loadNextPage: \(page)")
         isLoadingPage = true
-        if let text = searchController.searchBar.text{
-            api.search(query: text, page: page)
-                .done({ (results) in
-                    DispatchQueue.main.async {
-                        for result in results{
-                            if !self.searchResults.contains(where: { $0.id == result.id } ){
-                                self.searchResults.append(result)
-                            }
-                        }
-                        self.endOfResults = results.isEmpty
-                        self.lastPage = self.endOfResults ? self.lastPage : page
-                        self.isLoadingPage = false
+        if let text = searchController.searchBar.text {
+            attempt {
+                self.api.search(query: text, page: page)
+            }
+            .done(on: DispatchQueue.main) { results in
+                for result in results{
+                    if !self.searchResults.contains(where: { $0.id == result.id } ){
+                        self.searchResults.append(result)
                     }
-                })
-                .catch({ (error) in
-                    print(error)
-                })
+                }
+                self.endOfResults = results.isEmpty
+                self.lastPage = self.endOfResults ? self.lastPage : page
+                self.isLoadingPage = false
+            }
+            .catch({ (error) in
+                print(error)
+            })
         }
         else{
             searchResults = []
@@ -245,13 +245,13 @@ class AddFilmTableViewController: UITableViewController {
         endOfResults = false
         
         if let text = searchController.searchBar.text{
-            api.search(query: text, page: 1)
-            .done({ (results) in
-                DispatchQueue.main.async {
-                    self.searchResults = results
-                    self.isLoadingPage = false
-                }
-            })
+            attempt {
+                self.api.search(query: text, page: 1)
+            }
+            .done(on: DispatchQueue.main) { results in
+                self.searchResults = results
+                self.isLoadingPage = false
+            }
             .catch({ (error) in
                 print(error)
             })
