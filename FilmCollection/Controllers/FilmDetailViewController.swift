@@ -142,7 +142,7 @@ class FilmDetailViewController: UIViewController {
         }
     }
     
-    var movieImages: MovieImages?
+    var movieImages: FilmImages?
     var videos: [Video] = []{
         didSet{
             setFeaturedVideo()
@@ -542,7 +542,7 @@ class FilmDetailViewController: UIViewController {
         self.showMovieImages()
     }
     
-    func loadMovieImages() -> Promise<MovieImages>{
+    func loadMovieImages() -> Promise<FilmImages>{
         return Promise { result in
             guard let movieId = self.film?.id else{
                 print("No movie")

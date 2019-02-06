@@ -1,5 +1,5 @@
 //
-//  MovieImages.swift
+//  FilmImages.swift
 //  FilmCollection
 //
 //  Created by Heikki Hämälistö on 23/03/2018.

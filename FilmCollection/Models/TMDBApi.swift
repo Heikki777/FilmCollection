@@ -288,12 +288,12 @@ class TMDBApi{
 
     }
     
-    func loadImages(_ movieId: Int, size: PosterSize = .original, progressHandler: @escaping (Float) -> Void) -> Promise<MovieImages> {
+    func loadImages(_ movieId: Int, size: PosterSize = .original, progressHandler: @escaping (Float) -> Void) -> Promise<FilmImages> {
 
         return Promise { result in
             var postersLoaded: Bool = false
             var backdropsLoaded: Bool = false
-            let images = MovieImages()
+            let images = FilmImages()
 
             func fulFillCheck(){
                 if postersLoaded && backdropsLoaded {
