@@ -87,35 +87,32 @@ class FilmographyCollectionViewController: UIViewController {
         }
         
         // Load movie posters
-        thingsToLoad += personCredits.castRoles.count + personCredits.crewRoles.count
-        
         self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-        
-        let allPosterPaths: [(title: String?, posterPath: String?)] = personCredits.castRoles.map { (title: $0.title, posterPath:$0.posterPath) } + personCredits.crewRoles.map { ($0.title, posterPath:$0.posterPath) }
-        
+        let castRolesPosterPaths = personCredits.castRoles.map { (title: $0.title, posterPath:$0.posterPath) }.filter { $0.title != nil }
+        let crewRolesPosterPaths = personCredits.crewRoles.map { (title: $0.title, posterPath:$0.posterPath) }.filter { $0.title != nil }
+        var allPosterPaths = castRolesPosterPaths + crewRolesPosterPaths
+        allPosterPaths = allPosterPaths.filter { $0.title != nil }
+        thingsToLoad += allPosterPaths.filter { $0.title != nil }.count
+
         allPosterPaths.forEach { (movie) in
-            if let title = movie.title{
-                if let path = movie.posterPath {
-                    let url = TMDBApi.getPosterURL(size: .w92, imagePath: path)
-                    attempt{
-                        Downloader.shared.loadImage(url: url)
-                    }
-                    .done({ image in
-                        self.postersDictionary[title] = image
-                    })
-                    .catch({ error in
-                        self.postersDictionary[title] = #imageLiteral(resourceName: "placeholder_image")
-                    })
-                    .finally{
-                        thingsLoaded += 1
-                    }
+            let title = movie.title!
+            if let path = movie.posterPath {
+                let url = TMDBApi.getPosterURL(size: .w92, imagePath: path)
+                attempt {
+                    Downloader.shared.loadImage(url: url)
                 }
-                else{
+                .done({ image in
+                    self.postersDictionary[title] = image
+                })
+                .catch({ error in
                     self.postersDictionary[title] = #imageLiteral(resourceName: "placeholder_image")
+                })
+                .finally {
                     thingsLoaded += 1
                 }
             }
             else{
+                self.postersDictionary[title] = #imageLiteral(resourceName: "placeholder_image")
                 thingsLoaded += 1
             }
         }
@@ -259,7 +256,6 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                 self.tabBarController?.present(loadingIndicator, animated: true, completion: {
                     
                     let progressChanged: (String) -> () = { (infoMessage) in
-                        print(infoMessage)
                         loaded += 1
                         progress = loaded / thingsToLoad
                         loadingIndicator.setProgress(progress)

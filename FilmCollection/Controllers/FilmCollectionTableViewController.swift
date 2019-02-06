@@ -53,9 +53,6 @@ class FilmCollectionTableViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
-        print("Orientation changed")
-        
     }
     
     deinit {
@@ -63,18 +60,13 @@ class FilmCollectionTableViewController: UIViewController {
     }
 
     override func viewDidLoad() {
-        print("FilmCollectionTableViewController viewDidLoad")
         super.viewDidLoad()
         
         createObservers()
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
-            print("3D touch is available")
             registerForPreviewing(with: self, sourceView: view)
-        }
-        else{
-            print("3D Touch not available")
         }
         
         orderBarButton.title = String(filmCollection.order.symbol)
@@ -97,13 +89,10 @@ class FilmCollectionTableViewController: UIViewController {
             self.selectedLayoutOption = layoutOption
         }
         
-        //print("FILMS: \(filmCollection.size)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        print("FilmCollectionTableViewController viewDidAppear")
-        
+        super.viewDidAppear(animated)        
     }
     
     func createObservers(){
@@ -147,15 +136,13 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleSectionAddition(notification: NSNotification){
-        if let sectionIndex = notification.object as? Int{
-            print("new section: \(sectionIndex)")
+        if let sectionIndex = notification.object as? Int {
             self.tableView.insertSections([sectionIndex], with: .automatic)
         }
     }
     
     @objc func handleSectionRemoval(notification: NSNotification){
         if let sectionIndex = notification.object as? Int{
-            print("remove section at index: \(sectionIndex)")
             self.tableView.deleteSections([sectionIndex], with: .automatic)
             self.setNavigationBarTitle("\(self.filmCollection.size) films")
         }
@@ -168,10 +155,9 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleFilmRemoval(notification: NSNotification){
-        guard let (film, indexPath) = notification.object as? (Film, IndexPath) else {
+        guard let (_, indexPath) = notification.object as? (Film, IndexPath) else {
             return
         }
-        print("Remove: \(film.title) at indexPath: \(indexPath)")
     
         // Remove the corresponding tableview cell
         if (self.tableView.numberOfRows(inSection: indexPath.section) == 1) {
@@ -184,7 +170,6 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleShowDetailOfNotifiedFilm(notification: NSNotification){
-        print("handleShowDetailOfNotifiedFilm")
         guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
             return
         }
@@ -198,7 +183,6 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleCollectionLoaded(notification: NSNotification){
-        print("Film collection loaded. \(filmCollection.size) films")
         
         guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
             return
@@ -241,17 +225,11 @@ class FilmCollectionTableViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        guard let identifier = segue.identifier else{
-            print("No segue identifier")
-            return
-        }
+        guard let identifier = segue.identifier else { return }
         
         // Prepare for showing the movie detail view
         if identifier == Segue.showFilmDetailSegue.rawValue{
-            guard let indexPath = tableView.indexPathForSelectedRow else{
-                print("No indexpath")
-                return
-            }
+            guard let indexPath = tableView.indexPathForSelectedRow else { return }
             
             if let film = filmCollection.getMovie(at: indexPath){
                 
@@ -354,7 +332,6 @@ extension FilmCollectionTableViewController: UISearchBarDelegate{
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         let scope = scopeButtonTitles[selectedScope]
-        print("Selected scope: \(scope)")
         filmCollection.filterCollection(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
     }
     
@@ -380,28 +357,11 @@ extension FilmCollectionTableViewController: PopoverTableItemSelectionDelegate{
 
 extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
-
         let point = tableView.convert(location, from: self.view)
-        
-        guard let indexPath = tableView.indexPathForRow(at: point) else{
-            print("No indexpath for point: \(point)")
-            return nil
-        }
-        
-        guard let cell = tableView.cellForRow(at: indexPath) else{
-            print("no cell")
-            return nil
-        }
-        
-        guard let film = filmCollection.getMovie(at: indexPath) else{
-            print("There is no film at indexPath: \(indexPath)")
-            return nil
-        }
-        
-        guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else{
-            print("A FilmPreviewViewController could not be instantiated")
-            return nil
-        }
+        guard let indexPath = tableView.indexPathForRow(at: point) else { return nil }
+        guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+        guard let film = filmCollection.getMovie(at: indexPath) else { return nil }
+        guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else { return nil }
         
         previewingContext.sourceRect = self.view.convert(cell.frame, from: self.tableView)
         filmPreviewVC.film = film
@@ -411,15 +371,8 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         
-        guard let filmPreviewVC = viewControllerToCommit as? FilmPreviewViewController else{
-            print("viewControllerToCommit is not an instance of FilmPreviewViewController")
-            return
-        }
-        
-        guard let film = filmPreviewVC.film else {
-            print("No film in FilmPreviewViewController")
-            return
-        }
+        guard let filmPreviewVC = viewControllerToCommit as? FilmPreviewViewController else { return }
+        guard let film = filmPreviewVC.film else { return }
         
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "FilmDetailViewController") as? FilmDetailViewController{
             vc.film = film

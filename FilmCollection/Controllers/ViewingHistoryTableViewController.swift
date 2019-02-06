@@ -34,9 +34,6 @@ class ViewingHistoryTableViewController: UITableViewController {
         super.viewDidAppear(animated)
         
         self.viewings = appDelegate.viewingEntities
-        
-        print(viewings)
-        
         self.viewings.sort { $0.date! > $1.date! }
         self.tableView.reloadData()
     }

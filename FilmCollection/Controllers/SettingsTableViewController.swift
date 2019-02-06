@@ -141,7 +141,6 @@ class SettingsTableViewController: UITableViewController {
                 // Start
                 pickNotificationStartTime()
             case 2:
-                // TODO: - Repeat
                 break
             default:
                 print("case \(indexPath.row) not handled")

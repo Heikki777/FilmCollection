@@ -73,7 +73,6 @@ class HomeTabBarController: UITabBarController {
     }
     
     @objc func handleCollectionLayoutChange(notification: NSNotification){
-        print("handleCollectionLayoutChange")
         guard let layoutOption = notification.object as? Settings.FilmCollectionLayoutOption else{
             return
         }
@@ -110,19 +109,5 @@ class HomeTabBarController: UITabBarController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         show(alert, sender: self)
     }
-    
-    @objc func userSignedIn(notification: NSNotification){
-        print("userSignedIn")
-    }
-    
-    @objc func userSignedOut(notification: NSNotification){
-        print("userSignedOut")
-        let signInViewController = self.storyboard!.instantiateViewController(withIdentifier: "signInViewController")
-        appDelegate.window?.rootViewController = signInViewController
-        appDelegate.window?.makeKeyAndVisible()
-    }
-    
-    
-    
 
 }

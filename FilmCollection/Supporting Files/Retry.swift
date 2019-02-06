@@ -17,26 +17,19 @@ func attempt<T>(_ body: @escaping () -> Promise<T>) -> Promise<T>{
         return body().recover { error -> Promise<T> in
             // Attempt 20 times
             guard attempts < 20 else {
-                print("Attempted 20 times")
                 throw error
             }
             
             if let tmdbApiError = error as? TMDBApiError{
                 switch tmdbApiError{
                 case .RequestLimitExceeded(let retryAfterSeconds):
-                    print("Retry after \(retryAfterSeconds) seconds")
                     let milliseconds = retryAfterSeconds * 1000
                     return after(DispatchTimeInterval.milliseconds(milliseconds)).then(attempt)
                 default:
-                    print("default")
                     break
                 }
             }
             
-            print(error.localizedDescription)
-//            let seconds: Double = Double(2 * attempts) + drand48()
-//            let milliseconds: Int = Int(seconds * 1000)
-//            print("Retry after \(milliseconds) ms")
             return Promise.init(error: error)
         }
     }

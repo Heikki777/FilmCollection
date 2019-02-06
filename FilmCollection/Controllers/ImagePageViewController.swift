@@ -18,7 +18,6 @@ class ImagePageViewController: UIPageViewController {
         super.viewDidLoad()
                 
         guard startPageIdx < images.count else{
-            print("ImagePageViewController. startPageIdx is too big")
             return
         }
         

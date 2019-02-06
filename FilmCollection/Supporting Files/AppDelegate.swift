@@ -19,17 +19,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
-    var filmIdWithinNotification: Int? {
-        didSet{
-            print("filmDetailToBeShown: \(String(describing: filmIdWithinNotification))")
-        }
-    }
+    var filmIdWithinNotification: Int?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {        
         
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
-            print("granted")
+            if let error = error {
+                print(error.localizedDescription)
+            }
         }
         configureUserNotificationsCenter()
         
@@ -138,7 +136,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         saveContext()
         
         guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
-            print("No homeTabBarController")
             return
         }
         
@@ -162,11 +159,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func registerForFilmRecommendationNotifications(){
-        print("AppDelegate.registerForLocalNotifications")
         let filmCollection = FilmCollection.shared
         
         guard let startDate = settings.notificationStartDate else {
-            print("notificationStartDate is nil")
             return
         }
         
@@ -253,15 +248,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Core Data Saving support
     
     func saveContext () {
-        print("saveContext")
         let context = persistentContainer.viewContext
         if context.hasChanges {
-            print("Context has changes")
             do {
                 try context.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
@@ -337,13 +328,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     //for displaying notification when app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        print("willPresent")
         //If you don't want to show notification when app is open, do something here else and make a return here.
         //Even you don't implement this delegate method, you will not see the notification on the specified controller. So, you have to implement this delegate and make sure the below line execute. i.e. completionHandler.
         
         if notification.request.identifier == FilmNotification.Category.randomRecommendation{
             if settings.notificationRepetitionOption != .Never{
-                print("Repeat notification")
                 registerForFilmRecommendationNotifications()
             }
         }
@@ -352,46 +341,33 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     // For handling tap and user actions
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        print("userNotificationCenter: didReceive: \(response)")
-        
         switch response.notification.request.identifier {
         case FilmNotification.Category.randomRecommendation:
             switch response.actionIdentifier{
             case FilmNotification.Action.showDetails:
-                print("Show details of the recommended film")
                 if let filmID = response.notification.request.content.userInfo["filmID"] as? Int{
-                    print("Film in notification: \(filmID)")
                     if let film = FilmCollection.shared.getMovie(withId: filmID){
-                        print(film.titleYear)
                         
                         guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
-                            print("No homeTabBarController")
                             return
                         }
                         
                         guard let navigationController = homeTabBarController.children.filter({
                             $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
-                                print("CollectionTabNavigationController could not be found")
                                 return
                         }
                         
                         guard let indexPath = FilmCollection.shared.getIndexPath(for: film) else{
-                            print("The film has no indexPath")
                             return
                         }
                         
                         if let filmCollectionTableViewController = navigationController.children.first as? FilmCollectionTableViewController{
-                            print("FilmCollectionTableViewController")
                             filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
                             filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
                         }
                         else if let filmPosterCollectionViewController = navigationController.children.first as? FilmPosterCollectionViewController{
-                            print("FilmPosterCollectionViewController")
                             filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
                             filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-                        }
-                        else{
-                            print("ERROR!")
                         }
                         
                         homeTabBarController.selectedIndex = 0

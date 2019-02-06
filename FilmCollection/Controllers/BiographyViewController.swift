@@ -20,7 +20,6 @@ class BiographyViewController: UIViewController {
         super.viewDidLoad()
         
         guard let personDetailInformation = personDetailInformation else{
-            print("BiographyViewController: Error! personDetailInformation is nil")
             return
         }
         

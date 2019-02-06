@@ -49,7 +49,6 @@ class ReviewViewController: UIViewController {
         super.viewDidLoad()
         
         guard let film = film else{
-            print("ReviewViewController Error! No movie")
             return
         }
         

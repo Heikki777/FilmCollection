@@ -41,7 +41,6 @@ class FilmCollection: NSObject {
     private var filteringText: String = ""
     private var filterOn: Bool = false{
         didSet{
-            print("filterOn: \(filterOn)")
             if filterOn == false{
                 filteringScope = ""
                 filteringText = ""
@@ -143,7 +142,6 @@ class FilmCollection: NSObject {
         
         func updateLoadingProgress(){
             let progress: Float = Float(numberOfFilmsHandled) / Float(appDelegate.filmEntities.count)
-            print("Loaded: \(numberOfFilmsHandled) / \(appDelegate.filmEntities.count) (\(Int(progress*100)) %)")
             let progressNotificationName = Notifications.FilmCollectionNotification.loadingProgressChanged.name
             NotificationCenter.default.post(name: progressNotificationName, object: progress)
         }
@@ -159,7 +157,6 @@ class FilmCollection: NSObject {
                 film.smallPosterImage = small
             }
             .catch { error in
-                print("Could not load poster images for the movie \(film.title)")
                 print(error.localizedDescription)
             }
             .finally {
@@ -186,7 +183,6 @@ class FilmCollection: NSObject {
     }
     
     private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Film) -> Void, failure: @escaping (_ error: Error) -> Void) {
-        print("loadFilmFromTMDB: \(filmEntity.id)")
         attempt {
             self.api.loadMovie(Int(filmEntity.id), append: ["credits"])
         }
@@ -218,9 +214,7 @@ class FilmCollection: NSObject {
         }
         if let index = filmDict[sectionTitle]?.index(of: film){
             filmDict[sectionTitle]?.remove(at: index)
-            print("remove row \(index) in section \(sectionTitle)")
             if filmDict[sectionTitle]?.count == 0 {
-                print("Remove section: \(sectionTitle)")
                 filmDict.removeValue(forKey: sectionTitle)
                 if let sectionIndex = sections.firstIndex(of: sectionTitle){
                     sections.remove(at: sectionIndex)
@@ -464,7 +458,6 @@ extension FilmCollection: UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete{
-            print("DELETE")
             if let film = self.getMovie(at: indexPath), let filmEntity = film.entity {
 
                 let sectionTitle = getSectionTitle(for: film)

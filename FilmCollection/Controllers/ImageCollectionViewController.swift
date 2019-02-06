@@ -33,11 +33,7 @@ class ImageCollectionViewController: UICollectionViewController {
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
-            print("3D touch is available")
             registerForPreviewing(with: self, sourceView: view)
-        }
-        else{
-            print("3D Touch not available")
         }
     }
     
@@ -51,7 +47,6 @@ class ImageCollectionViewController: UICollectionViewController {
     }
     
     func showImagePageController(startPageIdx: Int = 0){
-        print("showImagePageController")
         var imageArray: [UIImage] = []
         for arr in images.values{
             imageArray += arr
@@ -156,22 +151,18 @@ extension ImageCollectionViewController: UIViewControllerPreviewingDelegate{
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         
         guard let locationInCollectionView: CGPoint = collectionView?.convert(location, from: self.view) else {
-            print("Location not in CollectionView")
             return nil
         }
         
         guard let indexPath = collectionView?.indexPathForItem(at: locationInCollectionView) else {
-            print("No indexPath")
             return nil
         }
         
         guard let cell = collectionView?.cellForItem(at: indexPath) as? ImageCollectionViewCell else {
-            print("No cell at indexPath: \(indexPath)")
             return nil
         }
         
         guard let image = cell.imageView.image else {
-            print("No image in the cell")
             return nil
         }
         

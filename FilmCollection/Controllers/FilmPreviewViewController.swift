@@ -17,10 +17,7 @@ class FilmPreviewViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let film = film else{
-            print("FilmPreviewViewController. No film")
-            return
-        }
+        guard let film = film else { return }
         
         attempt{
             film.loadLargePosterImage()
@@ -31,7 +28,7 @@ class FilmPreviewViewController: UIViewController {
             }
         }
         .catch { (error) in
-            print("")
+            print(error.localizedDescription)
         }
         
     }

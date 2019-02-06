@@ -216,13 +216,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		731401642204ED2A00908E03 /* Core Data */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "Core Data";
-			sourceTree = "<group>";
-		};
 		7314016A2209BB3D00908E03 /* FilmCollectionUITests */ = {
 			isa = PBXGroup;
 			children = (
@@ -268,7 +261,6 @@
 				C3B03633209C397F0089D0AE /* CrewMember.swift */,
 				C39C63592032DF9E0028B7CB /* Downloader.swift */,
 				7344E8ED20FCCB90004CB00A /* FilmNotification.swift */,
-				731401642204ED2A00908E03 /* Core Data */,
 				C3BE027220209BF100F78495 /* Genre.swift */,
 				73CBE4B1203A017300935F54 /* HasCredits.swift */,
 				73CBE4A32038F0B900935F54 /* HasVideo.swift */,

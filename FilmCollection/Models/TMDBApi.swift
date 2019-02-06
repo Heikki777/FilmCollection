@@ -213,7 +213,6 @@ class TMDBApi{
                     result.reject(error)
                 }
                 else if let data = dataResponse.data{
-                    print("data")
                     if let creditsResponse = try? self.jsonDecoder.decode(Credits.self, from: data){
                         let cast = creditsResponse.cast
                         let crew = creditsResponse.crew

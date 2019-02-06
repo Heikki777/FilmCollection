@@ -150,10 +150,6 @@ class AddFilmTableViewController: UITableViewController {
                 print(error.localizedDescription)
             }
         }
-        else{
-            print("The search result movie has no ID")
-        }
-        
     }
     
     func searchBarIsEmpty() -> Bool {
@@ -191,7 +187,6 @@ class AddFilmTableViewController: UITableViewController {
     }
     
     func selectSearchResult(at indexPath: IndexPath){
-        print("Number of searchResults: \(searchResults.count)")
         guard indexPath.row < searchResults.count else{
             print("Error! Selected search result not found. Index out of bounds")
             return
@@ -212,7 +207,6 @@ class AddFilmTableViewController: UITableViewController {
     
     func loadNextPage(){
         let page = lastPage+1
-        print("loadNextPage: \(page)")
         isLoadingPage = true
         if let text = searchController.searchBar.text {
             attempt {

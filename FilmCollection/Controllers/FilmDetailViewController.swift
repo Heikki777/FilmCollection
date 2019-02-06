@@ -40,7 +40,6 @@ class FilmDetailViewController: UIViewController {
     
     @IBAction func removeMovie(_ sender: Any) {
         guard let film = film else{
-            print("Error! There is no film to remove!")
             return
         }
         
@@ -97,7 +96,6 @@ class FilmDetailViewController: UIViewController {
         guard let film = film else{
             return
         }
-        print("Watched film \(film.title)")
         if let filmEntity = appDelegate.filmEntities.filter({ (entity) -> Bool in
             return Int(entity.id) == film.id
         }).first {
@@ -214,8 +212,6 @@ class FilmDetailViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
-        print("Orientation changed")
         setContentHeight()
     }
     
@@ -301,10 +297,7 @@ class FilmDetailViewController: UIViewController {
                 
         playVideoButton.isHidden = true
         
-        guard let film = film else{
-            print("No film")
-            return
-        }
+        guard let film = film else { return }
         
         // Bar buttons
         let filmIsInCollection = FilmCollection.shared.contains(film)
@@ -340,11 +333,7 @@ class FilmDetailViewController: UIViewController {
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
-            print("3D touch is available")
             registerForPreviewing(with: self, sourceView: view)
-        }
-        else{
-            print("3D Touch not available")
         }
         
         // MARK: - Set the movie title
@@ -545,7 +534,6 @@ class FilmDetailViewController: UIViewController {
     func loadMovieImages() -> Promise<FilmImages>{
         return Promise { result in
             guard let movieId = self.film?.id else{
-                print("No movie")
                 result.reject(FilmDetailViewControllerError.movieIsNil)
                 return
             }
@@ -637,20 +625,17 @@ class FilmDetailViewController: UIViewController {
             return true
 
         default:
-            print("Unknown segue")
             return false
         }
     }
     
     func showMovieImages(){
         guard let movieImages = self.movieImages else{
-            print("No images")
             return
         }
         
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
             guard movieImages.count > 0 else{
-                print("MovieImages is empty")
                 return
             }
             vc.images = movieImages.toDictionary
@@ -749,10 +734,7 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
         switch imagePreviewVC.identifier {
         case "Poster":
             
-            guard film != nil else{
-                print("film is nil")
-                return
-            }
+            guard film != nil else { return }
             
             if let movieImages = self.movieImages{
                 showImageCollectionVC(movieImages.toDictionary)
@@ -863,7 +845,6 @@ extension FilmDetailViewController: UICollectionViewDataSource{
         switch collectionView {
         case castCollectionView:
             guard !castMembersWithImage.isEmpty else {
-                print("There are no cast members with image -> hide collection view")
                 self.castCollectionView.isHidden = true
                 return UICollectionViewCell()
             }
@@ -881,7 +862,6 @@ extension FilmDetailViewController: UICollectionViewDataSource{
         
         case crewCollectionView:
             guard !crewMembersWithImage.isEmpty else {
-                print("There are no crew members with image -> hide collection view")
                 self.crewCollectionView.isHidden = true
                 return UICollectionViewCell()
             }
@@ -927,7 +907,6 @@ extension FilmDetailViewController: UICollectionViewDelegate{
         }
         
         guard let personID = id, let personName = name, let personProfilePath = profilePath else {
-            print("Error! Missing data")
             return
         }
         
@@ -935,7 +914,6 @@ extension FilmDetailViewController: UICollectionViewDelegate{
         
         // Actions
         let showBiographyAction = UIAlertAction.init(title: "Biography", style: .default, handler: { (action) in
-            print("Show Biography: \(personName)")
             
             let loadingIndicator = LoadingIndicatorViewController(title: "Loading biography", message: personName, complete: nil)
             var loaded = 0
@@ -961,7 +939,6 @@ extension FilmDetailViewController: UICollectionViewDelegate{
                 )
             }
             .done{ personDetailInformation, image in
-                print(personDetailInformation)
                 self.performSegue(withIdentifier: Segue.showBiographySegue.rawValue, sender: (personInfo: personDetailInformation, image: image))
             }
             .catch{ error in
@@ -972,9 +949,7 @@ extension FilmDetailViewController: UICollectionViewDelegate{
             }
         })
         
-        let showFilmographyAction = UIAlertAction.init(title: "Filmography", style: .default, handler: { (action) in
-            print("Show Movies: \(personName)")
-            
+        let showFilmographyAction = UIAlertAction.init(title: "Filmography", style: .default, handler: { (action) in            
             attempt{
                 self.api.loadCredits(forPersonWithID: personID)
             }
@@ -1015,10 +990,7 @@ extension FilmDetailViewController: UICollectionViewDelegate{
         actionSheet.addAction(showImagesAction)
         actionSheet.addAction(cancelAction)
         
-        self.present(actionSheet, animated: true) {
-            print("actionSheet completed")
-        }
-
+        self.present(actionSheet, animated: true)
     }
 }
 

@@ -35,7 +35,6 @@ class FilmSearchResultTableViewCell: UITableViewCell {
         }.done { image in
             self.posterImageView?.image = image
         }.catch({ (error) in
-            print("Image could not be loaded for tableview cell")
             print(error.localizedDescription)
         })
     }

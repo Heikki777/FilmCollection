@@ -37,7 +37,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     var filmCount = 0
     
     override func viewDidLoad() {
-        print("FilmPosterCollectionViewController")
         super.viewDidLoad()
         
         collectionView?.dataSource = self
@@ -56,14 +55,8 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
-            print("3D touch is available")
             registerForPreviewing(with: self, sourceView: view)
         }
-        else{
-            print("3D Touch not available")
-        }
-        
-        print("FILMS: \(filmCollection.size)")
         
         createObservers()
     }
@@ -105,16 +98,12 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleFilmRemoval(notification: NSNotification){
-        print("handleFilmRemoval")
         guard let (film, indexPath) = notification.object as? (Film, IndexPath) else {
             return
         }
         let cell = collectionView?.cellForItem(at: indexPath) as! FilmPosterCollectionViewCell
         if cell.filmId == film.id{
             self.removeMovie(at: indexPath)
-        }
-        else{
-            print("Error! handleFilmRemoval. film.id does not match with cell's filmId")
         }
     }
     
@@ -123,17 +112,13 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleCollectionAddition(notification: NSNotification){
-        print("handleCollectionAddition")
-        
         if let film = notification.object as? Film{
-            print("Film added: \(film.title)")
             setNavigationBarTitle("\(filmCollection.size) films")
             collectionView!.reloadData()
         }
     }
     
     @objc func handleFilmDictionaryChange(notification: NSNotification){
-        print("FilmPosterCollectionViewController: handleFilmDictionaryChange")
         collectionView!.reloadData()
     }
     
@@ -145,7 +130,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     @objc func handleLoadingProgressChange(notification: NSNotification){
-        print("handleLoadingProgressChange: \(Int(notification.object as! Float * 100)) %")
         guard let homeTabBarController = self.tabBarController as? HomeTabBarController else{
             return
         }
@@ -200,14 +184,12 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         guard let identifier = segue.identifier else{
-            print("No segue identifier")
             return
         }
         
         // Prepare for showing the movie detail view
         if identifier == Segue.showFilmDetailSegue.rawValue{
             guard let indexPath = collectionView!.indexPathsForSelectedItems?.first else{
-                print("No indexpath")
                 return
             }
             
@@ -243,7 +225,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
 
     override func indexTitles(for collectionView: UICollectionView) -> [String]? {
         let titles = filmCollection.sectionIndexTitles()
-        print("titles: \(titles)")
         return titles
     }
     
@@ -325,7 +306,6 @@ extension FilmPosterCollectionViewController: UISearchBarDelegate{
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         let scope = scopeButtonTitles[selectedScope]
-        print("Selected scope: \(scope)")
         filmCollection.filterCollection(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
     }
 }
@@ -335,27 +315,22 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         
         guard let locationInCollectionView: CGPoint = collectionView?.convert(location, from: self.view) else {
-            print("Location not in CollectionView")
             return nil
         }
         
         guard let indexPath = collectionView?.indexPathForItem(at: locationInCollectionView) else {
-            print("No indexPath")
             return nil
         }
         
         guard let cell = collectionView?.cellForItem(at: indexPath) as? FilmPosterCollectionViewCell else {
-            print("No cell at indexPath: \(indexPath)")
             return nil
         }
         
         guard let film = filmCollection.getMovie(at: indexPath) else {
-            print("No film at indexPath")
             return nil
         }
         
         guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else{
-            print("A FilmPreviewViewController could not be instantiated")
             return nil
         }
         
@@ -368,12 +343,10 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         
         guard let filmPreviewVC = viewControllerToCommit as? FilmPreviewViewController else{
-            print("viewControllerToCommit is not an instance of FilmPreviewViewController")
             return
         }
         
         guard let film = filmPreviewVC.film else {
-            print("No film in FilmPreviewViewController")
             return
         }
             
