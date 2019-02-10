@@ -16,7 +16,13 @@ class NotificationRepetitionTableViewController: UITableViewController {
         return appDelegate.settings
     }()
     
-    var selectedRepetitionOption: Settings.RepetitionOption = .Never
+    var selectedRepetitionOption: Settings.RepetitionOption = .Never {
+        didSet {
+            if selectedRepetitionOption != oldValue {
+                NotificationCenter.default.post(name: Notifications.SettingsNotification.notificationRepeatOptionChanged.name, object: nil)
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

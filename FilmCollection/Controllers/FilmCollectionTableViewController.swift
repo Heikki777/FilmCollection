@@ -262,17 +262,6 @@ class FilmCollectionTableViewController: UIViewController {
         }
     }
     
-    func handleShakeGesture(){
-        // Show a random movie
-        guard let movie = filmCollection.randomFilm() else{
-            return
-        }
-        if let indexPath = filmCollection.getIndexPath(for: movie){
-            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
-            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-        }
-    }
-    
     func setNavigationBarTitle(_ title: String){
         self.navigationItem.title = title
     }
@@ -379,4 +368,19 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
             show(vc, sender: self)
         }
     }
+}
+
+// MARK: - Shakeable
+extension FilmCollectionTableViewController: Shakeable {
+    func handleShakeGesture(){
+        // Show a random movie
+        guard let movie = filmCollection.randomFilm() else{
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: movie){
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+        }
+    }
+    
 }

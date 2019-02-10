@@ -9,6 +9,7 @@
 import UIKit
 import Alamofire
 import PromiseKit
+import EventKit
 
 class FilmDetailViewController: UIViewController {
     
@@ -89,6 +90,119 @@ class FilmDetailViewController: UIViewController {
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
         }
+    }
+    
+    private func insertCalendarEvent(store: EKEventStore){
+        guard let film = film, let runtime = film.runtime else { return }
+        
+        store.requestAccess(to: .event) { [weak self] (granted, error) in
+            
+            if let error = error {
+                print(error.localizedDescription)
+            }
+            
+            if granted {
+                let start = Date()
+                let end = start.addingTimeInterval(TimeInterval(runtime * 60))
+                let newEvent = EKEvent(eventStore: store)
+                let alarm = EKAlarm(absoluteDate: start)
+                newEvent.calendar = self?.appDelegate.appCalendar
+                newEvent.title = "Watch film: \(film.titleYear)"
+                newEvent.addAlarm(alarm)
+                newEvent.notes = film.overview ?? ""
+                newEvent.startDate = start
+                newEvent.endDate = end
+            
+                let predicate = store.predicateForEvents(withStart: start, end: end, calendars: nil)
+                var filmEvents: [EKEvent]? = nil
+                filmEvents = store.events(matching: predicate)
+                
+                let dateFormatter: DateFormatter = {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+                    return dateFormatter
+                }()
+                
+                let showSuccessAlert = {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "dd.MM.yyyy"
+                    let timeFormatter = DateFormatter()
+                    timeFormatter.dateFormat = "HH:mm"
+                    let startDateString = dateFormatter.string(from: start)
+                    let startTimeString = timeFormatter.string(from: start)
+                    DispatchQueue.main.async {
+                        self?.showAlert(title: "Calendar event added", message: "\"\(film.titleYear)\" is scheduled to be watched on \(startDateString) at \(startTimeString)")
+                    }
+                }
+                
+                guard let overlappingEvents = filmEvents else {
+                    // No overlapping events. Just add the new event
+                    do {
+                        try store.save(newEvent, span: .thisEvent)
+                        showSuccessAlert()
+                    }
+                    catch let error {
+                        print("Saving the calendar event failed")
+                        print(error.localizedDescription)
+                    }
+                    return
+                }
+                    
+                if let overlappingFilmEvent = overlappingEvents.first {
+                    let startDateString = dateFormatter.string(from: overlappingFilmEvent.startDate)
+                    let endDateString = dateFormatter.string(from: overlappingFilmEvent.endDate)
+                    let existingEventTitle = overlappingFilmEvent.title ?? "Unknown"
+                    let alertTitle = "Events overlap"
+                    let message = "The film \(existingEventTitle) is scheduled from \(startDateString) to \(endDateString)"
+                    let alert = UIAlertController(title: alertTitle, message: message, preferredStyle: .alert)
+                    let replaceAction = UIAlertAction(title: "Replace", style: .destructive, handler: { (action) in
+                        do {
+                            try store.remove(overlappingFilmEvent, span: .thisEvent)
+                            try store.save(newEvent, span: .thisEvent)
+                            showSuccessAlert()
+                        }
+                        catch let error {
+                            print(error.localizedDescription)
+                        }
+                    })
+                    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                    alert.addAction(replaceAction)
+                    alert.addAction(cancelAction)
+                    
+                    DispatchQueue.main.async {
+                        self?.present(alert, animated: true, completion: nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    @IBAction func handleCalendarButtonPressed(_ sender: Any) {
+        
+        switch EKEventStore.authorizationStatus(for: .event) {
+        case .authorized:
+            insertCalendarEvent(store: appDelegate.eventStore)
+        case .denied:
+            print("Access to the calendar is denied")
+        case .notDetermined:
+            appDelegate.eventStore.requestAccess(to: .event) { [weak self] (granted, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+                if granted {
+                    // Insert event
+                    if let strongSelf = self {
+                        strongSelf.insertCalendarEvent(store: strongSelf.appDelegate.eventStore)
+                    }
+                }
+                else {
+                    print("Access to the calendar is denied")
+                }
+            }
+        case .restricted:
+            break
+        }
+        
     }
     
     @IBAction func watched(_ sender: UIBarButtonItem) {
@@ -184,8 +298,6 @@ class FilmDetailViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmReviewed(notification:)), name: Notifications.FilmCollectionNotification.filmReviewed.name, object: nil)
     }
-    
-
     
     override func viewWillAppear(_ animated: Bool) {
 

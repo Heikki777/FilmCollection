@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 // MARK: - Film
-class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable {
+class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable, Hashable {
     
     static var dateFormatter: DateFormatter = {
         return DateFormatter()
@@ -58,14 +58,19 @@ class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable {
         return title
     }
     
-    // Rateable
+    // MARK: - Rateable
     var rating: Rating = .NotRated
     
-    // Reviewable
+    // MARK: - Reviewable
     var review: String? = nil
     
-    // HasVideo
+    // MARK: - HasVideo
     var videos: [Video] = []
+    
+    // MARK: - Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
     
     var year: Int?{
         get{
@@ -94,6 +99,7 @@ class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable {
         }
     }
     
+    // MARK: - Equatable
     static func ==(lhs: Film, rhs: Film) -> Bool{
         return lhs.id == rhs.id
     }

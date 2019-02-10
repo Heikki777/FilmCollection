@@ -17,6 +17,7 @@
 		7357F72420EE4B0900BCE9FD /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72320EE4B0900BCE9FD /* Collection.swift */; };
 		7357F72620F103A300BCE9FD /* FilmPosterCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72520F103A200BCE9FD /* FilmPosterCollectionViewController.swift */; };
 		7357F72820F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */; };
+		7368BD25220B63930090FCAA /* Shakeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7368BD24220B63930090FCAA /* Shakeable.swift */; };
 		737219AA20890698002A712D /* FilmographyCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737219A920890698002A712D /* FilmographyCollectionViewController.swift */; };
 		737219AC20892416002A712D /* FilmographyCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737219AB20892416002A712D /* FilmographyCollectionViewCell.swift */; };
 		737219AE208B206A002A712D /* PersonCredits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737219AD208B206A002A712D /* PersonCredits.swift */; };
@@ -111,6 +112,7 @@
 		7357F72320EE4B0900BCE9FD /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		7357F72520F103A200BCE9FD /* FilmPosterCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPosterCollectionViewController.swift; sourceTree = "<group>"; };
 		7357F72720F15D1700BCE9FD /* FilmPosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmPosterCollectionViewCell.swift; sourceTree = "<group>"; };
+		7368BD24220B63930090FCAA /* Shakeable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shakeable.swift; sourceTree = "<group>"; };
 		737219A920890698002A712D /* FilmographyCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmographyCollectionViewController.swift; sourceTree = "<group>"; };
 		737219AB20892416002A712D /* FilmographyCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmographyCollectionViewCell.swift; sourceTree = "<group>"; };
 		737219AD208B206A002A712D /* PersonCredits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonCredits.swift; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 		73FB10E820224E7F00B89532 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7368BD24220B63930090FCAA /* Shakeable.swift */,
 				C3B03635209C39BC0089D0AE /* CastMember.swift */,
 				7357F72320EE4B0900BCE9FD /* Collection.swift */,
 				C3D5DAF2206B6D0B00551ABD /* Credits.swift */,
@@ -689,6 +692,7 @@
 				73E3509F2025226100FFDB6E /* Rateable.swift in Sources */,
 				C357438D2020743400DC5F7B /* FilmCollectionTableViewController.swift in Sources */,
 				C3D5DAF1206B6BE000551ABD /* Film.swift in Sources */,
+				7368BD25220B63930090FCAA /* Shakeable.swift in Sources */,
 				73D7D5BA204363A200DF648C /* SortOrder.swift in Sources */,
 				73D5375B20729BF10088CBA5 /* Reviewable.swift in Sources */,
 				C38F682D206E06A000601F7B /* CastCollectionViewCell.swift in Sources */,

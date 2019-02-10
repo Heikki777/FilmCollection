@@ -273,6 +273,16 @@ class FilmCollection: NSObject {
         return films[random]
     }
     
+    func randomFilms(_ count: Int) -> Set<Film> {
+        var result = Set<Film>()
+        guard count <= self.size else { return result }
+        
+        while let randFilm = self.randomFilm(), result.count < count {
+            result.insert(randFilm)
+        }
+        return result
+    }
+    
     func getMovie(withId id: Int) -> Film?{
         return films.filter { $0.id == id }.first
     }

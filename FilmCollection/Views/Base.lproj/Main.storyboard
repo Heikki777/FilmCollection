@@ -901,10 +901,9 @@
                                                 </constraints>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8xb-w4-1Ve">
-                                                <rect key="frame" x="250" y="255.5" width="117" height="18"/>
+                                                <rect key="frame" x="8" y="255.5" width="359" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="18" id="292-ev-TXp"/>
-                                                    <constraint firstAttribute="width" constant="117" id="GZw-Ua-Mbi"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="15"/>
                                                 <state key="normal" title="Play video">
@@ -1105,6 +1104,7 @@
                                             <constraint firstItem="9oA-9C-6GB" firstAttribute="leading" secondItem="H7u-Ub-Hxg" secondAttribute="trailing" constant="18" id="dgX-w3-tgi"/>
                                             <constraint firstItem="koR-1I-BPC" firstAttribute="top" secondItem="rvz-2e-FlU" secondAttribute="bottom" constant="8" id="eRe-hr-6NP"/>
                                             <constraint firstItem="OzT-us-bPy" firstAttribute="leading" secondItem="H7u-Ub-Hxg" secondAttribute="trailing" constant="18" id="efS-EK-liT"/>
+                                            <constraint firstItem="8xb-w4-1Ve" firstAttribute="leading" secondItem="3Nc-Ar-U84" secondAttribute="leading" constant="8" id="fBu-d4-OF3"/>
                                             <constraint firstItem="htr-Aw-m6L" firstAttribute="top" secondItem="H7u-Ub-Hxg" secondAttribute="bottom" constant="24" id="ikd-Ac-7zj"/>
                                             <constraint firstItem="V5m-EF-zfq" firstAttribute="leading" secondItem="3Nc-Ar-U84" secondAttribute="leading" constant="8" id="jXG-HO-ko1"/>
                                             <constraint firstItem="H7u-Ub-Hxg" firstAttribute="top" secondItem="3Nc-Ar-U84" secondAttribute="top" id="lp5-Up-IGg"/>
@@ -1176,6 +1176,11 @@
                                     <action selector="handlePlusButtonTap:" destination="0Te-Bz-sJv" id="1ch-Gq-hxR"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem title="Calendar" image="calendar_icon" landscapeImage="calendar_icon" style="plain" id="qPJ-0X-uBx">
+                                <connections>
+                                    <action selector="handleCalendarButtonPressed:" destination="0Te-Bz-sJv" id="uF5-Jr-AQu"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                     <connections>
@@ -1208,7 +1213,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NqN-I4-zpC" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="5Ry-hP-Eu6" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3206" y="-1082"/>
+            <point key="canvasLocation" x="3205.5999999999999" y="-1082.608695652174"/>
         </scene>
         <!--Filmography Collection View Controller-->
         <scene sceneID="LGh-Bi-br1">
@@ -1419,13 +1424,14 @@
     </scenes>
     <resources>
         <image name="albums" width="30" height="30"/>
+        <image name="calendar_icon" width="512" height="512"/>
         <image name="placeholder_image" width="800" height="600"/>
         <image name="plus" width="30" height="30"/>
         <image name="settings" width="30" height="30"/>
         <image name="visible" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Sfb-mO-qwg"/>
+        <segue reference="vMr-6b-K8d"/>
         <segue reference="iDC-VI-RNN"/>
     </inferredMetricsTieBreakers>
 </document>

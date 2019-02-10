@@ -217,9 +217,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
             }
         }
     }
-    
-    // MARK: UICollectionViewDelegate
-
 
     // MARK: UICollectionViewDataSource
 
@@ -277,6 +274,12 @@ class FilmPosterCollectionViewController: UICollectionViewController {
             break
         }
         return UICollectionReusableView()
+    }
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if event?.subtype == UIEvent.EventSubtype.motionShake{
+            handleShakeGesture()
+        }
     }
 }
 
@@ -354,6 +357,20 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
             vc.film = film
             vc.preferredContentSize = CGSize(width: 0, height: 0)
             show(vc, sender: self)
+        }
+    }
+}
+
+// MARK: - Shakeable
+extension FilmPosterCollectionViewController: Shakeable {
+    func handleShakeGesture(){
+        // Show a random movie
+        guard let movie = filmCollection.randomFilm() else{
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: movie){
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
         }
     }
 }

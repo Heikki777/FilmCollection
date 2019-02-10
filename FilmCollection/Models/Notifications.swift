@@ -14,6 +14,7 @@ struct Notifications{
         case filmCollectionLayoutChanged = "filmCollectionLayoutChanged"
         case notificationsOnChanged = "notificationsOnChanged"
         case notificationStartDateChanged = "notificationStartDateChanged"
+        case notificationRepeatOptionChanged = "notificationRepeatOptionChanged"
         
         var notification: NSNotification{
             return NSNotification.init(name: self.name, object: nil)

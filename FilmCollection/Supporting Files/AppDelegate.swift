@@ -8,31 +8,53 @@
 
 import UIKit
 import PromiseKit
-import UserNotifications
 import CoreData
 import AFNetworking
+import EventKit
 
 let NetworkReachabilityChanged = NSNotification.Name("NetworkReachabilityChanged")
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    static let calendarIdentifier: String = "FilmCollectionCalendar"
+    static let calendarTitle: String = "FilmCollection"
+    
     var window: UIWindow?
     var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
     var filmIdWithinNotification: Int?
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {        
+    
+    let eventStore: EKEventStore = EKEventStore()
+    
+    lazy var appCalendar: EKCalendar = {
+        let calendars = eventStore.calendars(for: .event)
+        var filmCollectionCalendar = eventStore.calendar(withIdentifier: AppDelegate.calendarIdentifier)
+            ?? calendars.filter { $0.title == AppDelegate.calendarTitle }.first
+            ?? EKCalendar.init(for: .event, eventStore: eventStore)
         
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            }
+        filmCollectionCalendar.title = AppDelegate.calendarTitle
+        
+        let sourcesInEventStore = eventStore.sources
+        var source = sourcesInEventStore.filter { (source: EKSource) -> Bool in
+            source.sourceType == EKSourceType.local
+        }.first ?? sourcesInEventStore.filter { $0.sourceType == EKSourceType.calDAV }.first
+        
+        filmCollectionCalendar.source = source
+        
+        do {
+            try eventStore.saveCalendar(filmCollectionCalendar, commit: true)
+            UserDefaults.standard.set(filmCollectionCalendar.calendarIdentifier, forKey: AppDelegate.calendarIdentifier)
         }
-        configureUserNotificationsCenter()
+        catch let error {
+            print(error.localizedDescription)
+            print("Calendar could not be saved")
+        }
+        return filmCollectionCalendar
+    }()
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         setupNetworkReachabilityManager()
-        createObservers()
         
         return true
     }
@@ -92,129 +114,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.previousNetworkReachabilityStatus = status
         }
     }
-    
-    
-    func createObservers(){
-        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsOnChanged(notification:)), name: Notifications.SettingsNotification.notificationsOnChanged.name, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotificationsStartDateChanged(notification:)), name: Notifications.SettingsNotification.notificationStartDateChanged.name, object: nil)
-    }
-    
-    @objc func handleCollectionLoaded(notification: NSNotification){
-        registerForLocalNotifications()
-    }
-    
-    @objc func handleNotificationsOnChanged(notification: NSNotification){
-        print("AppDelegate: handleNotificationsOnChanged")
-        
-        if settings.notificationsOn {
-            registerForFilmRecommendationNotifications()
-        }
-        else{
-            unsubscribeNotifications()
-        }
-    }
-    
-    @objc func handleNotificationsStartDateChanged(notification: NSNotification){
-        print("AppDelegate: handleNotificationsStartDateChanged")
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
-        registerForFilmRecommendationNotifications()
-    }
-
-    // MARK: - Notifications
-    func registerForLocalNotifications() {
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
-        registerForFilmRecommendationNotifications()
-    }
-    
-    func unsubscribeNotifications(){
-        // Remove all pending notifications
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [FilmNotification.Category.randomRecommendation])
-        
-        // Turn of the notifications
-        settings.notificationsOn = false
-        saveContext()
-        
-        guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
-            return
-        }
-        
-        homeTabBarController.showBasicAlert(withTitle: "Unsubscribed", message: "You no longer receive notifications.")
-    }
-    
-    
-    private func configureUserNotificationsCenter() {
-        // Configure User Notification Center
-        UNUserNotificationCenter.current().delegate = self
-        
-        // Define Actions
-        let actionShowDetails = UNNotificationAction(identifier: FilmNotification.Action.showDetails, title: "Show Details", options: [.foreground])
-        let actionUnsubscribe = UNNotificationAction(identifier: FilmNotification.Action.unsubscribe, title: "Unsubscribe", options: [.destructive, .authenticationRequired])
-
-        // Define Category
-        let recommendationCategory = UNNotificationCategory(identifier: FilmNotification.Category.randomRecommendation, actions: [actionShowDetails, actionUnsubscribe], intentIdentifiers: [], options: [])
-        
-        // Register Category
-        UNUserNotificationCenter.current().setNotificationCategories([recommendationCategory])
-    }
-    
-    func registerForFilmRecommendationNotifications(){
-        let filmCollection = FilmCollection.shared
-        
-        guard let startDate = settings.notificationStartDate else {
-            return
-        }
-        
-        let repetitionOption = settings.notificationRepetitionOption
-        
-        if repetitionOption == .Never{
-            UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        }
-        
-        
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) {
-            (granted, error) in
-            print("Notifications permission granted: \(granted)")
-            
-            guard granted && filmCollection.size > 0 else{
-                return
-            }
-            
-            guard let randomFilm = filmCollection.randomFilm() else{
-                return
-            }
-                
-            let notificationContent = UNMutableNotificationContent()
-            notificationContent.title = "Film recommendation"
-            notificationContent.subtitle = "Watch today"
-            notificationContent.body = randomFilm.title
-            notificationContent.sound = UNNotificationSound.default
-            notificationContent.badge = 0
-            notificationContent.userInfo["filmID"] = randomFilm.id
-            notificationContent.categoryIdentifier = FilmNotification.Category.randomRecommendation
-            
-            let calendar = Locale.current.calendar
-            var dateComponents = DateComponents()
-            
-            switch repetitionOption{
-            case .Never:
-                dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
-            case .EveryDay:
-                dateComponents = calendar.dateComponents(Set([.hour, .minute]), from: startDate)
-            case .EveryWeek:
-                dateComponents = calendar.dateComponents(Set([.weekday, .hour, .minute]), from: startDate)
-            case .EveryMonth:
-                dateComponents = calendar.dateComponents(Set([.day, .hour, .minute]), from: startDate)
-            }
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-            let request = UNNotificationRequest(identifier: FilmNotification.Category.randomRecommendation, content: notificationContent, trigger: trigger)
-            UNUserNotificationCenter.current().add(request)
-
-        }
-    }
-    
     
     // MARK: - Core Data stack
     
@@ -318,81 +217,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return []
     }
 
-}
-
-enum NotificationRequest: String{
-    case randomFilmRecommendation
-}
-
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    
-    //for displaying notification when app is in foreground
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        //If you don't want to show notification when app is open, do something here else and make a return here.
-        //Even you don't implement this delegate method, you will not see the notification on the specified controller. So, you have to implement this delegate and make sure the below line execute. i.e. completionHandler.
-        
-        if notification.request.identifier == FilmNotification.Category.randomRecommendation{
-            if settings.notificationRepetitionOption != .Never{
-                registerForFilmRecommendationNotifications()
-            }
-        }
-    }
-    
-    // For handling tap and user actions
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        switch response.notification.request.identifier {
-        case FilmNotification.Category.randomRecommendation:
-            switch response.actionIdentifier{
-            case FilmNotification.Action.showDetails:
-                if let filmID = response.notification.request.content.userInfo["filmID"] as? Int{
-                    if let film = FilmCollection.shared.getMovie(withId: filmID){
-                        
-                        guard let homeTabBarController = window?.rootViewController as? HomeTabBarController else{
-                            return
-                        }
-                        
-                        guard let navigationController = homeTabBarController.children.filter({
-                            $0.title == "CollectionTabNavigationController" }).first as? UINavigationController else {
-                                return
-                        }
-                        
-                        guard let indexPath = FilmCollection.shared.getIndexPath(for: film) else{
-                            return
-                        }
-                        
-                        if let filmCollectionTableViewController = navigationController.children.first as? FilmCollectionTableViewController{
-                            filmCollectionTableViewController.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
-                            filmCollectionTableViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-                        }
-                        else if let filmPosterCollectionViewController = navigationController.children.first as? FilmPosterCollectionViewController{
-                            filmPosterCollectionViewController.collectionView?.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-                            filmPosterCollectionViewController.performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-                        }
-                        
-                        homeTabBarController.selectedIndex = 0
-                        
-                    }
-                }
-                
-            case FilmNotification.Action.unsubscribe:
-                unsubscribeNotifications()
-            
-            default:
-                // Show film details
-                guard let filmID = response.notification.request.content.userInfo["filmID"] as? Int else{
-                    return
-                }
-                
-                filmIdWithinNotification = filmID
-                NotificationCenter.default.post(name: NSNotification.Name.init("showDetailOfNotifiedFilm"), object: filmID)
-            }
-
-        default:
-            break
-        }
-        completionHandler()
-    }
-    
 }
 
