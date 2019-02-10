@@ -369,6 +369,90 @@
             </objects>
             <point key="canvasLocation" x="3993" y="-1868"/>
         </scene>
+        <!--Calendar Event Creation View Controller-->
+        <scene sceneID="8fs-q7-HIv">
+            <objects>
+                <viewController id="WTy-K9-nKr" customClass="CalendarEventCreationViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="xan-1b-TM5">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m8s-DN-Ymh">
+                                <rect key="frame" x="16" y="58" width="343" height="0.0"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Medium" family="Helvetica Neue" pointSize="18"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="DM2-LT-ciZ">
+                                <rect key="frame" x="0.0" y="66" width="375" height="216"/>
+                                <date key="date" timeIntervalSinceReferenceDate="571515558.71341598">
+                                    <!--2019-02-10 18:19:18 +0000-->
+                                </date>
+                            </datePicker>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B33-0w-Vxe">
+                                <rect key="frame" x="308" y="290" width="51" height="31"/>
+                            </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Alert" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mX2-e0-B04">
+                                <rect key="frame" x="16" y="290" width="284" height="31"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TfO-jC-5On">
+                                <rect key="frame" x="16" y="20" width="49" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="22" id="jpZ-ex-EIg"/>
+                                    <constraint firstAttribute="width" constant="49" id="v3h-h5-teu"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                <state key="normal" title="Save"/>
+                                <connections>
+                                    <action selector="save" destination="WTy-K9-nKr" eventType="touchUpInside" id="qcy-Ms-4l5"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7WT-iz-hbb">
+                                <rect key="frame" x="308" y="20" width="51" height="22"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="51" id="DlS-i4-0vF"/>
+                                    <constraint firstAttribute="height" constant="22" id="YbZ-yC-t2T"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                <state key="normal" title="Close"/>
+                                <connections>
+                                    <action selector="close" destination="WTy-K9-nKr" eventType="touchUpInside" id="lOF-bw-cWu"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="TfO-jC-5On" firstAttribute="width" secondItem="7WT-iz-hbb" secondAttribute="width" constant="-2" id="6sP-os-bpZ"/>
+                            <constraint firstItem="DM2-LT-ciZ" firstAttribute="leading" secondItem="qc4-4t-p5Y" secondAttribute="leading" id="76f-l3-Hqe"/>
+                            <constraint firstItem="mX2-e0-B04" firstAttribute="leading" secondItem="qc4-4t-p5Y" secondAttribute="leading" constant="16" id="HZM-UT-Uce"/>
+                            <constraint firstItem="TfO-jC-5On" firstAttribute="top" secondItem="qc4-4t-p5Y" secondAttribute="top" id="LbX-QX-HTa"/>
+                            <constraint firstItem="TfO-jC-5On" firstAttribute="leading" secondItem="qc4-4t-p5Y" secondAttribute="leading" constant="16" id="OAy-CR-5RP"/>
+                            <constraint firstItem="qc4-4t-p5Y" firstAttribute="trailing" secondItem="m8s-DN-Ymh" secondAttribute="trailing" constant="16" id="P0K-L6-f5e"/>
+                            <constraint firstItem="DM2-LT-ciZ" firstAttribute="top" secondItem="m8s-DN-Ymh" secondAttribute="bottom" constant="8" id="VJf-Vk-Z52"/>
+                            <constraint firstItem="7WT-iz-hbb" firstAttribute="top" secondItem="qc4-4t-p5Y" secondAttribute="top" id="b4z-ok-xIh"/>
+                            <constraint firstItem="mX2-e0-B04" firstAttribute="top" secondItem="DM2-LT-ciZ" secondAttribute="bottom" constant="8" id="bG8-C4-7dV"/>
+                            <constraint firstItem="m8s-DN-Ymh" firstAttribute="top" secondItem="TfO-jC-5On" secondAttribute="bottom" constant="16" id="dpp-nn-s81"/>
+                            <constraint firstItem="mX2-e0-B04" firstAttribute="centerY" secondItem="B33-0w-Vxe" secondAttribute="centerY" id="jCp-2K-3Ag"/>
+                            <constraint firstItem="m8s-DN-Ymh" firstAttribute="leading" secondItem="qc4-4t-p5Y" secondAttribute="leading" constant="16" id="mrv-e9-6vh"/>
+                            <constraint firstItem="qc4-4t-p5Y" firstAttribute="trailing" secondItem="7WT-iz-hbb" secondAttribute="trailing" constant="16" id="osk-BO-Pvc"/>
+                            <constraint firstItem="B33-0w-Vxe" firstAttribute="top" secondItem="DM2-LT-ciZ" secondAttribute="bottom" constant="8" id="qrm-oY-IhV"/>
+                            <constraint firstItem="qc4-4t-p5Y" firstAttribute="trailing" secondItem="B33-0w-Vxe" secondAttribute="trailing" constant="18" id="r1u-VD-yvI"/>
+                            <constraint firstItem="B33-0w-Vxe" firstAttribute="leading" secondItem="mX2-e0-B04" secondAttribute="trailing" constant="8" id="tyH-Ym-VXC"/>
+                            <constraint firstItem="DM2-LT-ciZ" firstAttribute="trailing" secondItem="qc4-4t-p5Y" secondAttribute="trailing" id="zmP-4A-I3V"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="qc4-4t-p5Y"/>
+                    </view>
+                    <connections>
+                        <outlet property="alertSwitch" destination="B33-0w-Vxe" id="r9V-ll-AfL"/>
+                        <outlet property="datePicker" destination="DM2-LT-ciZ" id="iS6-Ml-dvx"/>
+                        <outlet property="headerLabel" destination="m8s-DN-Ymh" id="caS-db-Fja"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="G6p-XW-2gc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3992.8000000000002" y="-312.59370314842579"/>
+        </scene>
         <!--Image Page View Controller-->
         <scene sceneID="WUs-KM-U6i">
             <objects>
@@ -1176,9 +1260,9 @@
                                     <action selector="handlePlusButtonTap:" destination="0Te-Bz-sJv" id="1ch-Gq-hxR"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Calendar" image="calendar_icon" landscapeImage="calendar_icon" style="plain" id="qPJ-0X-uBx">
+                            <barButtonItem title="Calendar" image="calendar_icon" landscapeImage="calendar_icon" style="done" id="qPJ-0X-uBx">
                                 <connections>
-                                    <action selector="handleCalendarButtonPressed:" destination="0Te-Bz-sJv" id="uF5-Jr-AQu"/>
+                                    <segue destination="WTy-K9-nKr" kind="presentation" identifier="calendarEventCreationSegue" id="0bs-f2-kZW"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
@@ -1424,7 +1508,7 @@
     </scenes>
     <resources>
         <image name="albums" width="30" height="30"/>
-        <image name="calendar_icon" width="512" height="512"/>
+        <image name="calendar_icon" width="24" height="24"/>
         <image name="placeholder_image" width="800" height="600"/>
         <image name="plus" width="30" height="30"/>
         <image name="settings" width="30" height="30"/>

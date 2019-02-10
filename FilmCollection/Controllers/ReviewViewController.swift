@@ -39,12 +39,6 @@ class ReviewViewController: UIViewController {
         }
     }
     
-    func showAlert(title: String, message: String){
-        let alert = UIAlertController.init(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         

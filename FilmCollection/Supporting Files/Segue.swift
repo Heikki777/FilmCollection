@@ -19,4 +19,5 @@ enum Segue: String{
     case showFilmographySegue
     case showBiographySegue
     case showNotificationRepetitionOptions
+    case calendarEventCreationSegue
 }

@@ -10,6 +10,9 @@
 		43F325D8DB89CF7AF6C0F986 /* Pods_FilmCollectionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C644CD3DC7871C8DF0D52FF /* Pods_FilmCollectionTests.framework */; };
 		730C54C8206AD17C00367B0A /* Retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730C54C7206AD17C00367B0A /* Retry.swift */; };
 		7314016C2209BB3E00908E03 /* FilmCollectionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7314016B2209BB3E00908E03 /* FilmCollectionUITests.swift */; };
+		73144A7F2210A91300D1419F /* CalendarEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */; };
+		73144A812210B48100D1419F /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A802210B48100D1419F /* CalendarManager.swift */; };
+		73144A832210BE2E00D1419F /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A822210BE2E00D1419F /* UIViewController+Extensions.swift */; };
 		7344E8EE20FCCB90004CB00A /* FilmNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8ED20FCCB90004CB00A /* FilmNotification.swift */; };
 		7344E8F021049C79004CB00A /* SettingsTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7344E8EF21049C79004CB00A /* SettingsTab.storyboard */; };
 		7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */; };
@@ -105,6 +108,9 @@
 		731401692209BB3D00908E03 /* FilmCollectionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FilmCollectionUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7314016B2209BB3E00908E03 /* FilmCollectionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmCollectionUITests.swift; sourceTree = "<group>"; };
 		7314016D2209BB3E00908E03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventCreationViewController.swift; sourceTree = "<group>"; };
+		73144A802210B48100D1419F /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
+		73144A822210BE2E00D1419F /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		7344E8ED20FCCB90004CB00A /* FilmNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmNotification.swift; sourceTree = "<group>"; };
 		7344E8EF21049C79004CB00A /* SettingsTab.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsTab.storyboard; sourceTree = "<group>"; };
 		7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRepetitionTableViewController.swift; sourceTree = "<group>"; };
@@ -230,6 +236,7 @@
 		73FB10E720224E6700B89532 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */,
 				737B7BA22030F30E00EEEEAC /* AddFilmTableViewController.swift */,
 				737219B12090EF62002A712D /* BiographyViewController.swift */,
 				C357438C2020743400DC5F7B /* FilmCollectionTableViewController.swift */,
@@ -257,6 +264,7 @@
 		73FB10E820224E7F00B89532 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				73144A802210B48100D1419F /* CalendarManager.swift */,
 				7368BD24220B63930090FCAA /* Shakeable.swift */,
 				C3B03635209C39BC0089D0AE /* CastMember.swift */,
 				7357F72320EE4B0900BCE9FD /* Collection.swift */,
@@ -309,6 +317,7 @@
 		73FB10EA20224EA800B89532 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				73144A822210BE2E00D1419F /* UIViewController+Extensions.swift */,
 				C335C17020D8EC9700F52856 /* UIImageViewExtensions.swift */,
 				C357438A2020743400DC5F7B /* AppDelegate.swift */,
 				73FB10EB202251DF00B89532 /* Helpers.swift */,
@@ -662,6 +671,7 @@
 				C366AB4F20E3543500BEC556 /* FilmTableViewCellSimple.swift in Sources */,
 				C3B03634209C397F0089D0AE /* CrewMember.swift in Sources */,
 				C3E4B8BD2064E3DA00F0BE90 /* ImageCollectionViewController.swift in Sources */,
+				73144A812210B48100D1419F /* CalendarManager.swift in Sources */,
 				C35CD3A220441BA200967E1F /* PopoverTableItemSelectionDelegate.swift in Sources */,
 				7350DF1A2131CB9F0040F720 /* Notifications.swift in Sources */,
 				73EEB09E207A8C2000726933 /* HomeTabBarController.swift in Sources */,
@@ -686,6 +696,7 @@
 				73C0203D20DFAD4500CE4281 /* SettingsTableViewController.swift in Sources */,
 				C34B3FDC2034437100503CB3 /* FilmSearchResultTableViewCell.swift in Sources */,
 				C3C7073120651A81008773F9 /* FilmImages.swift in Sources */,
+				73144A832210BE2E00D1419F /* UIViewController+Extensions.swift in Sources */,
 				73DADA78203E0EF1008E4D42 /* Youtube.swift in Sources */,
 				C3E2F86D2073A19B00F53F6C /* CrewCollectionViewCell.swift in Sources */,
 				73FB10EC202251DF00B89532 /* Helpers.swift in Sources */,
@@ -715,6 +726,7 @@
 				7344E8EE20FCCB90004CB00A /* FilmNotification.swift in Sources */,
 				C36CB4B72023079F00346E80 /* ImagePageViewController.swift in Sources */,
 				730C54C8206AD17C00367B0A /* Retry.swift in Sources */,
+				73144A7F2210A91300D1419F /* CalendarEventCreationViewController.swift in Sources */,
 				C31BC9D32040348000BC2FBD /* SortingRule.swift in Sources */,
 				7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */,
 				C31BC9D12040337100BC2FBD /* PopoverTableViewController.swift in Sources */,

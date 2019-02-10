@@ -19,27 +19,22 @@ class Settings: NSManagedObject {
     @NSManaged var notificationRepetitionOption: Notification.RepetitionOption
 
     var sections: [String] = [
-        SectionTitle.FilmCollectionLayout.rawValue,
-        SectionTitle.Notifications.rawValue
+        SectionTitle.FilmCollectionLayout.rawValue
     ]
     
     var dictionary: [String: [String]]{
         return [
-            SectionTitle.FilmCollectionLayout.rawValue: FilmCollectionLayoutOption.all.map{ $0.rawValue },
-            SectionTitle.Notifications.rawValue: Notification.all.map { $0.rawValue }
+            SectionTitle.FilmCollectionLayout.rawValue: FilmCollectionLayoutOption.all.map{ $0.rawValue }
         ]
     }
     
     enum SectionTitle: String {
         case FilmCollectionLayout = "Film collection layout"
-        case Notifications = "Notifications"
         
         var index: Int{
             switch self {
             case .FilmCollectionLayout:
                 return 0
-            case .Notifications:
-                return 1
             }
         }
     }

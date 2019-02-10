@@ -16,41 +16,10 @@ let NetworkReachabilityChanged = NSNotification.Name("NetworkReachabilityChanged
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    static let calendarIdentifier: String = "FilmCollectionCalendar"
-    static let calendarTitle: String = "FilmCollection"
     
     var window: UIWindow?
     var previousNetworkReachabilityStatus: AFNetworkReachabilityStatus = .unknown
     var filmIdWithinNotification: Int?
-    
-    let eventStore: EKEventStore = EKEventStore()
-    
-    lazy var appCalendar: EKCalendar = {
-        let calendars = eventStore.calendars(for: .event)
-        var filmCollectionCalendar = eventStore.calendar(withIdentifier: AppDelegate.calendarIdentifier)
-            ?? calendars.filter { $0.title == AppDelegate.calendarTitle }.first
-            ?? EKCalendar.init(for: .event, eventStore: eventStore)
-        
-        filmCollectionCalendar.title = AppDelegate.calendarTitle
-        
-        let sourcesInEventStore = eventStore.sources
-        var source = sourcesInEventStore.filter { (source: EKSource) -> Bool in
-            source.sourceType == EKSourceType.local
-        }.first ?? sourcesInEventStore.filter { $0.sourceType == EKSourceType.calDAV }.first
-        
-        filmCollectionCalendar.source = source
-        
-        do {
-            try eventStore.saveCalendar(filmCollectionCalendar, commit: true)
-            UserDefaults.standard.set(filmCollectionCalendar.calendarIdentifier, forKey: AppDelegate.calendarIdentifier)
-        }
-        catch let error {
-            print(error.localizedDescription)
-            print("Calendar could not be saved")
-        }
-        return filmCollectionCalendar
-    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         

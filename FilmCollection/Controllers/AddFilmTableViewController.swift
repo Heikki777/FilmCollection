@@ -193,7 +193,7 @@ class AddFilmTableViewController: UITableViewController {
         }
         
         let searchResult = searchResults[indexPath.row]
-        guard let id = searchResult.id else{
+        guard let _ = searchResult.id else{
             print("Error! The movie does not have an ID")
             return
         }

@@ -308,7 +308,6 @@ extension FilmPosterCollectionViewController: UISearchBarDelegate{
     }
     
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
-        let scope = scopeButtonTitles[selectedScope]
         filmCollection.filterCollection(scope: selectedFilteringScope, searchText: searchBar.text ?? "")
     }
 }

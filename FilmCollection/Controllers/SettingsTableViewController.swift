@@ -111,8 +111,6 @@ class SettingsTableViewController: UITableViewController {
         switch sectionTitle{
         case Settings.SectionTitle.FilmCollectionLayout:
             return FilmCollectionLayoutOption.all.count
-        case Settings.SectionTitle.Notifications:
-            return NotificationSettings.all.count
         }
     }
     
@@ -132,22 +130,6 @@ class SettingsTableViewController: UITableViewController {
             // Notify observers about the layout change
             NotificationCenter.default.post(name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: selectedLayoutOption)
         
-        case Settings.SectionTitle.Notifications.index:
-            switch indexPath.row{
-            case 0:
-                // Notifications on/off
-                break
-            case 1:
-                // Start
-                pickNotificationStartTime()
-            case 2:
-                break
-            default:
-                print("case \(indexPath.row) not handled")
-                break
-            }
-            
-            
         default:
             break
         }
