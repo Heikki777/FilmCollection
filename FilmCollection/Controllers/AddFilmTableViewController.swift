@@ -57,7 +57,7 @@ class AddFilmTableViewController: UITableViewController {
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
         searchController.searchBar.frame = CGRect(x: 0, y: 0, width: 320, height: 44)
-        searchController.searchBar.placeholder = "Search movies"
+        searchController.searchBar.placeholder = "Search films"
         searchController.searchBar.delegate = self
         definesPresentationContext = true
         
@@ -141,10 +141,10 @@ class AddFilmTableViewController: UITableViewController {
         let searchResult = searchResults[indexPath.row]
         if let id = searchResult.id{
             attempt{
-                self.api.loadMovie(id, append: ["credits"])
+                self.api.loadFilm(id, append: ["credits"])
             }
-            .done { movie in
-                self.addMovie(movie: movie)
+            .done { film in
+                self.addFilm(film: film)
             }
             .catch { error in
                 print(error.localizedDescription)
@@ -157,19 +157,19 @@ class AddFilmTableViewController: UITableViewController {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     
-    func addMovie(movie: Film){
+    func addFilm(film: Film){
         let context = appDelegate.persistentContainer.viewContext
         let newFilm = FilmEntity(context: context)
-        newFilm.id = Int32(movie.id)
+        newFilm.id = Int32(film.id)
         
-        if appDelegate.filmEntities.filter({ $0.id == movie.id }).isEmpty {
+        if appDelegate.filmEntities.filter({ $0.id == film.id }).isEmpty {
             let title = "Add a new film"
-            let message = "Are you sure that you want to add the film: \"\(movie.title)\" to your collection?"
+            let message = "Are you sure that you want to add the film: \"\(film.title)\" to your collection?"
             let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                 self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                 self.appDelegate.saveContext()
-                FilmCollection.shared.addFilm(movie)
+                FilmCollection.shared.addFilm(film)
             })
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alert.addAction(cancelAction)
@@ -178,7 +178,7 @@ class AddFilmTableViewController: UITableViewController {
         }
         else {
             let title = "The film was not added"
-            let message = "The film: \"\(movie.title)\" is already in the collection"
+            let message = "The film: \"\(film.title)\" is already in the collection"
             let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
             alert.addAction(okAction)
@@ -194,7 +194,7 @@ class AddFilmTableViewController: UITableViewController {
         
         let searchResult = searchResults[indexPath.row]
         guard let _ = searchResult.id else{
-            print("Error! The movie does not have an ID")
+            print("Error! The film does not have an ID")
             return
         }
         

@@ -55,7 +55,7 @@ class FilmographyCollectionViewController: UIViewController {
     }
     
     func setup(){
-        let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(personCredits.name) movies", message: "", complete: {
+        let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(personCredits.name) films", message: "", complete: {
             self.collectionView.reloadData()
         })
         
@@ -267,7 +267,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
                     loadingIndicator.setProgress(progress)
                     
                     attempt{
-                        self.api.loadMovie(filmID, append: ["credits"]).ensure { progressChanged("Film loaded") }
+                        self.api.loadFilm(filmID, append: ["credits"]).ensure { progressChanged("Film loaded") }
                     }
                     .done{ (film) in
                         if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
@@ -292,7 +292,7 @@ extension FilmographyCollectionViewController: UICollectionViewDelegate{
             // The movie is in the collection
             
             // Show movie detail action
-            let showMovieDetailAction = UIAlertAction(title: "Show movie detail", style: .default, handler: { (action) in
+            let showMovieDetailAction = UIAlertAction(title: "Show film detail", style: .default, handler: { (action) in
                 if let filmDetailVC = (self.navigationController?.viewControllers.filter({ (vc) -> Bool in
                     return vc is FilmDetailViewController
                 }).first as? FilmDetailViewController){

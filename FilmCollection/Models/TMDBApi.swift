@@ -45,9 +45,6 @@ class TMDBApi{
     lazy var jsonDecoder: JSONDecoder = {
         return JSONDecoder()
     }()
-
-    var searchDataTask: URLSessionDataTask?
-    var movieImagesDataTask: URLSessionDataTask?
     
     func search(query: String, page: Int = 1) -> Promise<[FilmSearchResult]> {
         
@@ -87,7 +84,7 @@ class TMDBApi{
         }
     }
     
-    func loadMovie(_ movieId: Int, append: [String] = []) -> Promise<Film> {
+    func loadFilm(_ movieId: Int, append: [String] = []) -> Promise<Film> {
         return Promise { result in
             let appendToResponse = (append.isEmpty) ? "" : "&append_to_response=" + append.joined(separator: ",")
             let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)?api_key=\(self.apiKey)&language=en-US\(appendToResponse)")!

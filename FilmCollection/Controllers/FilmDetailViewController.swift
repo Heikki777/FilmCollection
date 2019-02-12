@@ -43,14 +43,14 @@ class FilmDetailViewController: UIViewController {
        return CalendarManager(userViewController: self)
     }()
     
-    @IBAction func removeMovie(_ sender: Any) {
+    @IBAction func removeFilm(_ sender: Any) {
         guard let film = film else{
             return
         }
         
         guard let filmEntities: Set<FilmEntity> = appDelegate.filmCollectionEntity.films as? Set<FilmEntity> else { return }
         if let filmEntity = filmEntities.filter({ Int($0.id) == film.id }).first {
-            let alert = UIAlertController.init(title: "Remove film", message: "Are you sure that you want to remove the movie \"\(film.title)\" from the collection?", preferredStyle: .alert)
+            let alert = UIAlertController.init(title: "Remove film", message: "Are you sure that you want to remove the film \"\(film.title)\" from the collection?", preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "Remove", style: .destructive, handler: { (action) in
                 // Remove
                 self.appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
@@ -145,7 +145,7 @@ class FilmDetailViewController: UIViewController {
         }
     }
     
-    var movieImages: FilmImages?
+    var filmImages: FilmImages?
     var videos: [Video] = []{
         didSet{
             setFeaturedVideo()
@@ -512,11 +512,11 @@ class FilmDetailViewController: UIViewController {
     
     @objc func imageTapped(_ sender: UITapGestureRecognizer){
 
-        guard let movieImages = movieImages, !movieImages.isEmpty else{
-            loadMovieImages()
-            .done { (movieImages) in
-                self.movieImages = movieImages
-                self.showMovieImages()
+        guard let filmImages = filmImages, !filmImages.isEmpty else{
+            loadFilmImages()
+            .done { (filmImages) in
+                self.filmImages = filmImages
+                self.showFilmImages()
             }
             .catch { (error) in
                 print(error.localizedDescription)
@@ -525,10 +525,10 @@ class FilmDetailViewController: UIViewController {
         }
         
         // Images have already been loaded
-        self.showMovieImages()
+        self.showFilmImages()
     }
     
-    func loadMovieImages() -> Promise<FilmImages>{
+    func loadFilmImages() -> Promise<FilmImages>{
         return Promise { result in
             guard let movieId = self.film?.id else{
                 result.reject(FilmDetailViewControllerError.movieIsNil)
@@ -546,7 +546,7 @@ class FilmDetailViewController: UIViewController {
                 }
             }
             .done { images in
-                self.movieImages = images
+                self.filmImages = images
                 result.fulfill(images)
             }
             .catch { error in
@@ -634,16 +634,16 @@ class FilmDetailViewController: UIViewController {
         }
     }
     
-    func showMovieImages(){
-        guard let movieImages = self.movieImages else{
+    func showFilmImages(){
+        guard let filmImages = self.filmImages else{
             return
         }
         
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
-            guard movieImages.count > 0 else{
+            guard filmImages.count > 0 else{
                 return
             }
-            vc.images = movieImages.toDictionary
+            vc.images = filmImages.toDictionary
             vc.movieId = film?.id
             vc.navigationItem.title = film?.title
         
@@ -741,15 +741,15 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             
             guard film != nil else { return }
             
-            if let movieImages = self.movieImages{
-                showImageCollectionVC(movieImages.toDictionary)
+            if let filmImages = self.filmImages {
+                showImageCollectionVC(filmImages.toDictionary)
             }
             else{
                 attempt{
-                    self.loadMovieImages()
+                    self.loadFilmImages()
                 }
                 .done { (images) in
-                    self.movieImages = images
+                    self.filmImages = images
                     if images.isEmpty{
                         return
                     }

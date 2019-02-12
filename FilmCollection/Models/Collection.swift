@@ -184,7 +184,7 @@ class FilmCollection: NSObject {
     
     private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Film) -> Void, failure: @escaping (_ error: Error) -> Void) {
         attempt {
-            self.api.loadMovie(Int(filmEntity.id), append: ["credits"])
+            self.api.loadFilm(Int(filmEntity.id), append: ["credits"])
         }
         .done { film in
             film.review = filmEntity.review
@@ -231,7 +231,7 @@ class FilmCollection: NSObject {
         filmEntity.id = Int32(id)
         appDelegate.filmCollectionEntity.addToFilms(filmEntity)
         appDelegate.saveContext()
-        TMDBApi.shared.loadMovie(id, append: ["credits"])
+        TMDBApi.shared.loadFilm(id, append: ["credits"])
         .done { [weak self] (film) in
             self?.addFilm(film)
         }

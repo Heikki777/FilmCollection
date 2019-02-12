@@ -1168,7 +1168,7 @@
                             </barButtonItem>
                             <barButtonItem systemItem="trash" id="oIv-Ms-iqx">
                                 <connections>
-                                    <action selector="removeMovie:" destination="0Te-Bz-sJv" id="joz-uW-LOJ"/>
+                                    <action selector="removeFilm:" destination="0Te-Bz-sJv" id="joz-uW-LOJ"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="add" id="Dmm-h8-J8h">
@@ -1690,14 +1690,14 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="New calendar event" id="zC2-Db-VWY">
-                        <barButtonItem key="leftBarButtonItem" systemItem="save" id="ZHx-bd-H81">
-                            <connections>
-                                <action selector="save" destination="qgB-rz-Ola" id="mwo-ZL-FE6"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="cancel" id="wwk-cR-6Ot">
+                        <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="wwk-cR-6Ot">
                             <connections>
                                 <action selector="close" destination="qgB-rz-Ola" id="wgA-6f-437"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="save" id="ZHx-bd-H81">
+                            <connections>
+                                <action selector="save" destination="qgB-rz-Ola" id="mwo-ZL-FE6"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

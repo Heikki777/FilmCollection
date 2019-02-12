@@ -78,10 +78,9 @@ class FilmCollectionTableViewController: UIViewController {
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.dimsBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Filter movie collection"
+        searchController.searchBar.placeholder = "Filter the film collection"
         searchController.searchBar.delegate = self
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
-        searchController.searchBar.showsScopeBar = true
 
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
@@ -375,10 +374,10 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
 extension FilmCollectionTableViewController: Shakeable {
     func handleShakeGesture(){
         // Show a random movie
-        guard let movie = filmCollection.randomFilm() else{
+        guard let film = filmCollection.randomFilm() else{
             return
         }
-        if let indexPath = filmCollection.getIndexPath(for: movie){
+        if let indexPath = filmCollection.getIndexPath(for: film){
             tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
             performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
         }

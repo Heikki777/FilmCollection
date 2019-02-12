@@ -56,7 +56,7 @@ class FilmCollectionTests: XCTestCase {
     func testLoadingFilm(){
         let exp = self.expectation(description: "Load a film with id 426")
         
-        TMDBApi.shared.loadMovie(426, append: ["credits"])
+        TMDBApi.shared.loadFilm(426, append: ["credits"])
         .done { (results) in
             exp.fulfill()
         }
@@ -74,7 +74,7 @@ class FilmCollectionTests: XCTestCase {
     func testLoadingNonExistingFilm(){
         let exp = self.expectation(description: "Load a film with id 0")
         
-        TMDBApi.shared.loadMovie(0)
+        TMDBApi.shared.loadFilm(0)
         .done { (results) in
             XCTAssertFalse(false)
         }
