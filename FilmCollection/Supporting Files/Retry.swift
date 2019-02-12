@@ -13,7 +13,6 @@ func attempt<T>(_ body: @escaping () -> Promise<T>) -> Promise<T>{
     var attempts = 0
     func attempt() -> Promise<T> {
         attempts += 1
-        //print("Attempt: \(attempts)")
         return body().recover { error -> Promise<T> in
             // Attempt 20 times
             guard attempts < 20 else {

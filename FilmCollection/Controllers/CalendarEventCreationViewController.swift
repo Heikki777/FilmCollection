@@ -75,7 +75,6 @@ extension CalendarEventCreationViewController: AlertTimingSelectionDelegate {
 extension CalendarEventCreationViewController: CalendarManagerDelegate {
     func calendarEventAdded() {
         DispatchQueue.main.async {
-            print("calendarEventAdded")
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "dd.MM.yyyy"
             let timeFormatter = DateFormatter()
@@ -87,7 +86,6 @@ extension CalendarEventCreationViewController: CalendarManagerDelegate {
             
             let alert = UIAlertController.init(title: "Calendar event added", message: "\"\(film.titleYear)\" is scheduled to be watched on \(startDateString) at \(startTimeString)", preferredStyle: .alert)
             alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (action) in
-                print("OK Pressed")
                 self.close()
             }))
             
