@@ -25,7 +25,6 @@ class ViewingHistoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         tableView.delegate = self
         tableView.dataSource = self
     }
@@ -55,6 +54,7 @@ class ViewingHistoryTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
+        cell.isUserInteractionEnabled = false
         if let title = viewings[indexPath.row].title {
             cell.textLabel?.text = title
             cell.detailTextLabel?.text = dateFormatter.string(from: viewings[indexPath.row].date!)

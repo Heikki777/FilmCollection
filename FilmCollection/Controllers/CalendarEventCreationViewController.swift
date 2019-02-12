@@ -14,6 +14,7 @@ class CalendarEventCreationViewController: UITableViewController {
     @IBOutlet weak var selectedDateCell: UITableViewCell!
     @IBOutlet weak var alertCell: UITableViewCell!
     @IBOutlet weak var datePicker: UIDatePicker!
+    @IBOutlet weak var titleLabel: UILabel!
     
     var selectedAlertTimingOption: CalendarEventAlertOption = .none
     
@@ -48,6 +49,7 @@ class CalendarEventCreationViewController: UITableViewController {
         alertCell.detailTextLabel?.text = CalendarEventAlertOption.none.rawValue
         datePicker.addTarget(self, action: #selector(datePickerValueChanged(picker:)), for: .valueChanged)
         datePickerValueChanged(picker: datePicker)
+        titleLabel.text = film?.titleYear ?? ""
     }
     
     @objc func datePickerValueChanged(picker: UIDatePicker){

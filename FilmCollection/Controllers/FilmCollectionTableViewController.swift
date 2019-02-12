@@ -77,9 +77,11 @@ class FilmCollectionTableViewController: UIViewController {
         // Setup the search controller
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Filter movie collection"
         searchController.searchBar.delegate = self
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
+        searchController.searchBar.showsScopeBar = true
 
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true

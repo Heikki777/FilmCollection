@@ -1586,7 +1586,7 @@
             </objects>
             <point key="canvasLocation" x="1348" y="-1126.6866566716642"/>
         </scene>
-        <!--New Event-->
+        <!--New calendar event-->
         <scene sceneID="lqK-8p-8nq">
             <objects>
                 <tableViewController id="qgB-rz-Ola" customClass="CalendarEventCreationViewController" customModule="FilmCollection" customModuleProvider="target" sceneMemberID="viewController">
@@ -1594,11 +1594,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <label key="tableHeaderView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hateful Eight" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Cq1-43-gpf">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <sections>
-                            <tableViewSection id="9nv-xP-Wlw">
+                            <tableViewSection headerTitle="Schedule viewing" id="9nv-xP-Wlw">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" textLabel="1QV-Fh-Z2U" detailTextLabel="96X-iD-P98" rowHeight="44" style="IBUITableViewCellStyleValue1" id="v6T-6D-PRs">
-                                        <rect key="frame" x="0.0" y="35" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="99.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="v6T-6D-PRs" id="NQn-wX-mCB">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1622,7 +1629,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="163" id="sYe-bP-Smj">
-                                        <rect key="frame" x="0.0" y="79" width="375" height="163"/>
+                                        <rect key="frame" x="0.0" y="143.5" width="375" height="163"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="sYe-bP-Smj" id="iMb-MJ-JhD">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="162.5"/>
@@ -1645,10 +1652,10 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection id="jrW-fT-v0X">
+                            <tableViewSection headerTitle="Alert" id="jrW-fT-v0X">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="7du-Kt-Lo8" detailTextLabel="adF-An-f5J" style="IBUITableViewCellStyleValue1" id="AQh-Gc-uFF">
-                                        <rect key="frame" x="0.0" y="278" width="375" height="44"/>
+                                        <rect key="frame" x="0.0" y="362.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="AQh-Gc-uFF" id="HNi-Kj-eHB">
                                             <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
@@ -1682,7 +1689,7 @@
                             <outlet property="delegate" destination="qgB-rz-Ola" id="0ew-y7-vGd"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="New Event" id="zC2-Db-VWY">
+                    <navigationItem key="navigationItem" title="New calendar event" id="zC2-Db-VWY">
                         <barButtonItem key="leftBarButtonItem" systemItem="save" id="ZHx-bd-H81">
                             <connections>
                                 <action selector="save" destination="qgB-rz-Ola" id="mwo-ZL-FE6"/>
@@ -1698,6 +1705,7 @@
                         <outlet property="alertCell" destination="AQh-Gc-uFF" id="QPz-qw-oXO"/>
                         <outlet property="datePicker" destination="9Qe-ed-ewc" id="MfI-S7-urP"/>
                         <outlet property="selectedDateCell" destination="v6T-6D-PRs" id="Hkm-Mg-drx"/>
+                        <outlet property="titleLabel" destination="Cq1-43-gpf" id="zG4-uh-Wzs"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G6g-Ml-P6L" userLabel="First Responder" sceneMemberID="firstResponder"/>
