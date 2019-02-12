@@ -13,33 +13,6 @@ class SettingsTableViewController: UITableViewController {
     
     private let reuseIdentifier = "settingsTableViewCell"
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    var startDateCellExpanded: Bool = false
-
-    @IBOutlet weak var startDetailLabel: UILabel!
-    @IBOutlet weak var repeatDetailLabel: UILabel!
-    @IBOutlet weak var notificationsSwitch: UISwitch!
-    @IBOutlet weak var notificationStartDatePicker: UIDatePicker!
-    
-    @IBAction func datePickerValueChanged(_ sender: UIDatePicker) {
-        switch sender {
-        case notificationStartDatePicker:
-            notificationStartDate = sender.date
-        default:
-            break
-        }
-    }
-    
-    @IBAction func switchNotificationsOnOff(_ sender: UISwitch) {
-        tableView.beginUpdates()
-        tableView.endUpdates()
-        settings.notificationsOn = sender.isOn
-        if !sender.isOn{
-            startDateCellExpanded = false
-        }
-        appDelegate.saveContext()
-    
-        NotificationCenter.default.post(name: Notifications.SettingsNotification.notificationsOnChanged.name, object: nil)
-    }
     
     lazy var settings = {
         return appDelegate.settings
@@ -51,23 +24,8 @@ class SettingsTableViewController: UITableViewController {
         return formatter
     }()
     
-    var notificationStartDate: Date?{
-        didSet{
-            settings.notificationStartDate = notificationStartDate
-            startDetailLabel.text = ""
-            if let notificationStartDate = notificationStartDate {
-                startDetailLabel.text = dateFormatter.string(from: notificationStartDate)
-            }
-            appDelegate.saveContext()
-            
-            NotificationCenter.default.post(name: Notifications.SettingsNotification.notificationStartDateChanged.name, object: nil)
-        }
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.notificationStartDate = settings.notificationStartDate
-        notificationsSwitch.isOn = settings.notificationsOn
         
         let filmCollectionLayout = Settings.FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout) ?? .title
         let filmCollectionLayoutIndex = Settings.FilmCollectionLayoutOption.all.index(of: filmCollectionLayout) ?? 0
@@ -76,8 +34,6 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        repeatDetailLabel.text = settings.notificationRepetitionOption.description
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -135,22 +91,7 @@ class SettingsTableViewController: UITableViewController {
         }
     }
     
-    func pickNotificationStartTime(){
-        print("pickNotificationStartTime")
-        startDateCellExpanded = !startDateCellExpanded
-        tableView.beginUpdates()
-        tableView.endUpdates()
-    }
-    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 1{
-            if !notificationsSwitch.isOn && indexPath.row > 0{
-                return 0
-            }
-            if indexPath.row == 1{
-                return startDateCellExpanded ? 250 : 50
-            }
-        }
         return 50
     }
 

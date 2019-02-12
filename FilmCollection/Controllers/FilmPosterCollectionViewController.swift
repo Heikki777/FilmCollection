@@ -48,6 +48,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         searchController.searchBar.placeholder = "Filter movie collection"
         searchController.searchBar.delegate = self
         searchController.searchBar.scopeButtonTitles = scopeButtonTitles
+        searchController.searchBar.showsScopeBar = true
         
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
