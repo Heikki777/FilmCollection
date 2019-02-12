@@ -10,19 +10,21 @@ import Foundation
 import EventKit
 import UIKit
 
+protocol CalendarManagerDelegate: class {
+    func calendarEventAdded()
+}
+
 class CalendarManager {
     
     let calendarIdentifier: String = "FilmCollectionCalendar"
     let calendarTitle: String = "FilmCollection"
     let eventStore: EKEventStore = EKEventStore()
-    
     let userViewController: UIViewController
+    weak var delegate: CalendarManagerDelegate?
 
-    lazy var calendar: EKCalendar = {
+    lazy var calendar: EKCalendar? = {
         let calendars = eventStore.calendars(for: .event)
-        var filmCollectionCalendar = eventStore.calendar(withIdentifier: calendarIdentifier)
-            ?? calendars.filter { $0.title == calendarTitle }.first
-            ?? EKCalendar.init(for: .event, eventStore: eventStore)
+        var filmCollectionCalendar = calendars.filter { $0.title == calendarTitle }.first ?? EKCalendar.init(for: .event, eventStore: eventStore)
         
         filmCollectionCalendar.title = calendarTitle
         
@@ -48,7 +50,7 @@ class CalendarManager {
         self.userViewController = userViewController
     }
     
-    func insertCalendarEvent(forFilm film: Film, start: Date, setAlert: Bool = false){
+    func insertCalendarEvent(forFilm film: Film, start: Date, alertOption: CalendarEventAlertOption = .none){
         guard let runtime = film.runtime else { return }
         
         eventStore.requestAccess(to: .event) { [weak self] (granted, error) in
@@ -62,14 +64,14 @@ class CalendarManager {
             if granted {
                 let end = start.addingTimeInterval(TimeInterval(runtime * 60))
                 let newEvent = EKEvent(eventStore: strongSelf.eventStore)
-                newEvent.calendar = self?.calendar
+                newEvent.calendar = strongSelf.calendar
                 newEvent.title = "Watch film: \(film.titleYear)"
                 newEvent.notes = film.overview ?? ""
                 newEvent.startDate = start
                 newEvent.endDate = end
                 
-                if setAlert {
-                    let alarm = EKAlarm(absoluteDate: start)
+                if alertOption != .none {
+                    let alarm = EKAlarm(absoluteDate: start.addingTimeInterval(-alertOption.interval))
                     newEvent.addAlarm(alarm)
                 }
                 
@@ -83,23 +85,11 @@ class CalendarManager {
                     return dateFormatter
                 }()
                 
-                let showSuccessAlert = {
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "dd.MM.yyyy"
-                    let timeFormatter = DateFormatter()
-                    timeFormatter.dateFormat = "HH:mm"
-                    let startDateString = dateFormatter.string(from: start)
-                    let startTimeString = timeFormatter.string(from: start)
-                    DispatchQueue.main.async {
-                        strongSelf.userViewController.showAlert(title: "Calendar event added", message: "\"\(film.titleYear)\" is scheduled to be watched on \(startDateString) at \(startTimeString)")
-                    }
-                }
-                
                 guard let overlappingEvents = filmEvents, !overlappingEvents.isEmpty else {
                     // No overlapping events. Just add the new event
                     do {
                         try strongSelf.eventStore.save(newEvent, span: .thisEvent)
-                        showSuccessAlert()
+                        strongSelf.delegate?.calendarEventAdded()
                     }
                     catch let error {
                         print("Saving the calendar event failed")
@@ -119,7 +109,7 @@ class CalendarManager {
                         do {
                             try strongSelf.eventStore.remove(overlappingFilmEvent, span: .thisEvent)
                             try strongSelf.eventStore.save(newEvent, span: .thisEvent)
-                            showSuccessAlert()
+                            strongSelf.delegate?.calendarEventAdded()
                         }
                         catch let error {
                             print(error.localizedDescription)

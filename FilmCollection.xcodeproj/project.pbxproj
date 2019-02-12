@@ -13,6 +13,7 @@
 		73144A7F2210A91300D1419F /* CalendarEventCreationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */; };
 		73144A812210B48100D1419F /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A802210B48100D1419F /* CalendarManager.swift */; };
 		73144A832210BE2E00D1419F /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A822210BE2E00D1419F /* UIViewController+Extensions.swift */; };
+		73144A852211B21D00D1419F /* AlertTimingSelectionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73144A842211B21D00D1419F /* AlertTimingSelectionTableViewController.swift */; };
 		7344E8EE20FCCB90004CB00A /* FilmNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8ED20FCCB90004CB00A /* FilmNotification.swift */; };
 		7344E8F021049C79004CB00A /* SettingsTab.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7344E8EF21049C79004CB00A /* SettingsTab.storyboard */; };
 		7344E8F22104A48B004CB00A /* NotificationRepetitionTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */; };
@@ -111,6 +112,7 @@
 		73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventCreationViewController.swift; sourceTree = "<group>"; };
 		73144A802210B48100D1419F /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		73144A822210BE2E00D1419F /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
+		73144A842211B21D00D1419F /* AlertTimingSelectionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertTimingSelectionTableViewController.swift; sourceTree = "<group>"; };
 		7344E8ED20FCCB90004CB00A /* FilmNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilmNotification.swift; sourceTree = "<group>"; };
 		7344E8EF21049C79004CB00A /* SettingsTab.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = SettingsTab.storyboard; sourceTree = "<group>"; };
 		7344E8F12104A48B004CB00A /* NotificationRepetitionTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRepetitionTableViewController.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 		73FB10E720224E6700B89532 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				73144A842211B21D00D1419F /* AlertTimingSelectionTableViewController.swift */,
 				73144A7E2210A91300D1419F /* CalendarEventCreationViewController.swift */,
 				737B7BA22030F30E00EEEEAC /* AddFilmTableViewController.swift */,
 				737219B12090EF62002A712D /* BiographyViewController.swift */,
@@ -684,6 +687,7 @@
 				C313D02620221BD600BB658C /* Segue.swift in Sources */,
 				C3E4B8C52064E61300F0BE90 /* ImageCollectionViewCell.swift in Sources */,
 				C35743AD2020798900DC5F7B /* FilmTableViewCellExpanded.swift in Sources */,
+				73144A852211B21D00D1419F /* AlertTimingSelectionTableViewController.swift in Sources */,
 				C39C635A2032DF9E0028B7CB /* Downloader.swift in Sources */,
 				737219AE208B206A002A712D /* PersonCredits.swift in Sources */,
 				7357F72620F103A300BCE9FD /* FilmPosterCollectionViewController.swift in Sources */,
