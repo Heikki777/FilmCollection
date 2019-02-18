@@ -27,8 +27,8 @@ class SettingsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let filmCollectionLayout = Settings.FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout) ?? .title
-        let filmCollectionLayoutIndex = Settings.FilmCollectionLayoutOption.all.index(of: filmCollectionLayout) ?? 0
+        let filmCollectionLayout = FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout) ?? .title
+        let filmCollectionLayoutIndex = FilmCollectionLayoutOption.all.index(of: filmCollectionLayout) ?? 0
         checkCell(inRow: filmCollectionLayoutIndex, section: 0)
     }
     
@@ -39,17 +39,6 @@ class SettingsTableViewController: UITableViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         appDelegate.saveContext()
-    }
-    
-    // MARK: - Navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segue.showNotificationRepetitionOptions.rawValue{
-            if let vc = segue.destination as? NotificationRepetitionTableViewController{
-                if let repetitionOption = Settings.RepetitionOption(rawValue: settings.notificationRepetitionOption.rawValue){
-                    vc.selectedRepetitionOption = repetitionOption
-                }
-            }
-        }
     }
 
     // MARK: - Table view data source
@@ -79,7 +68,7 @@ class SettingsTableViewController: UITableViewController {
             
         case Settings.SectionTitle.FilmCollectionLayout.index:
             checkCell(inRow: indexPath.row, section: indexPath.section)
-            let selectedLayoutOption = Settings.FilmCollectionLayoutOption.all[indexPath.row]
+            let selectedLayoutOption = FilmCollectionLayoutOption.all[indexPath.row]
             settings.filmCollectionLayout = selectedLayoutOption.rawValue
             appDelegate.saveContext()
             

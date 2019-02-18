@@ -75,8 +75,8 @@ class FilmCollectionTests: XCTestCase {
         let exp = self.expectation(description: "Load a film with id 0")
         
         TMDBApi.shared.loadFilm(0)
-        .done { (results) in
-            XCTAssertFalse(false)
+        .done { (film) in
+            XCTAssertNil(film)
         }
         .catch { (_) in
             // Loading the film with an ID "0" should fail

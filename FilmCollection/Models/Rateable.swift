@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol Rateable{
+protocol Rateable {
     var rating: Rating { get set }
 }

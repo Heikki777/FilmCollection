@@ -18,7 +18,6 @@ enum Segue: String{
     case postSignInSegue
     case showFilmographySegue
     case showBiographySegue
-    case showNotificationRepetitionOptions
     case calendarEventCreationSegue
     case selectAlertOptionSegue
 }

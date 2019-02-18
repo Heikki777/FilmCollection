@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol PopoverTableItemSelectionDelegate{
+protocol PopoverTableItemSelectionDelegate {
     func itemSelected(indexPath: IndexPath)
 }

@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol Reviewable{
+protocol Reviewable {
     var review: String? { get set }
 }

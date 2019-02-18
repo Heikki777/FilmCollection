@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol RatingControlDelegate{
+protocol RatingControlDelegate {
     
     func ratingChanged(newRating: Rating)
     

@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 // MARK: - Film
-class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable, Hashable {
+class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
     
     static var dateFormatter: DateFormatter = {
         return DateFormatter()
@@ -66,11 +66,6 @@ class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable, Hash
     
     // MARK: - HasVideo
     var videos: [Video] = []
-    
-    // MARK: - Hashable
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
     
     var year: Int?{
         get{
@@ -194,6 +189,8 @@ class Film: Codable, Equatable, Rateable, HasVideo, HasCredits, Reviewable, Hash
         self.id = id
         self.originalTitle = originalTitle
         self.smallPosterImage = smallPosterImage
+        
+        super.init()
         
         if let filmEntity = entity {
             self.rating = Rating(rawValue: Int(filmEntity.rating)) ?? .NotRated

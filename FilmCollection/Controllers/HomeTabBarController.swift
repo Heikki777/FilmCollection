@@ -18,9 +18,7 @@ class HomeTabBarController: UITabBarController {
                 
         createObservers()
         
-        guard let layoutOption = Settings.FilmCollectionLayoutOption.init(rawValue: appDelegate.settings.filmCollectionLayout) else{
-            return
-        }
+        let layoutOption = FilmCollectionLayoutOption.init(rawValue: appDelegate.settings.filmCollectionLayout) ?? FilmCollectionLayoutOption.title
         
         guard let navigationVC = self.viewControllers?.first as? UINavigationController else{
             return
@@ -73,7 +71,7 @@ class HomeTabBarController: UITabBarController {
     }
     
     @objc func handleCollectionLayoutChange(notification: NSNotification){
-        guard let layoutOption = notification.object as? Settings.FilmCollectionLayoutOption else{
+        guard let layoutOption = notification.object as? FilmCollectionLayoutOption else{
             return
         }
         

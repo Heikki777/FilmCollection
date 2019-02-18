@@ -35,11 +35,11 @@ class FilmCollection: NSObject {
     private var films: [Film] = []
     private var sections: [String] = []
     private var filteredSections: [String] = []
-    private var filmDict: [String:[Film]] = [:]
+    @objc dynamic private var filmDict: [String:[Film]] = [:]
     private var filteredFilmDict: [String: [Film]] = [:]
     private var filteringScope: String = ""
     private var filteringText: String = ""
-    private var filterOn: Bool = false{
+    private var filterOn: Bool = false {
         didSet{
             if filterOn == false{
                 filteringScope = ""
