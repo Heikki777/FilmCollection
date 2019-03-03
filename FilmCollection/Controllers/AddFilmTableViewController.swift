@@ -8,9 +8,7 @@
 
 import UIKit
 import Alamofire
-import PromiseKit
 import CoreData
-
 
 class AddFilmTableViewController: UITableViewController {
     
@@ -118,7 +116,7 @@ class AddFilmTableViewController: UITableViewController {
         
         // Poster image
         if let posterPath = searchResult.posterPath{
-            let imageURL = TMDBApi.getPosterURL(size: .w92, imagePath: posterPath)
+            let imageURL = TMDBApi.getImageURL(size: .w92, imagePath: posterPath)
             cell.setImageURL(url: imageURL)
         }
     }
@@ -139,17 +137,20 @@ class AddFilmTableViewController: UITableViewController {
         selectSearchResult(at: indexPath)
         
         let searchResult = searchResults[indexPath.row]
-        if let id = searchResult.id{
-            attempt{
-                self.api.loadFilm(id, append: ["credits"])
-            }
-            .done { film in
-                self.addFilm(film: film)
-            }
-            .catch { error in
-                print(error.localizedDescription)
+        guard let id = searchResult.id else { return }
+
+        _ = self.api.loadFilm(id, append: ["credits"]) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let film):
+                    self?.addFilm(film: film)
+                case .failure(_):
+                    let message = (searchResult.title != nil) ? "The film: \(searchResult.title!) could not be loaded" : "The film could not be loaded"
+                    self?.showAlert(title: "Error", message: message)
+                }
             }
         }
+
     }
     
     func searchBarIsEmpty() -> Bool {
@@ -164,12 +165,12 @@ class AddFilmTableViewController: UITableViewController {
         
         if appDelegate.filmEntities.filter({ $0.id == film.id }).isEmpty {
             let title = "Add a new film"
-            let message = "Are you sure that you want to add the film: \"\(film.title)\" to your collection?"
+            let message = "Are you sure that you want to add the film: \"\(film.titleYear)\" to your collection?"
             let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                 self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                 self.appDelegate.saveContext()
-                FilmCollection.shared.addFilm(film)
+                FilmCollection.shared.addFilm(film, resetDictionary: true)
             })
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alert.addAction(cancelAction)
@@ -178,7 +179,7 @@ class AddFilmTableViewController: UITableViewController {
         }
         else {
             let title = "The film was not added"
-            let message = "The film: \"\(film.title)\" is already in the collection"
+            let message = "The film: \"\(film.titleYear)\" is already in the collection"
             let alert = UIAlertController.init(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
             let okAction = UIAlertAction.init(title: "OK", style: .default, handler: nil)
             alert.addAction(okAction)
@@ -209,22 +210,26 @@ class AddFilmTableViewController: UITableViewController {
         let page = lastPage+1
         isLoadingPage = true
         if let text = searchController.searchBar.text {
-            attempt {
-                self.api.search(query: text, page: page)
-            }
-            .done(on: DispatchQueue.main) { results in
-                for result in results{
-                    if !self.searchResults.contains(where: { $0.id == result.id } ){
-                        self.searchResults.append(result)
+            self.api.search(query: text, page: page) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                        
+                    case .success(let response):
+                        for result in response.results{
+                            if !self.searchResults.contains(where: { $0.id == result.id } ){
+                                self.searchResults.append(result)
+                            }
+                        }
+                        self.endOfResults = response.results.isEmpty
+                        self.lastPage = self.endOfResults ? self.lastPage : page
+                        self.isLoadingPage = false
+                        
+                    case .failure(let error):
+                        print(error.localizedDescription)
                     }
                 }
-                self.endOfResults = results.isEmpty
-                self.lastPage = self.endOfResults ? self.lastPage : page
-                self.isLoadingPage = false
             }
-            .catch({ (error) in
-                print(error)
-            })
+ 
         }
         else{
             searchResults = []
@@ -238,17 +243,20 @@ class AddFilmTableViewController: UITableViewController {
         isLoadingPage = true
         endOfResults = false
         
-        if let text = searchController.searchBar.text{
-            attempt {
-                self.api.search(query: text, page: 1)
+        if let text = searchController.searchBar.text {
+            self.api.search(query: text, page: 1) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                        
+                    case .success(let response):
+                        self.searchResults = response.results
+                        self.isLoadingPage = false
+                        
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
             }
-            .done(on: DispatchQueue.main) { results in
-                self.searchResults = results
-                self.isLoadingPage = false
-            }
-            .catch({ (error) in
-                print(error)
-            })
         }
         else{
             searchResults = []

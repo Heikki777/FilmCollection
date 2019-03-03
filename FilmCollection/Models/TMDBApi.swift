@@ -8,29 +8,26 @@
 
 import Foundation
 import UIKit
-import PromiseKit
 import Alamofire
 
 public enum RequestType: String {
     case GET, POST
 }
 
-class SearchRequest {
-    var method = RequestType.GET
-    var text = ""
-    
-    init(text: String) {
-        self.text = text
-    }
-}
-
-class TMDBApi{
+final class TMDBApi {
     
     static let baseURL: String = "https://api.themoviedb.org/"
     static let posterImageBaseURL: String = "https://image.tmdb.org/t/p/"
     static let version: Int = 3
     
-    private let apiKey: String = "a62c4199a4ee1f2fcec39ddffc60199f" //TMDB_API_KEY
+    private let apiKey: String = "a62c4199a4ee1f2fcec39ddffc60199f" // TMDB_API_KEY
+    
+    private lazy var sessionManager: SessionManager = {
+        let sessionManager = SessionManager()
+        let requestRetrier = NetworkRequestRetrier()
+        sessionManager.retrier = requestRetrier
+        return sessionManager
+    }()
     
     private init(){
         return
@@ -38,385 +35,120 @@ class TMDBApi{
     
     static let shared: TMDBApi = TMDBApi()
     
-    lazy var downloader: Downloader = {
-        return Downloader.shared
-    }()
-    
     lazy var jsonDecoder: JSONDecoder = {
         return JSONDecoder()
     }()
     
-    func search(query: String, page: Int = 1) -> Promise<[FilmSearchResult]> {
+    func search(query: String, page: Int = 1, completion: @escaping (GenericResult<FilmSearchResponse>) -> Void) {
+    
+        if query.isEmpty {
+            completion(GenericResult.failure(TMDBApiError.emptySearchError))
+            return
+        }
         
-        return Promise { result in
-            
-            if query.isEmpty {
-                result.fulfill([])
-                return
-            }
-            
-            var urlString = "\(TMDBApi.baseURL)\(TMDBApi.version)/search/movie?api_key=\(self.apiKey)&query=\(query)&language=en-US&include_adult=false&page=\(page)"
-            urlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            let url = URL.init(string: urlString)!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (dataResponse) in
-                if let error = dataResponse.error{
-                    if let response = dataResponse.response,
-                        let headers = response.allHeaderFields as? [String: Any],
-                        let retryAfter = headers["Retry-After"] as? String,
-                        let seconds = Int(retryAfter){
-                        if response.statusCode == 429{
-                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                            return
-                        }
-                    }
-                    result.reject(error)
-                }
-                else if let data = dataResponse.data{
-                    if let filmSearchResponse = try? self.jsonDecoder.decode(FilmSearchResponse.self, from: data){
-                        result.fulfill(filmSearchResponse.results)
-                    }
-                }
-            })
-        }
-    }
-    
-    func loadFilm(_ movieId: Int, append: [String] = []) -> Promise<Film> {
-        return Promise { result in
-            let appendToResponse = (append.isEmpty) ? "" : "&append_to_response=" + append.joined(separator: ",")
-            let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)?api_key=\(self.apiKey)&language=en-US\(appendToResponse)")!
-            let queue = DispatchQueue.init(label: "bgThread1", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (dataResponse) in
-
-                if let error = dataResponse.error{
-                    //print(error.localizedDescription)
-                    if let response = dataResponse.response,
-                    let headers = response.allHeaderFields as? [String: Any],
-                    let retryAfter = headers["Retry-After"] as? String,
-                    let seconds = Int(retryAfter){
-                        if response.statusCode == 429{
-                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                            return
-                        }
-                    }
-                    result.reject(error)
-                }
-                else if let data = dataResponse.data{
-                    if let movie = try? self.jsonDecoder.decode(Film.self, from: data){
-                        result.fulfill(movie)
-                    }
-                    else{
-                        print("Decoding movie failed")
-                        result.reject(TMDBApiError.DecodeMovieError)
-                    }
-                }
-            })
-        }
-    }
-    
-    func loadVideos(_ movieId: Int) -> Promise<[Video]> {
-        return Promise { result in
-            let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/videos?api_key=\(self.apiKey)&language=en-US")!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (dataResponse) in
-                if let error = dataResponse.error{
-                    //print(error.localizedDescription)
-                    if let response = dataResponse.response,
-                        let headers = response.allHeaderFields as? [String: Any],
-                        let retryAfter = headers["Retry-After"] as? String,
-                        let seconds = Int(retryAfter){
-                        if response.statusCode == 429{
-                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                            return
-                        }
-                    }
-                    result.reject(error)
-                }
-                else if let data = dataResponse.data{
-                    if let videoResponse = try? self.jsonDecoder.decode(VideoResponse.self, from: data){
-                        let videos = videoResponse.results
-                        result.fulfill(videos)
-                    }
-                }
-                result.reject(TMDBApiError.DecodeVideosError)
-            })
-        }
-    }
-    
-    func loadImage(withPath path: String?, size: PosterSize = .original) -> Promise<UIImage> {
-        return Promise { result in
-            guard let path = path else{
-                return result.reject(TMDBApiError.ImageError("No path"))
-            }
+        var urlString = "\(TMDBApi.baseURL)\(TMDBApi.version)/search/movie?api_key=\(self.apiKey)&query=\(query)&language=en-US&include_adult=false&page=\(page)"
+        urlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        let url = URL.init(string: urlString)!
+        let queue = DispatchQueue.init(label: "search", qos: .userInitiated, attributes: .concurrent)
         
-            let url = TMDBApi.getPosterURL(size: size, imagePath: path) 
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (dataResponse) in
-                if let error = dataResponse.error{
-                    //print(error.localizedDescription)
-                    if let response = dataResponse.response,
-                        let headers = response.allHeaderFields as? [String: Any],
-                        let retryAfter = headers["Retry-After"] as? String,
-                        let seconds = Int(retryAfter){
-                        if response.statusCode == 429{
-                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                            return
-                        }
-                    }
-                    result.reject(error)
-                }
-                else if let data = dataResponse.data{
-                    if let image = UIImage.init(data: data){
-                        result.fulfill(image)
-                    }
-                }
-                result.reject(TMDBApiError.DataError("No image data"))
-            })
-        }
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<FilmSearchResponse>().handleResponse(dataResponse)
+            completion(result)
+        })
     }
     
-    func loadCredits(forPersonWithID id: Int) -> Promise<(crew: [CrewMember], cast: [CastMember])>{
-        return Promise { result in
-            let url = URL(string: "https://api.themoviedb.org/3/person/\(id)/movie_credits?api_key=\(self.apiKey)&language=en-US")!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (dataResponse) in
-                if let error = dataResponse.error{
-                    if let response = dataResponse.response,
-                        let headers = response.allHeaderFields as? [String: Any],
-                        let retryAfter = headers["Retry-After"] as? String,
-                        let seconds = Int(retryAfter){
-                        if response.statusCode == 429{
-                            result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                            return
-                        }
-                    }
-                    result.reject(error)
-                }
-                else if let data = dataResponse.data{
-                    if let creditsResponse = try? self.jsonDecoder.decode(Credits.self, from: data){
-                        let cast = creditsResponse.cast
-                        let crew = creditsResponse.crew
-                        result.fulfill((crew: crew, cast: cast))
-                    }
-                    else{
-                        result.reject(TMDBApiError.DecodePersonMovieCreditsError)
-                    }
-                }
-                else{
-                    result.reject(TMDBApiError.DecodePersonMovieCreditsError)
-                }
-            })
-        }
-    }
-    
-    func loadImages(personId: Int, progressHandler: ((Float) -> Void)? = nil) -> Promise<[UIImage]>{
+    func loadFilm(_ movieId: Int, append: [String] = [], completion: @escaping (GenericResult<Film>) -> Void) {
+        let appendToResponse = (append.isEmpty) ? "" : "&append_to_response=" + append.joined(separator: ",")
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)?api_key=\(self.apiKey)&language=en-US\(appendToResponse)")!
+        let queue = DispatchQueue.init(label: "loadFilm", qos: .userInitiated, attributes: .concurrent)
         
-        return Promise { result in
-            let urlString = "https://api.themoviedb.org/3/person/\(personId)/images?api_key=\(self.apiKey)"
-            let url = URL.init(string: urlString)!
-            
-            DispatchQueue.global().async {
-                Alamofire.request(url)
-                .validate()
-                .responseData(completionHandler: { dataResponse in
-                    if let error = dataResponse.error{
-                        if let response = dataResponse.response,
-                            let headers = response.allHeaderFields as? [String: Any],
-                            let retryAfter = headers["Retry-After"] as? String,
-                            let seconds = Int(retryAfter){
-                            if response.statusCode == 429{
-                                result.reject(TMDBApiError.RequestLimitExceeded(seconds))
-                                return
-                            }
-                        }
-                        result.reject(error)
-                    }
-                    
-                    guard let data = dataResponse.data else{
-                        result.reject(TMDBApiError.DataError("No data in response"))
-                        return
-                    }
-                    if let personImagesResponse = try? self.jsonDecoder.decode(PersonImagesResponse.self, from: data){
-                        let imagePromises = personImagesResponse.profiles.map{
-                            self.loadImage(withPath: $0.file_path)
-                        }
-                        
-                        var imagesLoaded: Float = 0
-                        imagePromises.forEach({ (imagePromise) in
-                            imagePromise.done({ (image) in
-                                imagesLoaded += 1
-                                progressHandler?(imagesLoaded / Float(imagePromises.count))
-                            })
-                        })
-                    
-                        when(fulfilled: imagePromises)
-                        .done({ (images) in
-                            result.fulfill(images)
-                            progressHandler?(1)
-                        })
-                        .catch({ (error) in
-                            result.reject(error)
-                        })
-                    }
-                    else{
-                        result.reject(TMDBApiError.DecodeImagesError)
-                    }
-                })
-            }
-        }
-
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<Film>().handleResponse(dataResponse)
+            completion(result)
+        })
     }
     
-    func loadImages(_ movieId: Int, size: PosterSize = .original, progressHandler: @escaping (Float) -> Void) -> Promise<FilmImages> {
+    func loadVideos(_ movieId: Int, completion: @escaping (GenericResult<VideoResponse>) -> Void) {
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/videos?api_key=\(self.apiKey)&language=en-US")!
+        let queue = DispatchQueue.init(label: "loadVideos", qos: .userInitiated, attributes: .concurrent)
 
-        return Promise { result in
-            var postersLoaded: Bool = false
-            var backdropsLoaded: Bool = false
-            let images = FilmImages()
-
-            func fulFillCheck(){
-                if postersLoaded && backdropsLoaded {
-                    result.fulfill(images)
-                }
-            }
-            
-            let urlString = "https://api.themoviedb.org/3/movie/\(movieId)/images?api_key=\(self.apiKey)"
-            let url = URL.init(string: urlString)!
-            
-            var loaded: Float = 0
-            var numberOfPosterImagesLoaded = 0
-            var numberOfBackdropImagesLoaded = 0
-            
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-            
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
-                    result.reject(error)
-                }
-                else if let data = response.data{
-                    if let imagesResponse = try? self.jsonDecoder.decode(ImagesResponse.self, from: data){
-                        var posterImages: [(data: ImageData, image:UIImage)?] = Array.init(repeating: nil, count: imagesResponse.posters.count)
-                        var backdropImages: [(data: ImageData, image:UIImage)?] = Array.init(repeating: nil, count: imagesResponse.backdrops.count)
-                        let totalNumberOfImages: Float = Float(imagesResponse.backdrops.count) + Float(imagesResponse.posters.count)
-                       
-                        // Load poster images
-                        imagesResponse.posters.enumerated().forEach({ (i, imageData) in
-                            let url = TMDBApi.getPosterURL(size: size, imagePath: imageData.filePath)
-                            attempt{
-                                Downloader.shared.loadImage(url: url)
-                            }
-                            .done{ image in
-                                posterImages[i] = (data: imageData, image: image)
-                            }
-                            .ensure {
-                                numberOfPosterImagesLoaded += 1
-                                loaded += 1
-                                progressHandler(loaded / totalNumberOfImages)
-                                if numberOfPosterImagesLoaded == imagesResponse.posters.count{
-                                    postersLoaded = true
-                                    images.posters = posterImages.compactMap { $0 }
-                                    fulFillCheck()
-                                }
-                            }
-                            .catch { error in
-                                //print(error.localizedDescription)
-                            }
-                        })
-                        
-                        // Load backdrop images
-                        imagesResponse.backdrops.enumerated().forEach({ (i, imageData) in
-                            let url = TMDBApi.getPosterURL(size: size, imagePath: imageData.filePath)
-                            attempt{
-                                Downloader.shared.loadImage(url: url)
-                            }
-                            .done{ image in
-                                backdropImages[i] = (data: imageData, image: image)
-                            }
-                            .ensure {
-                                numberOfBackdropImagesLoaded += 1
-                                loaded += 1
-                                progressHandler(loaded / totalNumberOfImages)
-                                if numberOfBackdropImagesLoaded == imagesResponse.backdrops.count{
-                                    backdropsLoaded = true
-                                    images.backdrops = backdropImages.compactMap { $0 }
-                                    fulFillCheck()
-                                }
-                            }
-                            .catch { error in
-                                //print(error.localizedDescription)
-                            }
-                        })
-                    }
-                    else{
-                        result.reject(TMDBApiError.DecodeImagesError)
-                    }
-                }
-                else{
-                    result.reject(TMDBApiError.DataError("Data is nil"))
-                }
-            })
-        }
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<VideoResponse>().handleResponse(dataResponse)
+            completion(result)
+        })
+        
     }
     
-    func loadCredits(_ movieId: Int, retryCount: Int = 0) -> Promise<Credits> {
-        return Promise { result in
-            let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/credits?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
+    func loadCredits(forPersonWithID id: Int, completion: @escaping (GenericResult<Credits>) -> Void) {
+        let url = URL(string: "https://api.themoviedb.org/3/person/\(id)/movie_credits?api_key=\(self.apiKey)&language=en-US")!
+        let queue = DispatchQueue.init(label: "loadCredits", qos: .userInitiated, attributes: .concurrent)
 
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
-                    result.reject(error)
-                }
-                else if let data = response.data{
-                    if let creditsResponse = try? self.jsonDecoder.decode(CreditsResponse.self, from: data){
-                        let credits = Credits(crew: creditsResponse.crew, cast: creditsResponse.cast)
-                        result.fulfill(credits)
-                    }
-                }
-            })
-        }
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<Credits>().handleResponse(dataResponse)
+            completion(result)
+        })
+        
+    }
+
+    func loadPersonImages(personId: Int, completion: @escaping (GenericResult<PersonImagesResponse>) -> Void) {
+        let urlString = "https://api.themoviedb.org/3/person/\(personId)/images?api_key=\(self.apiKey)"
+        let url = URL.init(string: urlString)!
+        let queue = DispatchQueue(label: "loadPersonImages", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .workItem, target: nil)
+
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<PersonImagesResponse>().handleResponse(dataResponse)
+            completion(result)
+        })
     }
     
-    func loadPersonDetails(_ personId: Int) -> Promise<PersonDetailInformation> {
-        return Promise { result in
-            let url = URL(string: "https://api.themoviedb.org/3/person/\(personId)?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
-            let queue = DispatchQueue.init(label: "backgroundThread", qos: .background, attributes: .concurrent)
-
-            Alamofire.request(url)
-            .validate()
-            .responseData(queue: queue, completionHandler: { (response) in
-                if let error = response.error{
-                    result.reject(error)
-                }
-                else if let data = response.data{
-                    if let personDetailInformation = try? self.jsonDecoder.decode(PersonDetailInformation.self, from: data){
-                        result.fulfill(personDetailInformation)
-                    }
-                }
-            })
-        }
+    func loadFilmImages(_ movieId: Int, size: PosterSize = .original, completion: @escaping (GenericResult<ImagesResponse>) -> Void) {
+        let urlString = "https://api.themoviedb.org/3/movie/\(movieId)/images?api_key=\(self.apiKey)"
+        let url = URL.init(string: urlString)!
+        let queue = DispatchQueue(label: "loadFilmImages", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .workItem, target: nil)
+        
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<ImagesResponse>().handleResponse(dataResponse)
+            completion(result)
+        })
     }
     
-    static func getPosterURL(size: PosterSize, imagePath: String) -> URL{
+    func loadCredits(_ movieId: Int, completion: @escaping (GenericResult<CreditsResponse>) -> Void) {
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(movieId)/credits?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
+        let queue = DispatchQueue.init(label: "loadCredits", qos: .userInitiated, attributes: .concurrent)
+
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<CreditsResponse>().handleResponse(dataResponse)
+            completion(result)
+        })
+    }
+    
+    func loadPersonDetails(_ personId: Int, completion: @escaping (GenericResult<PersonDetailInformation>) -> Void) {
+        let url = URL(string: "https://api.themoviedb.org/3/person/\(personId)?api_key=a62c4199a4ee1f2fcec39ddffc60199f")!
+        let queue = DispatchQueue.init(label: "loadPersonDetails", qos: .userInitiated, attributes: .concurrent)
+
+        sessionManager.request(url)
+        .validate()
+        .responseData(queue: queue, completionHandler: { (dataResponse) in
+            let result = TMDbAPIResponseManager<PersonDetailInformation>().handleResponse(dataResponse)
+            completion(result)
+        })
+    }
+    
+    static func getImageURL(size: PosterSize, imagePath: String) -> URL{
         return URL(string: "\(TMDBApi.posterImageBaseURL)\(size)\(imagePath)")!
     }
     
@@ -430,10 +162,12 @@ class TMDBApi{
         case original
     }
 }
+
 struct PersonImagesResponse: Decodable{
     var profiles: [ProfileImage]
     var id: Int?
 }
+
 struct ProfileImage: Decodable{
     var file_path: String
 }
@@ -564,19 +298,58 @@ struct CreditsResponse: Decodable{
     var crew: [CrewMember]
 }
 
-enum TMDBApiError: Error{
-    case InvalidURL
-    case DecodeMovieError
-    case DecodeCreditsError
-    case DecodeImagesError
-    case DecodeSearchResponseError
-    case BadStatus(status: Int)
-    case DataError(String)
-    case DecodingError(String)
-    case DecodePersonMovieCreditsError
-    case ImageError(String)
-    case DecodeVideosError
-    case RequestLimitExceeded(Int)
+enum TMDBApiError: Error {
+    case invalidURL
+    case decodeMovieError
+    case decodeCreditsError
+    case decodeImagesError
+    case decodeSearchResponseError
+    case decodePersonDetailError
+    case emptySearchError
+    case badStatus(status: Int)
+    case dataError(String)
+    case decodingError
+    case decodePersonMovieCreditsError
+    case imageError(String)
+    case decodeVideosError
+    case requestLimitExceeded(Int)
+    case unknownError
+    
+    var localizedDescription: String {
+        switch self {
+        case .invalidURL:
+            return "invalid URL"
+        case .decodeMovieError:
+            return "Decode movie error"
+        case .decodeCreditsError:
+            return "Decode credits error"
+        case .decodeImagesError:
+            return "Decode images error"
+        case .decodeSearchResponseError:
+            return "Decode search response error"
+        case .decodePersonDetailError:
+            return "Decode person detail error"
+        case .emptySearchError:
+            return "empty search error"
+        case .badStatus(let status):
+            return "Bad status: \(status)"
+        case .dataError(_):
+            return "Data error"
+        case .decodingError:
+            return "Decoding error"
+        case .decodePersonMovieCreditsError:
+            return "Decode person movie credits error"
+        case .imageError(_):
+            return "Image error"
+        case .decodeVideosError:
+            return "Decode videos error"
+        case .requestLimitExceeded(_):
+            return "Request limit exceeded"
+        case .unknownError:
+            return "Unknown error"
+        }
+    }
+    
 }
 
 enum MovieError: Error{

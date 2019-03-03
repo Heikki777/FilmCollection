@@ -10,12 +10,16 @@ import UIKit
 
 class HomeTabBarController: UITabBarController {
 
-    let loadingIndicator: LoadingIndicatorViewController = LoadingIndicatorViewController(title: nil, message: nil, complete: nil)
+    var loadingIndicator: LoadingIndicatorViewController = LoadingIndicatorViewController()
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         createObservers()
         
         let layoutOption = FilmCollectionLayoutOption.init(rawValue: appDelegate.settings.filmCollectionLayout) ?? FilmCollectionLayoutOption.title
@@ -32,6 +36,9 @@ class HomeTabBarController: UITabBarController {
             let vc = storyboard?.instantiateViewController(withIdentifier: "FilmCollectionTableViewController") as! FilmCollectionTableViewController
             navigationVC.setViewControllers([vc], animated: false)
         }
+        
+        self.loadingIndicator = LoadingIndicatorViewController(delegate: self, title: "Loading film collection", message: nil)
+        FilmCollection.shared.loadingIndicatorDataSource = self.loadingIndicator
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,6 +48,12 @@ class HomeTabBarController: UITabBarController {
     
     deinit{
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func disableTabBarItems(){
+        tabBar.items?.forEach({ (tabBarItem) in
+            tabBarItem.isEnabled = false
+        })
     }
     
     func createObservers(){
@@ -64,10 +77,23 @@ class HomeTabBarController: UITabBarController {
         })
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLayoutChange(notification:)), name: Notifications.SettingsNotification.filmCollectionLayoutChanged.name, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded), name: Notifications.FilmCollectionNotification.filmCollectionValueChanged.name, object: nil)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        if (loadingIndicator.presentingViewController == nil){
+            self.present(loadingIndicator, animated: true, completion: nil)
+        }
+    }
+    
+    @objc func handleCollectionLoaded(notification: NSNotification) {
+        print("HomeTabBarController: collection loaded")
+        tabBar.items?.forEach({ (tabBarItem) in
+            tabBarItem.isEnabled = true
+        })
     }
     
     @objc func handleCollectionLayoutChange(notification: NSNotification){
@@ -89,23 +115,18 @@ class HomeTabBarController: UITabBarController {
         }
     }
     
-    func showLoadingIndicator(withTitle title: String?, message: String?, progress: Float?, complete: (() -> ())?){
-        loadingIndicator.title = title
-        loadingIndicator.message = message
-        loadingIndicator.complete = complete
-        if let progress = progress{
-            loadingIndicator.setProgress(progress)
-        }
-        
-        if(self.loadingIndicator.presentingViewController == nil){
-            self.present(self.loadingIndicator, animated: false, completion: complete)
-        }
-    }
-    
     func showBasicAlert(withTitle title: String, message: String? = ""){
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         show(alert, sender: self)
     }
+}
 
+extension HomeTabBarController: LoadingIndicatorViewControllerDelegate {
+    
+    func shouldShowCancelButton() -> Bool {
+        return false
+    }
+    
+    func loadingIndicatorViewControllerCancelButtonPressed() {}
 }

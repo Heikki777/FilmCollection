@@ -2,11 +2,12 @@
 //  FilmPreviewViewController.swift
 //  FilmCollection
 //
-//  Created by Sofia Digital on 22/06/2018.
+//  Created by Heikki Hämälistö on 22/06/2018.
 //  Copyright © 2018 Heikki Hämälistö. All rights reserved.
 //
 
 import UIKit
+import Nuke
 
 class FilmPreviewViewController: UIViewController {
 
@@ -19,16 +20,9 @@ class FilmPreviewViewController: UIViewController {
         
         guard let film = film else { return }
         
-        attempt{
-            film.loadLargePosterImage()
-        }
-        .done { (posterImage) in
-            DispatchQueue.main.async {
-                self.imageView.image = posterImage
-            }
-        }
-        .catch { (error) in
-            print(error.localizedDescription)
+        if let posterPath = film.posterPath {
+            let posterURL = TMDBApi.getImageURL(size: .w500, imagePath: posterPath)
+            Nuke.loadImage(with: posterURL, into: imageView)
         }
         
     }
@@ -37,16 +31,4 @@ class FilmPreviewViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

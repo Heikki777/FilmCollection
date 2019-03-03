@@ -7,19 +7,20 @@
 //
 
 import UIKit
+import Nuke
 
 class ImagePreviewController: UIViewController {
 
     @IBOutlet weak var imageView: UIImageView!
     
     var identifier: String = ""
-    var image: UIImage?
+    var imageUrl: URL?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         imageView.contentMode = .scaleAspectFit
-        if let image = image{
-            imageView.image = image
+        if let imageUrl = imageUrl {
+            Nuke.loadImage(with: imageUrl, into: imageView)
         }
     }
     

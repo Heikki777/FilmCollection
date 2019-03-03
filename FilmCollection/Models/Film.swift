@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import PromiseKit
+import UIKit
 
 // MARK: - Film
 class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
@@ -21,6 +21,7 @@ class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
     var budget: Int?
     var genres: [Genre]?
     var id: Int
+    var imdbId: String?
     var originalLanguage: String?
     var originalTitle: String
     var overview: String?
@@ -35,8 +36,6 @@ class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
     var tagline: String?
     var title: String
     var video: Bool?
-    var smallPosterImage: UIImage? = nil
-    var largePosterImage: UIImage? = nil
     var credits: Credits = Credits()
     
     weak var entity: FilmEntity? {
@@ -141,6 +140,7 @@ class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
         case credits
         case genres
         case id
+        case imdbId = "imdb_id"
         case originalLanguage = "original_language"
         case originalTitle = "original_title"
         case overview
@@ -164,6 +164,7 @@ class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
         self.budget = try? values.decode(Int.self, forKey: .budget)
         self.genres = try? values.decode([Genre].self, forKey: .genres)
         self.id = try values.decode(Int.self, forKey: .id)
+        self.imdbId = try values.decode(String.self, forKey: .imdbId)
         self.originalTitle = try values.decode(String.self, forKey: .originalTitle)
         self.originalLanguage = try? values.decode(String.self, forKey: .originalLanguage)
         self.overview = try? values.decode(String.self, forKey: .overview)
@@ -184,84 +185,16 @@ class Film: NSObject, Codable, Rateable, HasVideo, HasCredits, Reviewable {
         }
     }
     
-    init(id: Int, title: String, originalTitle: String, smallPosterImage: UIImage){
+    init(id: Int, title: String, originalTitle: String){
         self.title = title
         self.id = id
         self.originalTitle = originalTitle
-        self.smallPosterImage = smallPosterImage
         
         super.init()
         
         if let filmEntity = entity {
             self.rating = Rating(rawValue: Int(filmEntity.rating)) ?? .NotRated
             self.review = filmEntity.review
-        }
-    }
-    
-    func loadPosterImages() -> Promise<(small: UIImage, large: UIImage)>{
-        // Load posters
-        return Promise { result in
-            if let posterPath = self.posterPath{
-                
-                let largePosterURL = TMDBApi.getPosterURL(size: .w500, imagePath: posterPath)
-                let smallPosterURL = TMDBApi.getPosterURL(size: .w92, imagePath: posterPath)
-                let promises = [
-                    Downloader.shared.loadImage(url: smallPosterURL),
-                    Downloader.shared.loadImage(url: largePosterURL)
-                ]
-                attempt{
-                    when(fulfilled: promises).done({ (images) in
-                        result.fulfill((small: images[0], large: images[1]))
-                    })
-                }
-                .catch({ (error) in
-                    print("Loading poster images for the movie: \(self.title) failed")
-                    print(error.localizedDescription)
-                    result.reject(error)
-                })
-            }
-            else{
-                result.reject(MovieError.missingData("posterPath"))
-            }
-        }
-    }
-    
-    func loadSmallPosterImage() -> Promise<UIImage>{
-        return Promise { result in
-            if let posterPath = self.posterPath{
-
-                let smallPosterURL = TMDBApi.getPosterURL(size: .w92, imagePath: posterPath)
-                Downloader.shared.loadImage(url: smallPosterURL)
-                .done({ (image) in
-                    result.fulfill(image)
-                })
-                .catch({ (error) in
-                    print("Loading poster images for the movie: \(self.title) failed")
-                    print(error.localizedDescription)
-                })
-            }
-            else{
-                result.reject(MovieError.missingData("posterPath"))
-            }
-        }
-    }
-    
-    func loadLargePosterImage() -> Promise<UIImage>{
-        return Promise { result in
-            if let posterPath = self.posterPath{
-                let bigPosterURL = TMDBApi.getPosterURL(size: .w500, imagePath: posterPath)
-                Downloader.shared.loadImage(url: bigPosterURL)
-                .done({ (image) in
-                    result.fulfill(image)
-                })
-                .catch({ (error) in
-                    print("Loading poster images for the movie: \(self.title) failed")
-                    print(error.localizedDescription)
-                })
-            }
-            else{
-                result.reject(MovieError.missingData("posterPath"))
-            }
         }
     }
     

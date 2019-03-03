@@ -37,11 +37,11 @@ class Settings: NSManagedObject {
     
     enum FilmCollectionLayoutOption: String {
         case poster = "Poster"
-        case posterTitleOverview = "Poster, title, director, genre, rating"
+        case posterAndBriefInfo = "Poster and brief info"
         case title = "Title"
         
         static var all: [FilmCollectionLayoutOption]{
-            return [.poster, .posterTitleOverview, .title]
+            return [.poster, .posterAndBriefInfo, .title]
         }
     }
 }

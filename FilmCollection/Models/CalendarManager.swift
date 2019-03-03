@@ -51,7 +51,7 @@ class CalendarManager {
     }
     
     func insertCalendarEvent(forFilm film: Film, start: Date, alertOption: CalendarEventAlertOption = .none){
-        guard let runtime = film.runtime else { return }
+        guard let runtime = film.runtime, let filmCollectionCalendar = self.calendar else { return }
         
         eventStore.requestAccess(to: .event) { [weak self] (granted, error) in
             
@@ -64,7 +64,7 @@ class CalendarManager {
             if granted {
                 let end = start.addingTimeInterval(TimeInterval(runtime * 60))
                 let newEvent = EKEvent(eventStore: strongSelf.eventStore)
-                newEvent.calendar = strongSelf.calendar
+                newEvent.calendar = filmCollectionCalendar
                 newEvent.title = "Watch film: \(film.titleYear)"
                 newEvent.notes = film.overview ?? ""
                 newEvent.startDate = start
@@ -75,7 +75,7 @@ class CalendarManager {
                     newEvent.addAlarm(alarm)
                 }
                 
-                let predicate = strongSelf.eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
+                let predicate = strongSelf.eventStore.predicateForEvents(withStart: start, end: end, calendars: [filmCollectionCalendar])
                 var filmEvents: [EKEvent]? = nil
                 filmEvents = strongSelf.eventStore.events(matching: predicate)
                 

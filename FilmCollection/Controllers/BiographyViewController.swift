@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import Nuke
 
 class BiographyViewController: UIViewController {
 
-    var personImage: UIImage?
-    var personDetailInformation: PersonDetailInformation?
+    var personImageURL: URL!
+    var personDetailInformation: PersonDetailInformation!
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var biographyTextView: UITextView!
@@ -27,20 +28,7 @@ class BiographyViewController: UIViewController {
         navigationItem.title = personDetailInformation.name
         biographyTextView.text = personDetailInformation.biography
         
-        if let personImage = personImage{
-            self.imageView.image = personImage
-        }
-        else if let profilePath = personDetailInformation.profilePath{
-            let url = TMDBApi.getPosterURL(size: .w342, imagePath: profilePath)
-            Downloader.shared.loadImage(url: url)
-            .done({ (image) in
-                self.personImage = image
-                self.imageView.image = image
-            })
-            .catch({ (error) in
-                print(error.localizedDescription)
-            })
-        }
+        Nuke.loadImage(with: personImageURL, options: ImageLoadingOptions(placeholder: nil, transition: .fadeIn(duration: 0.33), failureImage: nil, failureImageTransition: nil, contentModes: nil), into: imageView, progress: nil, completion: nil)
     }
 
     override func didReceiveMemoryWarning() {

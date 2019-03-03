@@ -10,7 +10,7 @@ import UIKit
 
 class ImagePageViewController: UIPageViewController {
 
-    var images: [UIImage] = []
+    var images: [URL] = []
     var orderedViewControllers: [UIViewController] = []
     var startPageIdx: Int = 0
     
@@ -21,9 +21,9 @@ class ImagePageViewController: UIPageViewController {
             return
         }
         
-        self.orderedViewControllers = images.map{
+        self.orderedViewControllers = images.map {
             let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as! ImagePreviewController
-            vc.image = $0
+            vc.imageUrl = $0
             return vc
         }
         

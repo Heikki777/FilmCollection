@@ -8,39 +8,51 @@
 
 import UIKit
 
-class LoadingIndicatorViewController: UIViewController {
+class LoadingIndicatorViewController: UIViewController, LoadingProgressDataSource {
 
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var backgroundView: UIView!
+    @IBOutlet weak var cancelButton: UIButton!
     
-    override var title: String?{
+    @IBAction func handleCancelButtonPress() {
+        delegate?.loadingIndicatorViewControllerCancelButtonPressed()
+        dismiss(animated: true, completion: nil)
+    }
+    
+    override var title: String? {
         didSet{
             if titleLabel != nil{
                 titleLabel.text = title
             }
         }
     }
-    var message: String?{
+    var message: String? {
         didSet{
-            if messageLabel != nil{
-                messageLabel.text = message
-            }
+            messageLabel?.text = message
         }
     }
-    var complete: (() -> Void)?
-    var dismissWhenBecomesVisible: Bool = false
     
-    init(title: String?, message: String?, complete: (() -> Void)?){
+    private var complete: (() -> Void)?
+    private var dismissWhenBecomesVisible: Bool = false
+    
+    weak var delegate: LoadingIndicatorViewControllerDelegate?
+    
+    convenience init(delegate: LoadingIndicatorViewControllerDelegate? = nil, dataSource: LoadingProgressDataSource? = nil) {
+        self.init(delegate: delegate, title: nil, message: nil, complete: nil)
+    }
+    
+    init(delegate: LoadingIndicatorViewControllerDelegate?, title: String?, message: String?, showCancelButton: Bool = false, complete: (() -> Void)? = nil) {
         super.init(nibName: "LoadingIndicatorViewController", bundle: nil)
+        self.delegate = delegate
         self.title = title
         self.message = message
         self.complete = complete
         self.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         self.modalTransitionStyle = .crossDissolve
-        let _ = self.view
+        _ = self.view
     }
     
     override func awakeFromNib() {
@@ -62,10 +74,13 @@ class LoadingIndicatorViewController: UIViewController {
     }
     
     func finish(){
+        print("LoadingIndicatorViewController: finish()")
         if !self.isVisible{
             dismissWhenBecomesVisible = true
         }
-        self.dismiss(animated: true, completion: complete)
+        else {
+            self.dismiss(animated: true, completion: complete)
+        }
     }
     
     override func viewDidLoad() {
@@ -79,10 +94,16 @@ class LoadingIndicatorViewController: UIViewController {
         self.backgroundView.layer.cornerRadius = 10
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let showCancelButton = delegate?.shouldShowCancelButton() ?? true
+        self.cancelButton.isHidden = !showCancelButton
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if dismissWhenBecomesVisible{
+        if dismissWhenBecomesVisible {
             self.dismiss(animated: true, completion: complete)
             dismissWhenBecomesVisible = false
         }
@@ -92,15 +113,19 @@ class LoadingIndicatorViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    // MARK: - LoadingProgressDataSource
+    var isLoadingInProgress: Bool = false
+    
+    func loadingProgressChanged(progress: Float) {
+        isLoadingInProgress = true
+        progressView.progress = progress
+        let percentage: Int = Int(progress * 100)
+        message = "\(percentage) % loaded"
     }
-    */
-
+    
+    func loadingFinished() {
+        isLoadingInProgress = false
+        dismiss(animated: true, completion: nil)
+    }
 }

@@ -20,4 +20,6 @@ enum Segue: String{
     case showBiographySegue
     case calendarEventCreationSegue
     case selectAlertOptionSegue
+    case showImageCollectionSegue
+    case showImagePageViewControllerSegue
 }

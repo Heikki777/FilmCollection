@@ -8,7 +8,7 @@
 
 import UIKit
 import Alamofire
-import PromiseKit
+import Nuke
 
 class FilmTableViewCellExpanded: UITableViewCell {
 
@@ -42,14 +42,14 @@ class FilmTableViewCellExpanded: UITableViewCell {
         super.setHighlighted(highlighted, animated: animated)
     }
     
-    func configure(withMovie movie: Film){
+    func configure(withFilm film: Film){
         
-        self.film = movie
+        self.film = film
         
-        titleLabel.text = movie.titleYear
+        titleLabel.text = film.titleYear
         
         // Director(s)
-        let directors = movie.directors
+        let directors = film.directors
         directorLabel.isHidden = true
         if directors.count > 0{
             let directorsString = directors.compactMap{$0.name}.joined(separator: ", ")
@@ -58,16 +58,17 @@ class FilmTableViewCellExpanded: UITableViewCell {
         }
         
         // Image
-        if let smallPosterImage = movie.smallPosterImage{
-            self.posterImageView?.image = smallPosterImage
+        if let posterPath = film.posterPath {
+            let posterURL = TMDBApi.getImageURL(size: .w92, imagePath: posterPath)
+            Nuke.loadImage(with: posterURL, into: posterImageView)
         }
         
         // Genres
-        if let genres = movie.genres{
+        if let genres = film.genres{
             genreLabel.text = "Genre: " + genres.map{$0.name}.joined(separator: ", ")
         }
         
-        ratingLabel.text = "Rating: " + movie.rating.description
+        ratingLabel.text = "Rating: " + film.rating.description
     }
     
 }

@@ -8,8 +8,8 @@
 
 import UIKit
 import Alamofire
-import PromiseKit
 import EventKit
+import Nuke
 
 class FilmDetailViewController: UIViewController {
     
@@ -19,6 +19,8 @@ class FilmDetailViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var directorLabel: UILabel!
     @IBOutlet weak var ratingLabel: UILabel!
+    @IBOutlet weak var imdbLogo: UIImageView!
+    @IBOutlet weak var imdbRatingLabel: UILabel!
     @IBOutlet weak var descriptionTextView: UITextView!
     @IBOutlet weak var genreLabel: UILabel!
     @IBOutlet weak var durationLabel: UILabel!
@@ -79,7 +81,7 @@ class FilmDetailViewController: UIViewController {
             let yesAction = UIAlertAction(title: "Yes", style: .default, handler: { _ in
                 self.appDelegate.filmCollectionEntity.addToFilms(newFilm)
                 self.appDelegate.saveContext()
-                FilmCollection.shared.addFilm(film)
+                FilmCollection.shared.addFilm(film, resetDictionary: true)
             })
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             alert.addAction(cancelAction)
@@ -122,20 +124,6 @@ class FilmDetailViewController: UIViewController {
     
     var film: Film?
     
-    var smallPosterImage: UIImage?{
-        didSet{
-            DispatchQueue.main.async {
-                self.imageView.image = self.smallPosterImage
-            }
-        }
-    }
-    var bigPosterImage: UIImage?{
-        didSet{
-            DispatchQueue.main.async {
-                self.backgroundImageView.image = self.bigPosterImage
-            }
-        }
-    }
     var featuredVideo: Video?{
         didSet{
             if let featuredVideo = featuredVideo{
@@ -146,6 +134,7 @@ class FilmDetailViewController: UIViewController {
     }
     
     var filmImages: FilmImages?
+    
     var videos: [Video] = []{
         didSet{
             setFeaturedVideo()
@@ -164,8 +153,8 @@ class FilmDetailViewController: UIViewController {
         }) ?? []
     }
     
-    var castImages: [UIImage] = []
-    var crewImages: [UIImage] = []
+    var castImages: [URL] = []
+    var crewImages: [URL] = []
     
     var selectedCastMember: CastMember?
     var selectedCrewMember: CrewMember?
@@ -211,6 +200,8 @@ class FilmDetailViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        castCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
+        crewCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -282,6 +273,8 @@ class FilmDetailViewController: UIViewController {
             titleLabel,
             directorLabel,
             ratingLabel,
+            imdbLogo,
+            imdbRatingLabel,
             descriptionTextView,
             genreLabel,
             durationLabel,
@@ -307,23 +300,16 @@ class FilmDetailViewController: UIViewController {
         additionBarButton.isEnabled = !filmIsInCollection
         removeBarButton.isEnabled = filmIsInCollection
         
-        // Load background poster and the small poster images
-        film.loadPosterImages().done({ (smallPosterImage, bigPosterImage) in
-            self.bigPosterImage = bigPosterImage
-            self.smallPosterImage = smallPosterImage
-        }).catch { (error) in
-            print(error.localizedDescription)
-        }
-        
         // Videos
-        attempt{
-            self.api.loadVideos(film.id)
-        }
-        .done { (videos) in
-            self.videos = videos
-        }
-        .catch { (error) in
-            print(error.localizedDescription)
+        self.api.loadVideos(film.id) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let videoResponse):
+                    self.videos = videoResponse.results
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
         }
         
         // Add tap gesture recognizer to the image view
@@ -341,6 +327,14 @@ class FilmDetailViewController: UIViewController {
         
         // MARK: - Set the movie title
         titleLabel.text = film.titleYear
+        
+        // Images
+        if let posterPath = film.posterPath {
+            // Small poster image
+            Nuke.loadImage(with: TMDBApi.getImageURL(size: .w92, imagePath: posterPath), into: imageView)
+            // Background image
+            Nuke.loadImage(with: TMDBApi.getImageURL(size: .w780, imagePath: posterPath), into: backgroundImageView)
+        }
         
         // Overview
         if let overview = film.overview{
@@ -376,14 +370,37 @@ class FilmDetailViewController: UIViewController {
         // Rating
         ratingLabel.text = "Rating: \(film.rating.description)"
         
+        // IMDb Rating
+        imdbRatingLabel.text = ""
+        imdbLogo.isHidden = true
+        imdbRatingLabel.isHidden = true
+        
+        if let imdbId = film.imdbId {
+            IMDbAPI.shared.ratingForFilm(withIMDbId: imdbId) { result in
+                DispatchQueue.main.async { [weak self] in
+                    switch result {
+                    case .success(let imdbRating):
+                        self?.imdbLogo.isHidden = false
+                        self?.imdbRatingLabel.isHidden = false
+                        self?.imdbRatingLabel.text = "\(imdbRating) / 10.0"
+                    case .failure(let error):
+                        self?.imdbLogo.isHidden = true
+                        self?.imdbRatingLabel.isHidden = true
+                        print("IMDb rating for the film \(film.titleYear) could not be loaded")
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+        }
+        
         // Cast
-        castImages = []
+        castImages = film.credits.cast.compactMap { ($0.profilePath != nil) ? TMDBApi.getImageURL(size: .w342, imagePath: $0.profilePath!) : nil }
         castCollectionView.delegate = self
         castCollectionView.dataSource = self
         castCollectionView.isHidden = castMembersWithImage.isEmpty
  
         // If there are no cast members with images. Show the cast members as a list in a UILabel
-        if castMembersWithImage.isEmpty {
+        if castImages.isEmpty {
             castLabel.font = UIFont.init(name: "HelveticaNeue", size: 14.0)
             castLabel.numberOfLines = 5
             castLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -404,13 +421,13 @@ class FilmDetailViewController: UIViewController {
         }
         
         // Crew
-        crewImages = []
+        crewImages = film.credits.crew.compactMap { ($0.profilePath != nil) ? TMDBApi.getImageURL(size: .w342, imagePath: $0.profilePath!) : nil }
         crewCollectionView.delegate = self
         crewCollectionView.dataSource = self
         crewCollectionView.isHidden = crewMembersWithImage.isEmpty
         
         // If there are no crew members with images. Show the crew members as a list in a UILabel
-        if crewMembersWithImage.isEmpty {
+        if crewImages.isEmpty {
             crewLabel.font = UIFont.init(name: "HelveticaNeue", size: 14.0)
             crewLabel.numberOfLines = 5
             crewLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -428,52 +445,6 @@ class FilmDetailViewController: UIViewController {
             crewLabel.text = text
             crewCollectionView.removeFromSuperview()
         }
-        
-        let castMemberImagePromises = castMembersWithImage.map { (castMember) -> Promise<UIImage> in
-            let url = TMDBApi.getPosterURL(size: .w342, imagePath: castMember.profilePath!)
-            return Downloader.shared.loadImage(url: url)
-        }
-        
-        // Load cast images
-        when(fulfilled: castMemberImagePromises)
-        .done { (images) in
-            self.castImages = images
-            self.castCollectionView.reloadData()
-            if self.castCollectionView.numberOfSections > 0 && self.castCollectionView.numberOfItems(inSection: 0) > 0{
-                self.castCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
-            }
-        }
-        .catch({ (error) in
-            print(error.localizedDescription)
-            self.castImages = []
-            self.castCollectionView.reloadData()
-            if self.castCollectionView.numberOfSections > 0 && self.castCollectionView.numberOfItems(inSection: 0) > 0{
-                self.castCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
-            }
-        })
-        
-        let crewMemberImagePromises = crewMembersWithImage.map { (crewMember) -> Promise<UIImage> in
-            let url = TMDBApi.getPosterURL(size: .w342, imagePath: crewMember.profilePath!)
-            return Downloader.shared.loadImage(url: url)
-        }
-        
-        // Load crew images
-        when(fulfilled: crewMemberImagePromises)
-        .done { (images) in
-            self.crewImages = images
-            self.crewCollectionView.reloadData()
-            if self.crewCollectionView.numberOfSections > 0 && self.crewCollectionView.numberOfItems(inSection: 0) > 0{
-                self.crewCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
-            }
-        }
-        .catch({ (error) in
-            print(error.localizedDescription)
-            self.crewImages = []
-            self.crewCollectionView.reloadData()
-            if self.crewCollectionView.numberOfSections > 0 && self.crewCollectionView.numberOfItems(inSection: 0) > 0{
-                self.crewCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .left, animated: false)
-            }
-        })
         
         // Review
         setReviewText(reviewText: film.review ?? "")
@@ -512,14 +483,12 @@ class FilmDetailViewController: UIViewController {
     
     @objc func imageTapped(_ sender: UITapGestureRecognizer){
 
-        guard let filmImages = filmImages, !filmImages.isEmpty else{
-            loadFilmImages()
-            .done { (filmImages) in
-                self.filmImages = filmImages
-                self.showFilmImages()
-            }
-            .catch { (error) in
-                print(error.localizedDescription)
+        guard filmImages != nil else {
+            loadFilmImages { filmImages in
+                DispatchQueue.main.async {
+                    self.filmImages = filmImages
+                    self.showFilmImages()
+                }
             }
             return
         }
@@ -528,34 +497,26 @@ class FilmDetailViewController: UIViewController {
         self.showFilmImages()
     }
     
-    func loadFilmImages() -> Promise<FilmImages>{
-        return Promise { result in
-            guard let movieId = self.film?.id else{
-                result.reject(FilmDetailViewControllerError.movieIsNil)
-                return
-            }
-            
-            let loadingIndicator = LoadingIndicatorViewController(title: "Loading images", message: "", complete: nil)
-            
-            // Images have not been loaded yet
-            self.tabBarController?.present(loadingIndicator, animated: true)
-            attempt{
-                self.api.loadImages(movieId, size: .w500) {
-                    loadingIndicator.setProgress($0)
-                    loadingIndicator.message = "\(Int($0 * 100)) %"
-                }
-            }
-            .done { images in
-                self.filmImages = images
-                result.fulfill(images)
-            }
-            .catch { error in
-                print(error.localizedDescription)
-                result.reject(error)
-            }
-
+    func loadFilmImages(size: TMDBApi.PosterSize = .original, completion: @escaping (FilmImages?) -> Void) {
+        guard let filmId = film?.id else {
+            completion(nil)
+            return
         }
-
+        api.loadFilmImages(filmId, size: size) { result in
+            DispatchQueue.main.async {
+                var images = FilmImages()
+                switch result {
+                case .success(let imagesResponse):
+                    let posterImageURLs = imagesResponse.posters.map { TMDBApi.getImageURL(size: size, imagePath: $0.filePath) }
+                    let backdropImageURLs = imagesResponse.backdrops.map { TMDBApi.getImageURL(size: size, imagePath: $0.filePath) }
+                    images.posters = posterImageURLs
+                    images.backdrops = backdropImageURLs
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+                completion(images)
+            }
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -579,24 +540,30 @@ class FilmDetailViewController: UIViewController {
             case Segue.showReviewSegue.rawValue:
                 let vc = segue.destination as! ReviewViewController
                 vc.film = film
-                vc.backgroundImage = bigPosterImage
                 
             case Segue.showFilmographySegue.rawValue:
-                if let personCredits = sender as? PersonCredits {
+                if let data = sender as? (name: String, profilePath: String, credits: Credits) {
                     let vc = segue.destination as! FilmographyCollectionViewController
-                    vc.personCredits = personCredits
+                    vc.personName = data.name
+                    vc.profilePath = data.profilePath
+                    vc.personCredits = data.credits
                 }
             
             case Segue.showBiographySegue.rawValue:
-                if let data = sender as? (personInfo: PersonDetailInformation, image: UIImage?){
+                if let data = sender as? (personInfo: PersonDetailInformation, imageURL: URL){
                     let vc = segue.destination as! BiographyViewController
                     vc.personDetailInformation = data.personInfo
-                    vc.personImage = data.image
+                    vc.personImageURL = data.imageURL
                 }
                 
             case Segue.calendarEventCreationSegue.rawValue:
                 if let vc = segue.destination as? CalendarEventCreationViewController {
                     vc.film = self.film
+                }
+                
+            case Segue.showImageCollectionSegue.rawValue:
+                if let vc = segue.destination as? ImageCollectionViewController, let imageUrls = sender as? [String:[URL]] {
+                    vc.imageUrls = imageUrls
                 }
                 
             default:
@@ -628,6 +595,12 @@ class FilmDetailViewController: UIViewController {
             
         case Segue.calendarEventCreationSegue.rawValue:
             return true
+            
+        case Segue.showImageCollectionSegue.rawValue:
+            if let imageUrls = sender as? [String:URL], !imageUrls.isEmpty {
+                return true
+            }
+            return false
 
         default:
             return false
@@ -639,16 +612,7 @@ class FilmDetailViewController: UIViewController {
             return
         }
         
-        if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
-            guard filmImages.count > 0 else{
-                return
-            }
-            vc.images = filmImages.toDictionary
-            vc.movieId = film?.id
-            vc.navigationItem.title = film?.title
-        
-            self.show(vc, sender: self)
-        }
+        self.performSegue(withIdentifier: Segue.showImageCollectionSegue.rawValue, sender: filmImages.toDictionary)
     }
 }
 
@@ -656,18 +620,19 @@ class FilmDetailViewController: UIViewController {
 extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         
+        guard let film = film else { return nil }
+        
         // Movie poster
         let posterPoint = self.imageView.convert(location, from: view)
         if imageView.bounds.contains(posterPoint){
-            if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
-                if let image = self.bigPosterImage {
-                    previewingContext.sourceRect = self.view.convert(imageView.frame, from: contentView)
-                
-                    vc.identifier = "Poster"
-                    vc.image = image
-                    vc.preferredContentSize = image.size
-                    return vc
-                }
+            if let posterPath = film.posterPath, let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
+                let imageUrl = TMDBApi.getImageURL(size: .w780, imagePath: posterPath)
+                previewingContext.sourceRect = self.view.convert(imageView.frame, from: contentView)
+                vc.identifier = "Poster"
+                print(imageUrl.absoluteString)
+                vc.imageUrl = imageUrl
+                vc.preferredContentSize = CGSize(width: 780, height: 1170)
+                return vc
             }
         }
         
@@ -676,14 +641,14 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
         if let castIndexPath = castCollectionView.indexPathForItem(at: castCollectionViewPoint){
             if let cell = castCollectionView.cellForItem(at: castIndexPath) as? CastCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
-        
-                    if let image = cell.imageView.image {
-                        let castMember = castMembersWithImage[castIndexPath.row]
+                    
+                    if let imageUrl = cell.imageUrl {
+                        let castMember = film.credits.cast.filter{$0.profilePath != nil}[castIndexPath.row]
                         self.selectedCastMember = castMember
                         
-                        vc.image = image
+                        vc.imageUrl = imageUrl
                         vc.identifier = "CastMember"
-                        vc.preferredContentSize = image.size
+                        vc.preferredContentSize = CGSize(width: 780, height: 1170)
                         let resizedImageRect = cell.imageView.contentClippingRect
                         let x = cell.frame.minX + ((cell.frame.size.width - resizedImageRect.size.width) / 2)
                         let y = cell.frame.minY
@@ -702,9 +667,10 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             if let cell = crewCollectionView.cellForItem(at: crewIndexPath) as? CrewCollectionViewCell{
                 if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
                     
-                    if let image = cell.imageView.image {
-                        vc.image = image
+                    if let imageUrl = cell.imageUrl {
+                        vc.imageUrl = imageUrl
                         vc.identifier = "CrewMember"
+                        vc.preferredContentSize = CGSize(width: 780, height: 1170)
                         let crewMember = crewMembersWithImage[crewIndexPath.row]
                         self.selectedCrewMember = crewMember
 
@@ -729,38 +695,23 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
             return
         }
         
-        let showImageCollectionVC: (_ images: [String: [UIImage]]) -> () = { images in
-            if let imageCollectionVC = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as? ImageCollectionViewController{
-                imageCollectionVC.images = images
-                self.show(imageCollectionVC, sender: self)
-            }
-        }
-        
         switch imagePreviewVC.identifier {
         case "Poster":
             
             guard film != nil else { return }
             
             if let filmImages = self.filmImages {
-                showImageCollectionVC(filmImages.toDictionary)
+                performSegue(withIdentifier: Segue.showImageCollectionSegue.rawValue, sender: filmImages.toDictionary)
             }
             else{
-                attempt{
-                    self.loadFilmImages()
-                }
-                .done { (images) in
-                    self.filmImages = images
-                    if images.isEmpty{
-                        return
-                    }
-                    else{
-                        showImageCollectionVC(images.toDictionary)
+                self.loadFilmImages { images in
+                    DispatchQueue.main.async { [weak self] in
+                        self?.filmImages = images
+                        if let images = images {
+                            self?.performSegue(withIdentifier: Segue.showImageCollectionSegue.rawValue, sender: images.toDictionary)
+                        }
                     }
                 }
-                .catch({ (error) in
-                    print(error.localizedDescription)
-                    return
-                })
             }
         
         case "CastMember":
@@ -768,26 +719,8 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
                 return
             }
             
-            let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(name) images", message: "", complete: nil)
-            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-            
-            attempt{
-                self.api.loadImages(personId: personId, progressHandler: { (progress) in
-                    loadingIndicator.setProgress(progress)
-                    loadingIndicator.message = "\(Int(100 * progress)) %"
-                })
-            }
-            .done { (images) in
-                showImageCollectionVC([name: images])
-            }
-            .catch { (error) in
-                print(error.localizedDescription)
-            }
-            .finally {
-                loadingIndicator.finish()
-                self.selectedCastMember = nil
-            }
-            
+            showPersonImages(personId: personId, personName: name)
+
         case "CrewMember":
             guard
                 let crewMember = selectedCrewMember,
@@ -796,23 +729,7 @@ extension FilmDetailViewController: UIViewControllerPreviewingDelegate{
                 return
             }
             
-            let loadingIndicator = LoadingIndicatorViewController(title: "Loading \(name) images", message: "", complete: nil)
-            loadingIndicator.progressView.isHidden = true
-            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-            
-            attempt{
-                self.api.loadImages(personId: personId)
-            }
-            .done { (images) in
-                showImageCollectionVC([name: images])
-            }
-            .catch { (error) in
-                print(error.localizedDescription)
-            }
-            .finally {
-                loadingIndicator.finish()
-                self.selectedCrewMember = nil
-            }
+            showPersonImages(personId: personId, personName: name)
         
         default:
             break
@@ -857,11 +774,7 @@ extension FilmDetailViewController: UICollectionViewDataSource{
             if indexPath.row < castMembersWithImage.count {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "castCollectionViewCell", for: indexPath) as! CastCollectionViewCell
                 let castMember = castMembersWithImage[indexPath.row]
-                var image: UIImage?
-                if indexPath.row < castImages.count{
-                    image = castImages[indexPath.row]
-                }
-                cell.configure(with: castMember, image: image)
+                cell.configure(with: castMember, imageUrl: castImages[indexPath.row])
                 return cell
             }
         
@@ -874,11 +787,7 @@ extension FilmDetailViewController: UICollectionViewDataSource{
             if indexPath.row < crewMembersWithImage.count {
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "crewCollectionViewCell", for: indexPath) as! CrewCollectionViewCell
                 let crewMember = crewMembersWithImage[indexPath.row]
-                var image: UIImage?
-                if indexPath.row < crewImages.count{
-                    image = crewImages[indexPath.row]
-                }
-                cell.configure(with: crewMember, image: image)
+                cell.configure(with: crewMember, imageUrl: crewImages[indexPath.row])
                 return cell
             }
             
@@ -886,6 +795,20 @@ extension FilmDetailViewController: UICollectionViewDataSource{
             return UICollectionViewCell()
         }
         return UICollectionViewCell()
+    }
+    
+    private func showPersonImages(personId: Int, personName: String) {
+        self.api.loadPersonImages(personId: personId, completion: { (result) in
+            DispatchQueue.main.async { [weak self] in
+                switch result {
+                case .success(let personImagesResponse):
+                    let personImageURLs = personImagesResponse.profiles.map { TMDBApi.getImageURL(size: .original, imagePath: $0.file_path) }
+                    self?.performSegue(withIdentifier: Segue.showImageCollectionSegue.rawValue, sender: [personName:personImageURLs])
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+        })
     }
 }
 
@@ -919,74 +842,41 @@ extension FilmDetailViewController: UICollectionViewDelegate{
         
         // Actions
         let showBiographyAction = UIAlertAction.init(title: "Biography", style: .default, handler: { (action) in
+        
+            self.api.loadPersonDetails(personID, completion: { (result) in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let personDetailInformation):
+                        let imageURL = TMDBApi.getImageURL(size: .w342, imagePath: personProfilePath)
+                        self.performSegue(withIdentifier: Segue.showBiographySegue.rawValue, sender: (personInfo: personDetailInformation, imageURL: imageURL))
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
+            })
+        })
+        
+        let showFilmographyAction = UIAlertAction.init(title: "Filmography", style: .default, handler: { (action) in
             
-            let loadingIndicator = LoadingIndicatorViewController(title: "Loading biography", message: personName, complete: nil)
-            var loaded = 0
-            let toLoad = 2
-            let itemLoaded: (() -> Void) = {
-                loaded += 1
-                let progress = Float(loaded) / Float(toLoad)
-                loadingIndicator.setProgress(progress)
-                if loaded == toLoad {
-                    loadingIndicator.finish()
+            self.api.loadCredits(forPersonWithID: personID) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let personCredits):
+                        self.performSegue(withIdentifier: Segue.showFilmographySegue.rawValue, sender: (personName, personProfilePath, personCredits))
+                    case .failure(let error):
+                        switch error {
+                        case TMDBApiError.requestLimitExceeded(let seconds):
+                            print("Request limit exceeded. Try again after \(seconds) seconds")
+                        default:
+                            print(error.localizedDescription)
+                        }
+                    }
                 }
             }
-            self.presentingViewController?.present(loadingIndicator, animated: true, completion: nil)
-            
-            firstly{
-                when(fulfilled:
-                    attempt{
-                        self.api.loadPersonDetails(personID)
-                    }.ensure { itemLoaded() },
-                    attempt{
-                        self.api.loadImage(withPath: personProfilePath, size: .w342)
-                    }.ensure { itemLoaded() }
-                )
-            }
-            .done{ personDetailInformation, image in
-                self.performSegue(withIdentifier: Segue.showBiographySegue.rawValue, sender: (personInfo: personDetailInformation, image: image))
-            }
-            .catch{ error in
-                print(error.localizedDescription)
-            }
-            .finally {
-                loadingIndicator.finish()
-            }
         })
         
-        let showFilmographyAction = UIAlertAction.init(title: "Filmography", style: .default, handler: { (action) in            
-            attempt{
-                self.api.loadCredits(forPersonWithID: personID)
-            }
-            .done({ (crew, cast) in
-                let credits = PersonCredits(name: personName, profilePath: personProfilePath, crewRoles: crew, castRoles: cast)
-                self.performSegue(withIdentifier: Segue.showFilmographySegue.rawValue, sender: credits)
-            })
-            .catch({ (error) in
-                print(error.localizedDescription)
-            })
-            
-        })
-        
-        let showImagesAction = UIAlertAction.init(title: "Show images", style: .default) { (action) in
-            
-            let loadingIndicator = LoadingIndicatorViewController.init(title: "Loading images", message: personName, complete: nil)
-            self.tabBarController?.present(loadingIndicator, animated: true, completion: nil)
-            
-            attempt {
-                self.api.loadImages(personId: personID, progressHandler: { (progress) in
-                    loadingIndicator.setProgress(progress)
-                })
-            }
-            .done({(images) in
-                guard images.count > 0 else { return }
-                let imageCollectionViewController = self.storyboard!.instantiateViewController(withIdentifier: "ImageCollectionViewController") as! ImageCollectionViewController
-                imageCollectionViewController.images = [personName : images]
-                self.show(imageCollectionViewController, sender: nil)
-            })
-            .catch({ (error) in
-                print(error.localizedDescription)
-            })
+        let showImagesAction = UIAlertAction.init(title: "Show images", style: .default) { [weak self] _ in
+            self?.showPersonImages(personId: personID, personName: personName)
         }
         
         let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)

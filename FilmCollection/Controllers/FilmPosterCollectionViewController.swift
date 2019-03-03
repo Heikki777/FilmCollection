@@ -19,8 +19,8 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         orderBarButton.title = String(filmCollection.order.symbol)
     }
     
-    @IBAction func unwindFromDetailToFilmPosterCollectionVC(_ segue: UIStoryboardSegue){
-        
+    @IBAction func handleRandomBarButtonPressed(_ sender: UIBarButtonItem) {
+        showRandomFilm()
     }
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -80,31 +80,34 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         let filmAddedToCollection = Notifications.FilmCollectionNotification.filmAddedToCollection.name
         let filmChanged = Notifications.FilmCollectionNotification.filmChanged.name
         let filmRemoved = Notifications.FilmCollectionNotification.filmRemoved.name
-        let progressChanged = Notifications.FilmCollectionNotification.loadingProgressChanged.name
         let filmDictionaryChanged = Notifications.FilmCollectionNotification.filmDictionaryChanged.name
         let collectionFiltered = Notifications.FilmCollectionNotification.collectionFiltered.name
-        
+        let sectionRemoved = Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name
+
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionLoaded(notification:)), name: collectionLoaded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleChangeInFilmData(notification:)), name: filmChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmRemoval(notification:)), name: filmRemoved, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleLoadingProgressChange(notification:)), name: progressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmDictionaryChange(notification:)), name: filmDictionaryChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSectionRemoval(notification:)), name: sectionRemoved, object: nil)
     }
     
     func setNavigationBarTitle(_ title: String){
         self.navigationItem.title = title
     }
     
+    @objc func handleSectionRemoval(notification: NSNotification){
+        if let sectionIndex = notification.object as? Int{
+            self.collectionView.deleteSections([sectionIndex])
+        }
+    }
+    
     @objc func handleFilmRemoval(notification: NSNotification){
         guard let (film, indexPath) = notification.object as? (Film, IndexPath) else {
             return
         }
-        let cell = collectionView?.cellForItem(at: indexPath) as! FilmPosterCollectionViewCell
-        if cell.filmId == film.id{
-            self.removeMovie(at: indexPath)
-        }
+        self.removeMovie(at: indexPath)
     }
     
     @objc func handleCollectionFiltered(notification: NSNotification){
@@ -129,16 +132,6 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         }
     }
     
-    @objc func handleLoadingProgressChange(notification: NSNotification){
-        guard let homeTabBarController = self.tabBarController as? HomeTabBarController else{
-            return
-        }
-        if let progress = notification.object as? Float{
-            let percentage: Int = Int(progress * 100)
-            homeTabBarController.showLoadingIndicator(withTitle: "Loading films", message: "\(percentage) %", progress: progress, complete: nil)
-        }
-    }
-    
     @objc func handleCollectionLoaded(notification: NSNotification){
         guard let collectionView = collectionView else{
             return
@@ -146,7 +139,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
         guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
             return
         }
-        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
+        guard let notifiedFilm = filmCollection.getFilm(withId: filmIdWithinNotification) else {
             return
         }
         
@@ -158,17 +151,8 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     
     func removeMovie(at indexPath: IndexPath){
         // Remove the corresponding UICollectionView cell
-        let sectionTitle = filmCollection.getSectionTitle(atIndex: indexPath.section)
-        
         DispatchQueue.main.async {
-            self.collectionView!.performBatchUpdates({
-                self.collectionView!.deleteItems(at: [indexPath])
-                
-                // If the section is empty now, remove that too
-                if self.filmCollection.filmsInSection(sectionTitle).isEmpty {
-                    self.collectionView!.deleteSections([indexPath.section])
-                }
-            })
+            self.collectionView!.deleteItems(at: [indexPath])
         }
     }
     
@@ -193,7 +177,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
                 return
             }
             
-            if let film = filmCollection.getMovie(at: indexPath){
+            if let film = filmCollection.getFilm(at: indexPath){
                 
                 if let identifier = segue.identifier{
                     if identifier == Segue.showFilmDetailSegue.rawValue{
@@ -239,14 +223,9 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! FilmPosterCollectionViewCell
         
-        // Reset
-        cell.filmId = nil
-        cell.posterImageView.image = nil
-        
         // Configure the cell
-        if let film = filmCollection.getMovie(at: indexPath){
-            cell.posterImageView.image = film.smallPosterImage
-            cell.filmId = film.id
+        if let film = filmCollection.getFilm(at: indexPath){
+            cell.configure(withFilm: film)
         }
     
         return cell
@@ -279,6 +258,17 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if event?.subtype == UIEvent.EventSubtype.motionShake{
             handleShakeGesture()
+        }
+    }
+    
+    func showRandomFilm(){
+        // Show a random movie
+        guard let movie = filmCollection.randomFilm() else{
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: movie){
+            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
         }
     }
 }
@@ -328,7 +318,7 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
             return nil
         }
         
-        guard let film = filmCollection.getMovie(at: indexPath) else {
+        guard let film = filmCollection.getFilm(at: indexPath) else {
             return nil
         }
         
@@ -363,13 +353,6 @@ extension FilmPosterCollectionViewController: UIViewControllerPreviewingDelegate
 // MARK: - Shakeable
 extension FilmPosterCollectionViewController: Shakeable {
     func handleShakeGesture(){
-        // Show a random movie
-        guard let movie = filmCollection.randomFilm() else{
-            return
-        }
-        if let indexPath = filmCollection.getIndexPath(for: movie){
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
-            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-        }
+        showRandomFilm()
     }
 }

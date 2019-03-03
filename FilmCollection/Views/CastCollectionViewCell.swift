@@ -7,12 +7,14 @@
 //
 
 import UIKit
-import PromiseKit
+import Nuke
 
 class CastCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var actorNameLabel: UILabel!
     @IBOutlet weak var characterNameLabel: UILabel!
+    
+    var imageUrl: URL?
     
     func reset(){
         actorNameLabel.text = ""
@@ -20,7 +22,7 @@ class CastCollectionViewCell: UICollectionViewCell {
         imageView.image = nil
     }
     
-    func configure(with castMember: CastMember, image: UIImage?){
+    func configure(with castMember: CastMember, imageUrl: URL?){
         // Reset
         reset()
         
@@ -31,6 +33,9 @@ class CastCollectionViewCell: UICollectionViewCell {
         characterNameLabel.text = castMember.character
         
         // Image
-        self.imageView.image = image
+        self.imageUrl = imageUrl
+        if let imageUrl = imageUrl {
+            Nuke.loadImage(with: imageUrl, into: imageView)
+        }
     }
 }

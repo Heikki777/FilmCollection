@@ -9,34 +9,34 @@
 import Foundation
 import UIKit
 
-class FilmImages{
-    var posters: [(data: ImageData, image: UIImage)]
-    var backdrops: [(data: ImageData, image: UIImage)]
-    
+struct FilmImages {
+    var posters: [URL]
+    var backdrops: [URL]
+
     let groupTitles: [String] = ["Posters", "Backdrops"]
-    
+
     var count: Int{
         return posters.count + backdrops.count
     }
-    
+
     var isEmpty: Bool{
         return self.count == 0
     }
-    
-    var all: [(data: ImageData, image: UIImage)]{
-        return groupTitles.flatMap({ (groupTitle) -> [(data: ImageData, image: UIImage)] in
+
+    var all: [URL] {
+        return groupTitles.flatMap({ (groupTitle) -> [URL] in
             self[groupTitle]
         })
     }
-    
-    var toDictionary: [String: [UIImage]]{
+
+    var toDictionary: [String: [URL]]{
         return [
-            "Posters": posters.map{ $0.image },
-            "Backdrops": backdrops.map{ $0.image},
+            "Posters": posters,
+            "Backdrops": backdrops
         ]
     }
-    
-    subscript(key: String) -> [(data: ImageData, image: UIImage)] {
+
+    subscript(key: String) -> [URL] {
         get {
             switch key.capitalized{
             case "Posters":
@@ -58,11 +58,9 @@ class FilmImages{
             }
         }
     }
-    
+
     init(){
         self.posters = []
         self.backdrops = []
     }
-    
-    
 }

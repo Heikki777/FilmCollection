@@ -7,11 +7,14 @@
 //
 
 import UIKit
+import Nuke
 
 class CrewCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var personNameLabel: UILabel!
     @IBOutlet weak var jobLabel: UILabel!
+    
+    var imageUrl: URL?
     
     func reset(){
         personNameLabel.text = ""
@@ -19,7 +22,7 @@ class CrewCollectionViewCell: UICollectionViewCell {
         imageView.image = nil
     }
     
-    func configure(with crewMember: CrewMember, image: UIImage?){
+    func configure(with crewMember: CrewMember, imageUrl: URL?){
         // Reset
         reset()
         
@@ -30,7 +33,10 @@ class CrewCollectionViewCell: UICollectionViewCell {
         jobLabel.text = crewMember.job
         
         // Image
-        self.imageView.image = image
+        self.imageUrl = imageUrl
+        if let imageUrl = imageUrl {
+            Nuke.loadImage(with: imageUrl, into: imageView)
+        }
 
     }
 }

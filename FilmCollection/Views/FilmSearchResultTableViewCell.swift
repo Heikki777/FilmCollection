@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import PromiseKit
+import Nuke
 
 class FilmSearchResultTableViewCell: UITableViewCell {
     
@@ -29,14 +29,8 @@ class FilmSearchResultTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setImageURL(url: URL){
-        firstly {
-            Downloader.shared.loadImage(url: url)
-        }.done { image in
-            self.posterImageView?.image = image
-        }.catch({ (error) in
-            print(error.localizedDescription)
-        })
+    func setImageURL(url: URL) {
+        Nuke.loadImage(with: url, options: ImageLoadingOptions(placeholder: nil, transition: .fadeIn(duration: 0.33), failureImage: nil, failureImageTransition: nil, contentModes: nil), into: posterImageView, progress: nil, completion: nil)
     }
     
     func clear(){

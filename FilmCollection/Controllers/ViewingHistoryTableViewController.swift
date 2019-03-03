@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import PromiseKit
 import CoreData
 
 class ViewingHistoryTableViewController: UITableViewController {

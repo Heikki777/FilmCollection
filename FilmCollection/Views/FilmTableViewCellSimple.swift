@@ -2,7 +2,7 @@
 //  FilmTableViewCellSimple.swift
 //  FilmCollection
 //
-//  Created by Sofia Digital on 27/06/2018.
+//  Created by Heikki Hämälistö on 27/06/2018.
 //  Copyright © 2018 Heikki Hämälistö. All rights reserved.
 //
 
@@ -12,7 +12,7 @@ class FilmTableViewCellSimple: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
     
-    var movie: Film?
+    var film: Film?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -38,9 +38,9 @@ class FilmTableViewCellSimple: UITableViewCell {
     }
     
     
-    func configure(withMovie movie: Film){
-        self.movie = movie
-        titleLabel.text = movie.titleYear
+    func configure(withMovie film: Film){
+        self.film = film
+        titleLabel.text = film.titleYear
     }
 
 }

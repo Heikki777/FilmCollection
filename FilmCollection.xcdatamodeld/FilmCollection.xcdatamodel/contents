@@ -11,7 +11,7 @@
         <relationship name="viewings" toMany="YES" deletionRule="No Action" destinationEntity="Viewing" inverseName="film" inverseEntity="Viewing" syncable="YES"/>
     </entity>
     <entity name="Settings" representedClassName=".Settings" syncable="YES">
-        <attribute name="filmCollectionLayout" optional="YES" attributeType="String" defaultValueString="Poster, title and overview" syncable="YES"/>
+        <attribute name="filmCollectionLayout" optional="YES" attributeType="String" defaultValueString="Title" syncable="YES"/>
     </entity>
     <entity name="Viewing" representedClassName=".Viewing" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>

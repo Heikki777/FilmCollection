@@ -8,20 +8,16 @@
 
 import Foundation
 
-class PersonCredits{
+class PersonCredits: Decodable {
     var name: String
     var profilePath: String?
-    var crewRoles: [CrewMember]
-    var castRoles: [CastMember]
+    var crew: [CrewMember]
+    var cast: [CastMember]
     
     init(name: String, profilePath: String?, crewRoles: [CrewMember], castRoles: [CastMember]) {
         self.name = name
         self.profilePath = profilePath
-        self.crewRoles = crewRoles
-        self.castRoles = castRoles
-    }
-    
-    convenience init() {
-        self.init(name: "", profilePath: nil, crewRoles: [], castRoles: [])
+        self.crew = crewRoles
+        self.cast = castRoles
     }
 }

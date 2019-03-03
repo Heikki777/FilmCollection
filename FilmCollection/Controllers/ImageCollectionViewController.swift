@@ -7,23 +7,24 @@
 //
 
 import UIKit
-import PromiseKit
 
 class ImageCollectionViewController: UICollectionViewController {
     
     private let reuseIdentifier = "imageCollectionViewCell"
     
     var movieId: Int?
-    var images: [String: [UIImage]] = [:]
-    var largeImages: [String: [UIImage]] = [:]
+    var sections: [String] = []
+    var imageUrls: [String: [URL]] = [:] {
+        didSet {
+            sections = Array(imageUrls.keys).sorted().reversed()
+            collectionView?.reloadData()
+        }
+    }
+    var largeImages: [String: [URL]] = [:]
 
     var sectionTitles: [String]{
-        return images.keys.map{ $0 }
+        return imageUrls.keys.map{ $0 }
     }
-    
-    lazy var api: TMDBApi = {
-        return TMDBApi.shared
-    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,27 +48,25 @@ class ImageCollectionViewController: UICollectionViewController {
     }
     
     func showImagePageController(startPageIdx: Int = 0){
-        var imageArray: [UIImage] = []
-        for arr in images.values{
+        var imageArray: [URL] = []
+        for arr in imageUrls.values{
             imageArray += arr
         }
-        instantiateImagePageViewController(images: imageArray, startPageIdx: startPageIdx)
+        performSegue(withIdentifier: Segue.showImagePageViewControllerSegue.rawValue, sender: (images: imageArray, startPageIdx: startPageIdx))
     }
     
-    func instantiateImagePageViewController(images: [UIImage], startPageIdx: Int = 0){
-        if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
-            if !images.isEmpty{
-                vc.images = images
-                vc.startPageIdx = startPageIdx
-                self.show(vc, sender: self)
-            }
+    // MARK: Navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let pageVC = segue.destination as? ImagePageViewController, let senderTuple = sender as? (images: [URL], startPageIdx: Int){
+            pageVC.images = senderTuple.images
+            pageVC.startPageIdx = senderTuple.startPageIdx
         }
     }
     
     // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return images.keys.count
+        return imageUrls.keys.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -92,24 +91,22 @@ class ImageCollectionViewController: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let sectionTitle = sectionTitles[section]
-        return images[sectionTitle]?.count ?? 0
+        return imageUrls[sectionTitle]?.count ?? 0
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ImageCollectionViewCell
         let sectionTitle = sectionTitles[indexPath.section]
-        cell.configure(image: images[sectionTitle]?[indexPath.row])
+        cell.configure(imageUrl: imageUrls[sectionTitle]?[indexPath.row])
         return cell
     }
     
-
-
     // MARK: UICollectionViewDelegate
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sectionTitle = sectionTitles[indexPath.section]
-        if let selectedImage = images[sectionTitle]?[indexPath.row]{
-            if let index = images.values.reduce([], +).index(of: selectedImage){
+        if let selectedImage = imageUrls[sectionTitle]?[indexPath.row]{
+            if let index = imageUrls.values.reduce([], +).index(of: selectedImage){
                 showImagePageController(startPageIdx: index)
             }
         }
@@ -162,7 +159,8 @@ extension ImageCollectionViewController: UIViewControllerPreviewingDelegate{
             return nil
         }
         
-        guard let image = cell.imageView.image else {
+        let section = sections[indexPath.section]
+        guard let imageUrl = imageUrls[section]?[indexPath.row] else {
             return nil
         }
         
@@ -170,8 +168,8 @@ extension ImageCollectionViewController: UIViewControllerPreviewingDelegate{
         if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePreviewController") as? ImagePreviewController{
             previewingContext.sourceRect = self.view.convert(cell.frame, from: self.collectionView)
             
-            vc.image = image
-            vc.preferredContentSize = image.size
+            vc.imageUrl = imageUrl
+            vc.preferredContentSize = self.view.frame.size
             return vc
         }
         
@@ -180,14 +178,14 @@ extension ImageCollectionViewController: UIViewControllerPreviewingDelegate{
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
         
-        guard !images.isEmpty else{
+        guard !imageUrls.isEmpty else{
             return
         }
         
         if let imagePreviewController = viewControllerToCommit as? ImagePreviewController{
             if let vc = self.storyboard!.instantiateViewController(withIdentifier: "ImagePageViewController") as? ImagePageViewController{
-                if let firstImage = imagePreviewController.image{
-                    vc.images = images.values.reduce([], +)
+                if let firstImage = imagePreviewController.imageUrl {
+                    vc.images = imageUrls.values.reduce([], +)
                     vc.startPageIdx = vc.images.index(of: firstImage) ?? 0
                     
                     if vc.images.count > 0{

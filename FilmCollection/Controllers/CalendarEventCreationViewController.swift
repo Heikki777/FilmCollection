@@ -16,6 +16,7 @@ class CalendarEventCreationViewController: UITableViewController {
     @IBOutlet weak var datePicker: UIDatePicker!
     @IBOutlet weak var titleLabel: UILabel!
     
+    
     var selectedAlertTimingOption: CalendarEventAlertOption = .none
     
     lazy var calendarManager: CalendarManager = {

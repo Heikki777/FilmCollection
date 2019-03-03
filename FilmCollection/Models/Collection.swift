@@ -35,7 +35,7 @@ class FilmCollection: NSObject {
     private var films: [Film] = []
     private var sections: [String] = []
     private var filteredSections: [String] = []
-    @objc dynamic private var filmDict: [String:[Film]] = [:]
+    private var filmDict: [String:[Film]] = [:]
     private var filteredFilmDict: [String: [Film]] = [:]
     private var filteringScope: String = ""
     private var filteringText: String = ""
@@ -47,6 +47,8 @@ class FilmCollection: NSObject {
             }
         }
     }
+    
+    weak var loadingIndicatorDataSource: LoadingProgressDataSource?
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
@@ -76,23 +78,81 @@ class FilmCollection: NSObject {
     
     // TMDB API
     let api: TMDBApi = TMDBApi.shared
+    let imdbApi: IMDbAPI = IMDbAPI.shared
     
-    private func createMovieDictionary(notifyObservers: Bool = true){
-        var tempFilms = films
-        let secondarySortingRule: SortingRule = (sortingRule == .title) ? .year : .title
-        FilmCollection.sort(movies: &tempFilms, sortingRule: secondarySortingRule, order: order)
+    private override init(){
+        super.init()
         
-        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
+        // Update IMDb ratings every 2 hours
+        imdbApi.setScheduledRatingsUpdate(withInterval: DispatchTimeInterval.seconds(60*60*2))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmReviewed(notification:)), name: Notifications.FilmCollectionNotification.filmReviewed.name, object: nil)
+
+        let queue = DispatchQueue(label: "loadCollection", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .workItem, target: nil)
+        let group = DispatchGroup()
+        
+        let collectionLoadingFinished = DispatchWorkItem {
+            DispatchQueue.main.async {
+                print("collectionLoadingFinished")
+                self.loadingIndicatorDataSource?.loadingFinished()
+                self.createMovieDictionary()
+            }
+        }
+        
+        let totalCount = appDelegate.filmEntities.count
+        
+        guard totalCount > 0 else {
+            group.notify(queue: queue, work: collectionLoadingFinished)
+            return
+        }
+        
+        var countDown = totalCount
+        appDelegate.filmEntities.forEach { filmEntity in
+            group.enter()
+            loadFilmFromTMDB(filmEntity) { [weak self] filmResult in
+                DispatchQueue.main.async {
+
+                    switch filmResult {
+                    case .success(let film):
+                        print("\(film.titleYear) loaded")
+                        self?.addFilm(film, resetDictionary: false)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                    
+                    group.leave()
+                    countDown -= 1
+                    
+                    let progress: Float = Float(totalCount - countDown) / Float(totalCount)
+                    self?.loadingIndicatorDataSource?.loadingProgressChanged(progress: progress)
+                    
+                    if countDown == 0 {
+                        group.notify(queue: queue, work: collectionLoadingFinished)
+                    }
+                }
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    private func createMovieDictionary(){
+        let secondarySortingRule: SortingRule = (sortingRule == .title) ? .year : .title
+        FilmCollection.sort(movies: &films, sortingRule: secondarySortingRule, order: order)
+        
         sections = []
         filteredSections = []
         filmDict = [:]
         filteredFilmDict = [:]
+        
         NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmDictionaryChanged.name, object: nil)
-        NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
 
-        for movie in tempFilms{
-            self.addMovieToDictionary(movie)
+        for film in films {
+            self.addMovieToDictionary(film)
         }
+        
     }
     
     private func addMovieToDictionary(_ film: Film){
@@ -100,20 +160,17 @@ class FilmCollection: NSObject {
         // Create a new section in the film dictionary
         if filmDict[sectionTitle] == nil{
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
-            
             sections.append(sectionTitle)
             filmDict[sectionTitle] = []
             sections.sort(by: { (a, b) -> Bool in
                 return (order == .ascending) ? a < b : a > b
             })
-            
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.newSectionAddedToDictionary.name, object: sections.index(of: sectionTitle)!)
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
         }
         
         if var sectionMovies = filmDict[sectionTitle], !sectionMovies.contains(film){
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
-            
             // Add movie to temp array
             sectionMovies.append(film)
             // Sort
@@ -125,75 +182,19 @@ class FilmCollection: NSObject {
             
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmAddedToCollection.name, object: film)
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
+        }
+    }
+    
+    private func loadFilmFromTMDB(_ filmEntity: FilmEntity, completion: @escaping (GenericResult<Film>) -> Void) {
 
-        }
-    }
-    
-    private override init(){
-        super.init()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(handleFilmReviewed(notification:)), name: Notifications.FilmCollectionNotification.filmReviewed.name, object: nil)
-        
-        var loaded: Int = 0
-        var failed: Int = 0
-        var numberOfFilmsHandled: Int {
-            return loaded + failed
-        }
-        
-        func updateLoadingProgress(){
-            let progress: Float = Float(numberOfFilmsHandled) / Float(appDelegate.filmEntities.count)
-            let progressNotificationName = Notifications.FilmCollectionNotification.loadingProgressChanged.name
-            NotificationCenter.default.post(name: progressNotificationName, object: progress)
-        }
-        
-        let filmLoadedSuccessfullyHandler: (Film) -> Void = { film in
-            // Load the small poster image for the film
-            // And then add the film to the collection.
-            
-            attempt {
-                film.loadSmallPosterImage()
+        self.api.loadFilm(Int(filmEntity.id), append: ["credits"]) { filmResult in
+            switch filmResult {
+            case .success(let film):
+                film.rating = Rating(rawValue: Int(filmEntity.rating)) ?? Rating.NotRated
+                completion(.success(film))
+            case .failure(let error):
+                completion(.failure(error))
             }
-            .done { (small) in
-                film.smallPosterImage = small
-            }
-            .catch { error in
-                print(error.localizedDescription)
-            }
-            .finally {
-                self.films.append(film)
-                self.addMovieToDictionary(film)
-                loaded += 1
-                updateLoadingProgress()
-            }
-        }
-        
-        let filmLoadingFailed: (Error) -> Void = { error in
-            print(error.localizedDescription)
-            failed += 1
-            updateLoadingProgress()
-        }
-        
-        appDelegate.filmEntities.compactMap { $0 }.forEach { filmEntity in
-            loadFilmFromTMDB(filmEntity, success: filmLoadedSuccessfullyHandler, failure: filmLoadingFailed)
-        }
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    private func loadFilmFromTMDB(_ filmEntity: FilmEntity, success: @escaping (_ film: Film) -> Void, failure: @escaping (_ error: Error) -> Void) {
-        attempt {
-            self.api.loadFilm(Int(filmEntity.id), append: ["credits"])
-        }
-        .done { film in
-            film.review = filmEntity.review
-            let ratingNumber = Int(filmEntity.rating)
-            film.rating = Rating.all[ratingNumber]
-            success(film)
-        }
-        .catch { error in
-            failure(error)
         }
     }
     
@@ -208,18 +209,32 @@ class FilmCollection: NSObject {
             appDelegate.saveContext()
         }
 
+        guard let indexPath = getIndexPath(for: film) else { return }
+        
         let sectionTitle = getSectionTitle(for: film)
         if let index = films.index(of: film){
             films.remove(at: index)
         }
-        if let index = filmDict[sectionTitle]?.index(of: film){
-            filmDict[sectionTitle]?.remove(at: index)
-            if filmDict[sectionTitle]?.count == 0 {
+        if let row = filmDict[sectionTitle]?.index(of: film),
+            let section = sections.firstIndex(of: sectionTitle){
+            
+            // Remove film
+            // Remove section
+            if filmDict[sectionTitle]?.count == 1 {
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
                 filmDict.removeValue(forKey: sectionTitle)
-                if let sectionIndex = sections.firstIndex(of: sectionTitle){
-                    sections.remove(at: sectionIndex)
-                }
+                sections.remove(at: section)
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
             }
+            else {
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
+                filmDict[sectionTitle]?.remove(at: row)
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmRemoved.name, object: (film, indexPath))
+                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
+            }
+            
+
             if filterOn {
                 filterCollection(scope: filteringScope, searchText: filteringText)
             }
@@ -231,35 +246,24 @@ class FilmCollection: NSObject {
         filmEntity.id = Int32(id)
         appDelegate.filmCollectionEntity.addToFilms(filmEntity)
         appDelegate.saveContext()
-        TMDBApi.shared.loadFilm(id, append: ["credits"])
-        .done { [weak self] (film) in
-            self?.addFilm(film)
-        }
-        .catch { (error) in
-            print(error.localizedDescription)
+        TMDBApi.shared.loadFilm(id, append: ["credits"]) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let film):
+                    self?.addFilm(film, resetDictionary: true)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
         }
     }
     
-    func addFilm(_ film: Film){
+    func addFilm(_ film: Film, resetDictionary: Bool){
         guard !films.contains(film) else { return }
-        guard film.smallPosterImage == nil else {
-            films.append(film)
-            createMovieDictionary(notifyObservers: true)
-            return
-        }
-
-        attempt {
-            film.loadSmallPosterImage()
-        }
-        .done { (smallPosterImage) in
-            film.smallPosterImage = smallPosterImage
-        }
-        .catch { (error) in
-            print(error.localizedDescription)
-        }
-        .finally { [weak self] in
-            self?.films.append(film)
-            self?.createMovieDictionary(notifyObservers: true)
+        
+        self.films.append(film)
+        if resetDictionary {
+            self.createMovieDictionary()
         }
     }
     
@@ -283,11 +287,11 @@ class FilmCollection: NSObject {
         return result
     }
     
-    func getMovie(withId id: Int) -> Film?{
+    func getFilm(withId id: Int) -> Film?{
         return films.filter { $0.id == id }.first
     }
     
-    func getMovie(at indexPath: IndexPath) -> Film?{
+    func getFilm(at indexPath: IndexPath) -> Film?{
         let sectionTitle = getSectionTitle(atIndex: indexPath.section)
         if filterOn{
             if indexPath.row < filteredFilmDict[sectionTitle]?.count ?? 0{
@@ -437,23 +441,29 @@ extension FilmCollection: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if let movie = self.getMovie(at: indexPath){
-            
-            switch settings.filmCollectionLayout {
+        if let film = self.getFilm(at: indexPath){
+
+            guard let layoutOption = FilmCollectionLayoutOption(rawValue: settings.filmCollectionLayout) else {
+                print("Error! Invalid layout option")
+                return UITableViewCell()
+            }
+
+            switch layoutOption {
                 
-            case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
+            case .posterAndBriefInfo:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "filmCellExpanded") as! FilmTableViewCellExpanded
-                cell.configure(withMovie: movie)
+                cell.configure(withFilm: film)
                 cell.selectionStyle = .none
                 return cell
                 
-            case FilmCollectionLayoutOption.title.rawValue:
+            case .title:
                 let cell = tableView.dequeueReusableCell(withIdentifier: "filmCellSimple") as! FilmTableViewCellSimple
-                cell.configure(withMovie: movie)
+                cell.configure(withMovie: film)
                 cell.selectionStyle = .none
                 return cell
                 
-            default:
+            case .poster:
+                // Handled elsewhere
                 break
             }
         }
@@ -468,23 +478,8 @@ extension FilmCollection: UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete{
-            if let film = self.getMovie(at: indexPath), let filmEntity = film.entity {
-
-                let sectionTitle = getSectionTitle(for: film)
-
-                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.beginUpdates.name, object: nil)
+            if let film = self.getFilm(at: indexPath){
                 removeFilm(film)
-
-                if filmDict[sectionTitle] == nil || filmDict[sectionTitle]?.count == 0 {
-                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name, object: indexPath.section)
-                }
-                else {
-                    NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmRemoved.name, object: (film, indexPath))
-                }
-                
-                NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.endUpdates.name, object: nil)
-                appDelegate.filmCollectionEntity.removeFromFilms(filmEntity)
-                appDelegate.saveContext()
             }
         }
     }
@@ -501,4 +496,3 @@ extension FilmCollection: UITableViewDataSource {
         return nil
     }
 }
-

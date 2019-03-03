@@ -22,13 +22,15 @@ class FilmCollectionTableViewController: UIViewController {
         filmCollection.order.toggle()
         orderBarButton.title = String(filmCollection.order.symbol)
     }
-
+    
+    @IBAction func handleRandomBarButtonPressed(_ sender: UIBarButtonItem) {
+        showRandomFilm()
+    }
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let filmCollection = FilmCollection.shared
     let scopeButtonTitles: [String] = ["All"] + Genre.all.map {$0.rawValue}
     let searchController = UISearchController(searchResultsController: nil)
-    
-    var selectedLayoutOption: FilmCollectionLayoutOption = .posterTitleOverview
     
     var selectedFilteringScope: String{
         let index = searchController.searchBar.selectedScopeButtonIndex
@@ -61,8 +63,7 @@ class FilmCollectionTableViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        createObservers()
+        print("FilmCollectionTableViewController viewDidLoad")
         
         // Check if 3D Touch is available
         if traitCollection.forceTouchCapability == .available{
@@ -73,7 +74,7 @@ class FilmCollectionTableViewController: UIViewController {
 
         tableView.delegate = self
         tableView.dataSource = filmCollection
-        
+
         // Setup the search controller
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
@@ -85,19 +86,19 @@ class FilmCollectionTableViewController: UIViewController {
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = true
         definesPresentationContext = true
-
-        if let layoutOption = FilmCollectionLayoutOption(rawValue: appDelegate.settings.filmCollectionLayout){
-            self.selectedLayoutOption = layoutOption
-        }
         
+        createObservers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.setNavigationBarTitle("\(self.filmCollection.size) films")
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)        
+        super.viewDidAppear(animated)
+        self.tableView.reloadData()
+
     }
     
     func createObservers(){
@@ -105,7 +106,6 @@ class FilmCollectionTableViewController: UIViewController {
         let filmAddedToCollection = Notifications.FilmCollectionNotification.filmAddedToCollection.name
         let filmChanged = Notifications.FilmCollectionNotification.filmChanged.name
         let filmRemoved = Notifications.FilmCollectionNotification.filmRemoved.name
-        let progressChanged = Notifications.FilmCollectionNotification.loadingProgressChanged.name
         let filmDictionaryChanged = Notifications.FilmCollectionNotification.filmDictionaryChanged.name
         let newSectionAdded = Notifications.FilmCollectionNotification.newSectionAddedToDictionary.name
         let sectionRemoved = Notifications.FilmCollectionNotification.sectionRemovedFromDictionary.name
@@ -117,15 +117,12 @@ class FilmCollectionTableViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionAddition(notification:)), name: filmAddedToCollection, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleChangeInFilmData(notification:)), name: filmChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmRemoval(notification:)), name: filmRemoved, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleLoadingProgressChange(notification:)), name: progressChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleFilmDictionaryChange(notification:)), name: filmDictionaryChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleSectionAddition(notification:)), name: newSectionAdded, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleSectionRemoval(notification:)), name: sectionRemoved, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(beginUpdates(notification:)), name: beginUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(endUpdates(notification:)), name: endUpdates, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCollectionFiltered(notification:)), name: collectionFiltered, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleShowDetailOfNotifiedFilm(notification:)), name: NSNotification.Name.init("showDetailOfNotifiedFilm"), object: nil)
-
     }
     
     @objc func handleCollectionFiltered(notification: NSNotification){
@@ -142,21 +139,19 @@ class FilmCollectionTableViewController: UIViewController {
     
     @objc func handleSectionAddition(notification: NSNotification){
         if let sectionIndex = notification.object as? Int {
-            self.tableView.insertSections([sectionIndex], with: .automatic)
+            self.tableView.insertSections([sectionIndex], with: .fade)
         }
     }
     
     @objc func handleSectionRemoval(notification: NSNotification){
         if let sectionIndex = notification.object as? Int{
-            self.tableView.deleteSections([sectionIndex], with: .automatic)
+            self.tableView.deleteSections([sectionIndex], with: .fade)
             self.setNavigationBarTitle("\(self.filmCollection.size) films")
         }
     }
     
     @objc func handleFilmDictionaryChange(notification: NSNotification){
-        let sectionIndices: IndexSet = IndexSet(0..<tableView.numberOfSections)
-        tableView.deleteSections(sectionIndices, with: .automatic)
-        tableView.reloadData()
+        self.tableView.reloadData()
     }
     
     @objc func handleFilmRemoval(notification: NSNotification){
@@ -178,7 +173,7 @@ class FilmCollectionTableViewController: UIViewController {
         guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
             return
         }
-        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
+        guard let notifiedFilm = filmCollection.getFilm(withId: filmIdWithinNotification) else {
             return
         }
         if let indexPath = filmCollection.getIndexPath(for: notifiedFilm){
@@ -188,17 +183,7 @@ class FilmCollectionTableViewController: UIViewController {
     }
     
     @objc func handleCollectionLoaded(notification: NSNotification){
-        
-        guard let filmIdWithinNotification = appDelegate.filmIdWithinNotification else {
-            return
-        }
-        guard let notifiedFilm = filmCollection.getMovie(withId: filmIdWithinNotification) else {
-            return
-        }
-        if let indexPath = filmCollection.getIndexPath(for: notifiedFilm){
-            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
-            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-        }
+        self.tabBarController?.tabBar.isUserInteractionEnabled = true
     }
     
     @objc func handleCollectionAddition(notification: NSNotification){
@@ -218,16 +203,6 @@ class FilmCollectionTableViewController: UIViewController {
         }
     }
     
-    @objc func handleLoadingProgressChange(notification: NSNotification){
-        guard let homeTabBarController = self.tabBarController as? HomeTabBarController else{
-            return
-        }
-        if let progress = notification.object as? Float{
-            let percentage: Int = Int(progress * 100)
-            homeTabBarController.showLoadingIndicator(withTitle: "Loading films", message: "\(percentage) %", progress: progress, complete: nil)
-        }
-    }
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         guard let identifier = segue.identifier else { return }
@@ -236,7 +211,7 @@ class FilmCollectionTableViewController: UIViewController {
         if identifier == Segue.showFilmDetailSegue.rawValue{
             guard let indexPath = tableView.indexPathForSelectedRow else { return }
             
-            if let film = filmCollection.getMovie(at: indexPath){
+            if let film = filmCollection.getFilm(at: indexPath){
                 
                 if let identifier = segue.identifier{
                     if identifier == Segue.showFilmDetailSegue.rawValue{
@@ -275,6 +250,17 @@ class FilmCollectionTableViewController: UIViewController {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     
+    func showRandomFilm(){
+        // Show a random movie
+        guard let film = filmCollection.randomFilm() else{
+            return
+        }
+        if let indexPath = filmCollection.getIndexPath(for: film){
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
+        }
+    }
+    
 }
 
 extension FilmCollectionTableViewController: UITableViewDelegate{
@@ -282,7 +268,7 @@ extension FilmCollectionTableViewController: UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch settings.filmCollectionLayout{
-        case FilmCollectionLayoutOption.posterTitleOverview.rawValue:
+        case FilmCollectionLayoutOption.posterAndBriefInfo.rawValue:
             return 138
         case FilmCollectionLayoutOption.title.rawValue:
             return 45
@@ -353,12 +339,13 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
         let point = tableView.convert(location, from: self.view)
         guard let indexPath = tableView.indexPathForRow(at: point) else { return nil }
         guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
-        guard let film = filmCollection.getMovie(at: indexPath) else { return nil }
+        guard let film = filmCollection.getFilm(at: indexPath) else { return nil }
         guard let filmPreviewVC = storyboard?.instantiateViewController(withIdentifier: "FilmPreviewViewController") as? FilmPreviewViewController else { return nil }
         
         previewingContext.sourceRect = self.view.convert(cell.frame, from: self.tableView)
         filmPreviewVC.film = film
-        
+        filmPreviewVC.preferredContentSize = CGSize(width: 780, height: 1170)
+
         return filmPreviewVC
     }
     
@@ -377,14 +364,7 @@ extension FilmCollectionTableViewController: UIViewControllerPreviewingDelegate{
 // MARK: - Shakeable
 extension FilmCollectionTableViewController: Shakeable {
     func handleShakeGesture(){
-        // Show a random movie
-        guard let film = filmCollection.randomFilm() else{
-            return
-        }
-        if let indexPath = filmCollection.getIndexPath(for: film){
-            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
-            performSegue(withIdentifier: Segue.showFilmDetailSegue.rawValue, sender: nil)
-        }
+        showRandomFilm()
     }
     
 }
