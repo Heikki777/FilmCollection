@@ -72,6 +72,7 @@ class FilmPosterCollectionViewController: UICollectionViewController {
     }
     
     deinit {
+        print("deinit FilmPosterCollectionViewController")
         NotificationCenter.default.removeObserver(self)
     }
     

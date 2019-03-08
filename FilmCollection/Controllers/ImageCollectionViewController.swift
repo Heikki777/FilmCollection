@@ -26,6 +26,11 @@ class ImageCollectionViewController: UICollectionViewController {
         return imageUrls.keys.map{ $0 }
     }
     
+    deinit {
+        print("deinit ImageCollectionViewController")
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

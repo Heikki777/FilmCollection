@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Nuke
 
 class ReviewViewController: UIViewController {
 
@@ -18,9 +19,12 @@ class ReviewViewController: UIViewController {
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var saveBarButton: UIBarButtonItem!
     
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    var film: Film?
-    var backgroundImage: UIImage?
+    weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
+    weak var film: Film?
+    
+    deinit {
+        print("deinit ReviewViewController")
+    }
     
     @IBAction func save(_ sender: Any) {
         
@@ -33,7 +37,7 @@ class ReviewViewController: UIViewController {
             filmEntity.rating = Int16(ratingControl.rating.rawValue)
             film.review = textView.text
             film.rating = ratingControl.rating
-            appDelegate.saveContext()
+            appDelegate?.saveContext()
             NotificationCenter.default.post(name: Notifications.FilmCollectionNotification.filmReviewed.name, object: film)
             self.showAlert(title: "Saved", message: "The review has been saved")
         }
@@ -47,12 +51,14 @@ class ReviewViewController: UIViewController {
         }
         
         titleLabel.text = "Review the movie: \(film.titleYear)"
-        ratingControl.delegate = self
+        ratingControl.ratingControlDelegate = self
         ratingControl.rating = film.rating
         textView.layer.cornerRadius = 5
         textView.text = film.review
         
-        backgroundImageView.image = backgroundImage
+        if let posterPath = film.posterPath {
+            Nuke.loadImage(with: TMDBApi.getImageURL(size: .w780, imagePath: posterPath), into: backgroundImageView)
+        }
     }
 
     override func didReceiveMemoryWarning() {

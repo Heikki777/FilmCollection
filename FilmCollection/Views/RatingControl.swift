@@ -15,7 +15,7 @@ class RatingControl: UIControl {
     
     var rating: Rating = .NotRated{
         didSet{
-            if let delegate = delegate{
+            if let delegate = ratingControlDelegate{
                 delegate.ratingChanged(newRating: rating)
             }
             setNeedsDisplay()
@@ -42,7 +42,7 @@ class RatingControl: UIControl {
     
     @IBInspectable var alignment: UIControl.ContentHorizontalAlignment = .center
     
-    var delegate: RatingControlDelegate?
+    weak var ratingControlDelegate: RatingControlDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)

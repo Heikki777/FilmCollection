@@ -31,6 +31,10 @@ class FilmographyCollectionViewController: UIViewController {
         return TMDBApi.shared
     }()
     
+    deinit {
+        print("deinit FilmographyCollectionViewController")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
